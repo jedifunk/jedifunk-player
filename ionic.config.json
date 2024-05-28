@@ -1,0 +1,7 @@
+{
+  "name": "jedifunk",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
