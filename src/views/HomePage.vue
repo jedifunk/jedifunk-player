@@ -5,24 +5,15 @@
         <ion-title>All Shows</ion-title>
       </ion-toolbar>
     </ion-header>
-
     <ion-content :fullscreen="true">
       <div v-if="isLoading">Loading...</div>
       <ion-list v-else>
-        <!-- {{ years.data[0].show_count }} -->
-        <router-link v-for="year in years.data.slice().reverse()"
-        :key="year.date"
-        :to="{ name: 'Year', params: {yearParam: year.date}}"
-        ref="yearsRefs"
-        >
-        <ion-item :button="true">
-        <!-- <ion-item v-for="year in years.data.slice().reverse()" :key="year.date" :to="{name: 'Year', params: {year: year.date}}" :button="true"> -->
+        <ion-item v-for="year in years.data.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.date)">
           <ion-label>
             <h1>{{  year.date }}</h1>
             <p>{{ year.show_count }} Shows</p>
           </ion-label>
         </ion-item>
-        </router-link>
       </ion-list>
     </ion-content>
   </ion-page>
@@ -37,26 +28,32 @@ import {
   IonToolbar,
   IonList,
   IonItem,
-  IonLabel,
-  onIonViewWillEnter,
-  onIonViewWillLeave,
+  IonLabel
 } from '@ionic/vue';
 
-import { ref } from 'vue'
+//import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
 import { getYears } from '@/utils/fetch'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
-const years = ref({})
-const isLoading = ref(true);
-const yearsRefs = ref([])
+const store = useStore()
+const isLoading = ref(true)
+const years = ref([])
+const router = useRouter()
 
-onIonViewWillEnter(async () => {
-  console.log('home ion initialized')
-  years.value = await getYears()
+onMounted(async () => {
+  isLoading.value = true
+  await getYears()
+  years.value = store.getters.years
+  console.log('years:', years.value)  
   isLoading.value = false
 })
-onIonViewWillLeave(() => {
-  console.log('home ion destroyed');
-});
+
+function selectedYear(year: string) {
+  store.commit('setYearParam', year)
+  router.push({ name: 'Year', params: { yearParam: year } })
+}
 </script>
 <style>
 a {

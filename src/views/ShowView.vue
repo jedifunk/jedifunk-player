@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ props.dateParam }}</ion-title>
+        <ion-title>{{ store.state.dateParam }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -14,10 +14,10 @@
       <div v-else>
         <ion-card>
           <ion-card-content class="show-details">
-            <h1>{{ single.data.venue.name }}</h1>
+            <h1>{{ singleShow.data.venue.name }}</h1>
             <p>
-              {{ single.data.venue.location }}
-              <span>{{ formatDuration(single.data.duration) }}</span>
+              {{ singleShow.data.venue.location }}
+              <span>{{ formatDuration(singleShow.data.duration) }}</span>
             </p>
           </ion-card-content>
         </ion-card>
@@ -70,46 +70,44 @@ import {
   IonLabel,
   IonButtons,
   IonBackButton,
-  onIonViewWillEnter,
-  onIonViewWillLeave,
+  onIonViewWillEnter
 } from '@ionic/vue'
 
 import { ref, defineProps, computed } from 'vue'
 import { heart, listOutline } from 'ionicons/icons'
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
+import { useStore } from 'vuex'
 
-const props = defineProps<{
-  dateParam: string, // Expecting a string for the year
-}>();
+// const props = defineProps<{
+//   dateParam: string, // Expecting a string for the year
+// }>();
 
-const single = ref([])
+const store = useStore()
+const singleShow = ref([])
 const isLoading = ref(true)
-console.log('show params', props)
 
 onIonViewWillEnter(async () => {
-  console.log('show ion initialized', props.dateParam)
-  single.value = await getSingleShow(props.dateParam)
+  console.log('show ion initialized', store.state.dateParam)
+  isLoading.value = true
+  await getSingleShow(store.state.dateParam)
+  singleShow.value = store.getters.singleShow 
   isLoading.value = false
 
-  single.value.data.tracks.forEach((track) => {
+  singleShow.value.data.tracks.forEach((track) => {
     track.formattedDuration = formatDuration(track.duration); // Manually computing formatted duration for each track
   })
 })
 
 const groupedTracks = computed(() => {
   const groups = {};
-  single.value.data.tracks.forEach(track => {
+  singleShow.value.data.tracks.forEach(track => {
     if (!groups[track.set_name]) {
       groups[track.set_name] = [];
     }
     groups[track.set_name].push(track);
   });
   return groups;
-});
-
-onIonViewWillLeave(() => {
-  console.log('show ion destroyed')
 })
 </script>
 <style>
