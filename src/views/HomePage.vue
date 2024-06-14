@@ -31,7 +31,6 @@ import {
   IonLabel
 } from '@ionic/vue';
 
-//import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { getYears } from '@/utils/fetch'
 import { useStore } from 'vuex'
@@ -46,7 +45,6 @@ onMounted(async () => {
   isLoading.value = true
   await getYears()
   years.value = store.getters.years
-  console.log('years:', years.value)  
   isLoading.value = false
 })
 

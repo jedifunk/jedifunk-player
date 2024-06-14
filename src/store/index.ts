@@ -5,6 +5,8 @@ export default createStore({
     years: {},
     shows: {},
     singleShow: {},
+    showTracks: [],
+    startingTrack: {},
     yearParam: null,
     dateParam: null
   },
@@ -17,6 +19,12 @@ export default createStore({
     },
     setSingleShow(state, value) {
       state.singleShow = value
+    },
+    setShowTracks(state, value) {
+      state.showTracks = value
+    },
+    setStartingTrack(state, value) {
+      state.startingTrack = value
     },
     setYearParam(state, value) {
       state.yearParam = value
@@ -35,6 +43,12 @@ export default createStore({
     setSingleShow({ commit }, value) {
       commit('setSingleShow', value)
     },
+    setShowTracks({ commit }, value) {
+      commit('setShowTracks', value)
+    },
+    setStartingTrack({ commit }, value) {
+      commit('setStartingTrack', value)
+    },
     setYearParam({ commit }, value) {
       commit('setYearParam', value)
     },
@@ -46,6 +60,8 @@ export default createStore({
     years: state => state.years,
     shows: state => state.shows,
     singleShow: state => state.singleShow,
+    showTracks: state => state.showTracks,
+    startingTrack: state => state.startingTrack,
     yearParam: state => state.yearParam,
     dateParam: state => state.dateParam
   }

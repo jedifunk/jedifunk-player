@@ -29,14 +29,12 @@ const routes: Array<RouteRecordRaw> = [
         path: 'home/:yearParam',
         name: 'Year',
         component: () => import('@/views/YearView.vue'),
-        props: true,
       },
       {
         path: 'home/:yearParam/:dateParam',
         name: 'Date',
         component: () => import('@/views/ShowView.vue'),
-        props: true,
-      },
+      }
     ],
   },
 ]

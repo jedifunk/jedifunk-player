@@ -41,22 +41,23 @@ import {
 import { ref } from 'vue'
 import { getShows } from '@/utils/fetch'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const store = useStore()
 const isLoading = ref(true)
 const shows = ref([])
+const route = useRoute()
 const router = useRouter()
 
 onIonViewWillEnter(async () => {
-  console.log('year ion initialized')
   isLoading.value = true
-  await getShows(store.state.yearParam)
+  await getShows(route.params.yearParam)
   shows.value = store.getters.shows
   isLoading.value = false
 })
 
-function selectedDate(date: string) {
+// click event for show selection
+const selectedDate = (date: string) => {
   store.commit('setDateParam', date)
   router.push({ name: 'Date', params: { dateParam: date } })
 }

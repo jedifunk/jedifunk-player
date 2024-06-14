@@ -27,7 +27,7 @@
             <ion-list class="tracks">
 
               <ion-item-sliding v-for="track in tracks" :key="track.id">
-                <ion-item>
+                <ion-item :button="true" @click="openPlayer(track)">
                   <ion-label class="track">
                     <div>{{ track.position }}</div>
                     <div>{{ track.title }}</div>
@@ -37,7 +37,7 @@
   
                 <ion-item-options side="end"> 
                   <ion-item-option>
-                    <ion-icon slot="icon-only" :icon="heart">Love</ion-icon>
+                    <ion-icon slot="icon-only" :icon="heart"></ion-icon>
                   </ion-item-option>
                   <ion-item-option color="tertiary">
                     <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
@@ -70,45 +70,62 @@ import {
   IonLabel,
   IonButtons,
   IonBackButton,
-  onIonViewWillEnter
+  onIonViewWillEnter,
+  modalController
 } from '@ionic/vue'
 
-import { ref, defineProps, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import { heart, listOutline } from 'ionicons/icons'
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
-import { useStore } from 'vuex'
+import Player from '@/components/PlayerComponent.vue'
 
-// const props = defineProps<{
-//   dateParam: string, // Expecting a string for the year
-// }>();
-
+const route = useRoute()
 const store = useStore()
 const singleShow = ref([])
 const isLoading = ref(true)
 
 onIonViewWillEnter(async () => {
-  console.log('show ion initialized', store.state.dateParam)
   isLoading.value = true
-  await getSingleShow(store.state.dateParam)
+  await getSingleShow(route.params.dateParam)
   singleShow.value = store.getters.singleShow 
+  console.log(singleShow.value)
   isLoading.value = false
 
-  singleShow.value.data.tracks.forEach((track) => {
-    track.formattedDuration = formatDuration(track.duration); // Manually computing formatted duration for each track
-  })
+  if (singleShow.value.data && Array.isArray(singleShow.value.data.tracks)) {
+    singleShow.value.data.tracks.forEach((track) => {
+      track.formattedDuration = formatDuration(track.duration); // Manually computing formatted duration for each track
+    })
+  }
 })
 
 const groupedTracks = computed(() => {
-  const groups = {};
-  singleShow.value.data.tracks.forEach(track => {
-    if (!groups[track.set_name]) {
-      groups[track.set_name] = [];
-    }
-    groups[track.set_name].push(track);
-  });
-  return groups;
+  const groups = {}
+  if (singleShow.value.data && Array.isArray(singleShow.value.data.tracks)) {
+    singleShow.value.data.tracks.forEach(track => {
+      if (!groups[track.set_name]) {
+        groups[track.set_name] = [];
+      }
+      groups[track.set_name].push(track);
+    })
+  }
+  return groups
 })
+
+const openPlayer = async (track: object) => {
+  // set tracklist for the show
+  store.dispatch('setShowTracks', singleShow.value.data.tracks)
+  // set the selected track clicked
+  store.dispatch('setStartingTrack', track)
+
+  const modal = await modalController.create({
+    component: Player,
+  })
+
+  await modal.present()
+}
 </script>
 <style>
 .show-details p span {
