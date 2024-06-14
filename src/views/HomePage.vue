@@ -1,12 +1,12 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-title>All Shows</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div v-if="isLoading">Loading...</div>
+      <div class="loading" v-if="isLoading"><ion-spinner name="dots"></ion-spinner></div>
       <ion-list v-else>
         <ion-item v-for="year in years.data.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.date)">
           <ion-label>
@@ -28,7 +28,8 @@ import {
   IonToolbar,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonSpinner
 } from '@ionic/vue';
 
 import { ref, onMounted } from 'vue'
@@ -56,5 +57,11 @@ function selectedYear(year: string) {
 <style>
 a {
   text-decoration: none;
+}
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>

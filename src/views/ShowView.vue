@@ -1,35 +1,34 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ store.state.dateParam }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
-      <div v-if="isLoading">Loading...</div>
+      <div class="loading" v-if="isLoading">
+        <ion-spinner name="dots"></ion-spinner>
+      </div>
       <div v-else>
-        <ion-card>
-          <ion-card-content class="show-details">
-            <h1>{{ singleShow.data.venue.name }}</h1>
-            <p>
-              {{ singleShow.data.venue.location }}
-              <span>{{ formatDuration(singleShow.data.duration) }}</span>
-            </p>
-          </ion-card-content>
-        </ion-card>
+        <div class="show-details ion-padding">
+          <h1>{{ singleShow.data.date }}</h1>
+          <h3>{{ singleShow.data.venue.name }}</h3>
+          <p>
+            {{ singleShow.data.venue.location }}
+            <span>{{ formatDuration(singleShow.data.duration) }}</span>
+          </p>
+        </div>
         <div>
           <div v-for="(tracks, setName) in groupedTracks" :key="setName">
             <h4 class="set-title ion-padding-start">{{ setName }}</h4>
             <ion-list class="tracks">
 
               <ion-item-sliding v-for="track in tracks" :key="track.id">
-                <ion-item :button="true" @click="openPlayer(track)">
+                <ion-item :button="true" :detail="false" @click="openPlayer(track)">
                   <ion-label class="track">
-                    <div>{{ track.position }}</div>
                     <div>{{ track.title }}</div>
                     <div>{{ track.formattedDuration }}</div>
                   </ion-label>
@@ -71,7 +70,8 @@ import {
   IonButtons,
   IonBackButton,
   onIonViewWillEnter,
-  modalController
+  modalController,
+  IonSpinner
 } from '@ionic/vue'
 
 import { ref, computed, onMounted } from 'vue'
@@ -128,6 +128,9 @@ const openPlayer = async (track: object) => {
 }
 </script>
 <style>
+.show-details {
+  background: var(--ion-color-light-tint);
+}
 .show-details p span {
   float: right;
 }
@@ -137,8 +140,12 @@ const openPlayer = async (track: object) => {
 .tracks .track {
   display: flex;
   gap: 1rem;
+  justify-content: space-between;
 }
-.track div:nth-child(2) {
-  flex-grow: 2;
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>

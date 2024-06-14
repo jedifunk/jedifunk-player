@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content>
-      <div v-if="isLoading">Loading...</div>
+      <div class="loading" v-if="isLoading"><ion-spinner name="dots"></ion-spinner></div>
       <ion-list v-else>
         <ion-item v-for="show in shows.data.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
           <ion-label>
@@ -35,7 +35,8 @@ import {
   IonLabel,
   IonButtons,
   IonBackButton,
-  onIonViewWillEnter
+  onIonViewWillEnter,
+  IonSpinner
 } from '@ionic/vue'
 
 import { ref } from 'vue'
@@ -65,5 +66,11 @@ const selectedDate = (date: string) => {
 <style>
 a {
   text-decoration: none;
+}
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>
