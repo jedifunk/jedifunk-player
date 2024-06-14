@@ -1,12 +1,12 @@
 <template>
-  <ion-header>
+  <ion-header class="ion-no-border">
     <ion-toolbar>
+      <ion-title>{{ store.state.dateParam }}</ion-title>
       <ion-buttons slot="start">
-        <ion-button @click="hide">
+        <ion-button @click="dismiss">
           <ion-icon slot="icon-only" :icon="chevronDown"></ion-icon>
         </ion-button>
       </ion-buttons>
-      <ion-title>{{ store.state.dateParam }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -212,11 +212,14 @@ const scrub = (event) => {
 
 const stopScrubbing = () => {
   isScrubbing.value = false
-};
+}
 
-const hide = () => modalController.dismiss()
+const dismiss = () => modalController.dismiss()
 </script>
 <style>
+.toolbar-background {
+  background: transparent;
+}
 .wrapper {
   width: 100%;
   padding: 1rem;
