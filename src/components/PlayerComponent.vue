@@ -78,11 +78,14 @@ const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
 const isScrubbing = ref(false)
 const currentTrack = computed(() => store.getters.currentTrack)
+const comingFromShow = computed(() => store.getters.comingFromShow)
 
 onMounted(async () => {
   await nextTick()
   
-  audioService.setAudioSource(startingTrack.value.mp3)
+  if (comingFromShow.value) {
+    audioService.setAudioSource(startingTrack.value.mp3)
+  }
 
   audioService.addEventListener('canplaythrough', () => {
     isLoadingAudio.value = 100; // Fully loaded
@@ -110,56 +113,63 @@ const togglePlayPause = () => {
 }
 
 const skipForward = () => {
-  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id)
+  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id);
 
   if (currentIndex >= tracklist.value.length - 1) {
     console.log('Already on the last track');
     return;
   }
 
-  // Move to the next track
-  startingTrack.value = tracklist.value[currentIndex + 1];
+  // Find the next track in the list
+  const nextIndex = currentIndex + 1;
+  const nextTrack = tracklist.value[nextIndex];
 
-  // Check if formattedDuration is available before setting elapsedTime
-  if (startingTrack.value.formattedDuration) {
-    elapsedTime.value = startingTrack.value.formattedDuration;
-  } else {
-    console.warn("Formatted duration is missing for the track.");
-    // Optionally, set a default value or handle the missing data appropriately
-    elapsedTime.value = '00:00';
+  if (!nextTrack) {
+    console.log('No more tracks to play.');
+    return;
   }
 
-  // Update the audio source
-  audioService.setAudioSource(startingTrack.value.mp3)
-  store.dispatch('setStartingTrack', startingTrack.value.mp3)
+  // Set the next track as the starting track
+  startingTrack.value = nextTrack;
 
-  console.log('Skipping forward...', startingTrack.value.title);
+  // Update the audio source to the next track
+  audioService.setAudioSource(nextTrack.mp3);
+  audioService.play()
+  // Dispatch the action to update the Vuex store with the new starting track
+  store.dispatch('setStartingTrack', nextTrack);
+
+  console.log('Skipping forward to:', nextTrack.title);
 }
 
 const skipBackward = () => {
   const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id);
+
   if (currentIndex <= 0) {
     console.log('Already on the first track');
     return;
   }
 
-  // Move to the previous track
-  startingTrack.value = tracklist.value[currentIndex - 1];
+  // Calculate the index of the previous track
+  const prevIndex = currentIndex - 1;
+  const prevTrack = tracklist.value[prevIndex];
 
-  // Check if formattedDuration is available before setting elapsedTime
-  if (startingTrack.value.formattedDuration) {
-    elapsedTime.value = startingTrack.value.formattedDuration;
-  } else {
-    console.warn("Formatted duration is missing for the track.");
-    // Optionally, set a default value or handle the missing data appropriately
-    elapsedTime.value = '00:00';
+  if (!prevTrack) {
+    console.log('No previous track to go back to.');
+    return;
   }
 
-  // Update the audio source
-  audioService.setAudioSource(startingTrack.value.mp3)
-  store.dispatch('setStartingTrack', startingTrack.value.mp3)
+  // Set the previous track as the starting track
+  startingTrack.value = prevTrack;
 
-  console.log('Skipping backward...', startingTrack.value.title);
+  // Update the audio source to the previous track
+  audioService.setAudioSource(prevTrack.mp3);
+  // Explicitly tell the audio service to play the new track
+  audioService.play();
+
+  // Dispatch the action to update the Vuex store with the new starting track
+  store.dispatch('setStartingTrack', prevTrack);
+
+  console.log('Skipping backward to:', prevTrack.title);
 }
 
 const updateProgress = () => {
@@ -199,7 +209,7 @@ const scrub = (event) => {
   const rect = target.getBoundingClientRect();
   const x = isTouchEvent? event.touches[0].clientX - rect.left : event.clientX - rect.left;
   const percentage = x / rect.width;
-  const seekPosition = audioService.duration * percentage;
+  const seekPosition = audioService.getDuration() * percentage;
   audioService.setCurrentTime(seekPosition)
 }
 

@@ -55,11 +55,8 @@
 import {
   IonContent, 
   IonHeader, 
-  IonPage, 
-  IonTitle, 
+  IonPage,  
   IonToolbar,
-  IonCard,
-  IonCardContent,
   IonList,
   IonItem,
   IonItemSliding,
@@ -74,7 +71,7 @@ import {
   IonSpinner
 } from '@ionic/vue'
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { heart, listOutline } from 'ionicons/icons'
@@ -119,6 +116,7 @@ const openPlayer = async (track: object) => {
   store.dispatch('setShowTracks', singleShow.value.data.tracks)
   // set the selected track clicked
   store.dispatch('setStartingTrack', track)
+  store.dispatch('setComingFromShow', true)
 
   const modal = await modalController.create({
     component: Player,

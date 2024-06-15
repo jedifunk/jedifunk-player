@@ -18,7 +18,6 @@ class AudioService {
   private initAudioElement() {
     if (!this.audioElement) {
       this.audioElement = new Audio();
-      console.log('audio initialized', this.audioElement)
     }
   }
 

@@ -12,7 +12,8 @@ export default createStore({
     dateParam: null,
     showMiniPlayer: false,
     isPlaying: false,
-    currentTrack: {}
+    currentTrack: {},
+    comingFromShow: false
   },
   mutations: {
     setYears(state, value) {
@@ -44,6 +45,9 @@ export default createStore({
     },
     setCurrentTrack(state, track) {
       state.currentTrack = track
+    },
+    setComingFromShow(state, track) {
+      state.comingFromShow = track
     },
   },
   actions: {
@@ -80,6 +84,9 @@ export default createStore({
       commit('setIsPlaying', false)
       audioService.pause()
     },
+    setComingFromShow({ commit }, value) {
+      commit('setComingFromShow', value)
+    }
   },
   getters: {
     years: state => state.years,
@@ -92,6 +99,7 @@ export default createStore({
     showMiniPlayer: state => state.showMiniPlayer,
     isPlaying: state => state.isPlaying,
     currentTrack: state => state.currentTrack,
-    getAudioElement: () => audioService.audioElement
+    getAudioElement: () => audioService.audioElement,
+    comingFromShow: state => state.comingFromShow
   }
 })

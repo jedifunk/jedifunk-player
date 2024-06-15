@@ -1,8 +1,6 @@
 import store from '../store'
 
 const token = import.meta.env.VITE_BEARER_TOKEN
-
-console.log(token)
 const headers = {
   'Authorization': `Bearer ${token}`,
   'Accept': 'application/json' 

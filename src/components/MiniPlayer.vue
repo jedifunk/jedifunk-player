@@ -1,46 +1,52 @@
 <template>
   <div class="mini-player">
     <div class="flex">
-      <div ref="ctm" class="current-track-meta">
-        <h6>{{ currentTrack.title }}</h6>
-        <p :class="{ 'anim': tO}">{{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
+      <div class="current-track-meta" @click="handleModalSwitch">
+        <h6>{{ startingTrack.title }}</h6>
+        <p>{{ startingTrack.show_date }} | {{ startingTrack.venue_name }}, {{ startingTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayPause">
         <ion-icon slot="icon-only" size="small" :icon="store.getters.isPlaying ? pauseOutline : playOutline"></ion-icon>
       </ion-button>
     </div>
+    <div class="progress">
+      <div class="progress-bar-container">
+        <div class="progress-bar" :style="{ width: `${progressBar}%` }"></div> 
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watchEffect } from 'vue'
-import { IonButton, IonIcon } from '@ionic/vue'
+import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
+import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
 import { useStore } from 'vuex'
 import audioService from '@/utils/audioService'
+import Player from '@/components/PlayerComponent.vue'
 
 const store = useStore()
 const currentTrack = computed(() => store.getters.currentTrack)
-const ctm = ref(null)
+const startingTrack = computed(() => store.getters.startingTrack)
+const progressBar = ref(0)
+const elapsedTime = ref('00:00')
+const remainingTime = ref('00:00')
+let ctm = null
 
-watchEffect(async () => {
+onMounted( async() => {
   await nextTick()
-  if (ctm.value) {
-    const para = ctm.value.querySelector('.current-track-meta p')
-    const parentWidth = ctm.value.clientWidth
+  if (audioService) {
+    audioService.addEventListener('timeupdate', updateProgress)
+  }
+  ctm = document.querySelector('.current-track-meta')
+  if (ctm) {
+    const para = document.querySelector('.current-track-meta p')
+    const parentWidth = ctm.clientWidth
     const pWidth = para.scrollWidth
-
     if (pWidth > parentWidth) {
-      ctm.value.classList.add('text-over')
-    } else {
-      ctm.value.classList.remove('text-over')
+      para?.classList.add('anim')
     }
   }
-})
-
-const tO = computed(() => {
-  if (!ctm.value || !ctm.value?.classList.contains('text-over')) return false
-  return true
 })
 
 const togglePlayPause = () => {
@@ -52,11 +58,47 @@ const togglePlayPause = () => {
     store.dispatch('playTrack', currentTrack.value)
   }
 }
+
+const updateProgress = () => {
+  progressBar.value = (audioService.currentTime / audioService.duration) * 100
+
+  const currentTime = audioService.getCurrentTime(); // Hypothetical method
+  const duration = audioService.getDuration();
+  
+  if (currentTime && duration) {
+    progressBar.value = (currentTime / duration) * 100;
+
+    const minutes = Math.floor(currentTime / 60);
+    const seconds = Math.floor(currentTime % 60);
+    elapsedTime.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+
+    const totalMinutes = Math.floor(duration / 60);
+    const totalSeconds = Math.floor(duration % 60);
+    const remainingMinutes = totalMinutes - minutes;
+    let remainingSeconds = totalSeconds - seconds;
+
+    if (remainingSeconds < 0) {
+      remainingSeconds += 60;
+    }
+    remainingTime.value = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+}
+
+const handleModalSwitch = async () => {
+  store.dispatch('setShowMiniPlayer', false)
+  store.dispatch('setComingFromShow', false)
+  const modal = await modalController.create({
+    component: Player
+  })
+
+  await modal.present()
+}
 </script>
 <style>
 .mini-player {
   position: absolute;
   bottom: 50px;
+  height: 100%;
   max-height: 50px;
   width: calc(100% - 10px);
   background: rgba(0,0,0,.86);
@@ -70,6 +112,7 @@ const togglePlayPause = () => {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  margin-bottom: 2px;
 }
 .current-track-meta {
   display: flex;
@@ -87,6 +130,9 @@ const togglePlayPause = () => {
 }
 p.anim {
   animation: backAndForth 15s linear infinite;
+}
+.mini-player .progress-bar {
+  height: 2px;
 }
 audio {
   display: none;
