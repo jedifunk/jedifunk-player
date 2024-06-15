@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import audioService from '@/utils/audioService'
 
 export default createStore({
   state: {
@@ -8,7 +9,10 @@ export default createStore({
     showTracks: [],
     startingTrack: {},
     yearParam: null,
-    dateParam: null
+    dateParam: null,
+    showMiniPlayer: false,
+    isPlaying: false,
+    currentTrack: {}
   },
   mutations: {
     setYears(state, value) {
@@ -31,7 +35,16 @@ export default createStore({
     },
     setDateParam(state, value) {
       state.dateParam = value
-    }
+    },
+    setShowMiniPlayer(state, value) {
+      state.showMiniPlayer = value
+    },
+    setIsPlaying(state, playing) {
+      state.isPlaying = playing
+    },
+    setCurrentTrack(state, track) {
+      state.currentTrack = track
+    },
   },
   actions: {
     setYears({ commit }, value) {
@@ -54,7 +67,19 @@ export default createStore({
     },
     setDateParam({ commit }, value) {
       commit('setDateParam', value)
-    }
+    },
+    setShowMiniPlayer({ commit }, value) {
+      commit('setShowMiniPlayer', value)
+    },
+    playTrack({ commit }, track) {
+      commit('setCurrentTrack', track)
+      audioService.play()
+      commit('setIsPlaying', true)
+    },
+    pauseTrack({ commit }) {
+      commit('setIsPlaying', false)
+      audioService.pause()
+    },
   },
   getters: {
     years: state => state.years,
@@ -63,6 +88,10 @@ export default createStore({
     showTracks: state => state.showTracks,
     startingTrack: state => state.startingTrack,
     yearParam: state => state.yearParam,
-    dateParam: state => state.dateParam
+    dateParam: state => state.dateParam,
+    showMiniPlayer: state => state.showMiniPlayer,
+    isPlaying: state => state.isPlaying,
+    currentTrack: state => state.currentTrack,
+    getAudioElement: () => audioService.audioElement
   }
 })

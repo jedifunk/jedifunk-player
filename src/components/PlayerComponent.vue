@@ -3,7 +3,7 @@
     <ion-toolbar>
       <ion-title>{{ store.state.dateParam }}</ion-title>
       <ion-buttons slot="start">
-        <ion-button @click="dismiss">
+        <ion-button @click="dismiss(startingTrack)">
           <ion-icon slot="icon-only" :icon="chevronDown"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -42,16 +42,13 @@
             <ion-icon slot="icon-only" size="large" :icon="playSkipBackOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="togglePlayPause">
-            <ion-icon slot="icon-only" size="large" :icon="isPlaying ? pauseOutline : playOutline"></ion-icon>
+            <ion-icon slot="icon-only" size="large" :icon="store.getters.isPlaying ? pauseOutline : playOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="skipForward">
             <ion-icon slot="icon-only" size="large" :icon="playSkipForwardOutline"></ion-icon>
           </ion-button>
         </div>
       </div>
-      <audio ref="audioPlayer" preload="metadata" autoplay>
-        <source :src="startingTrack.mp3" type="audio/mp3"/>
-      </audio>
     </div>
   </ion-content>
 </template>
@@ -67,62 +64,54 @@ import {
   modalController
 } from '@ionic/vue'
 
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import { useStore } from 'vuex'
 import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, pauseOutline } from 'ionicons/icons'
+import audioService from '@/utils/audioService'
 
 const store = useStore()
-const tracklist = ref([])
-const startingTrack = ref({})
+const tracklist = computed(() => store.getters.showTracks)
+const startingTrack = computed(() => store.getters.startingTrack)
 const isLoadingAudio = ref(0)
-const isPlaying = ref(true)
 const progressBar = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
 const isScrubbing = ref(false)
-
-let audioElement
-
-tracklist.value = store.getters.showTracks
-startingTrack.value = store.getters.startingTrack
-console.log('track:', startingTrack.value)
+const currentTrack = computed(() => store.getters.currentTrack)
 
 onMounted(async () => {
   await nextTick()
-  audioElement = document.querySelector('audio')
-  const buffer = audioElement.buffered
-  console.log(buffer)
+  
+  audioService.setAudioSource(startingTrack.value.mp3)
 
-  if (!audioElement) {
-    console.error('audio element not found')
-    return
-  }
-  audioElement.addEventListener('canplaythrough', () => {
+  audioService.addEventListener('canplaythrough', () => {
     isLoadingAudio.value = 100; // Fully loaded
   })
-  audioElement.addEventListener('progress', (event) => {
+  audioService.addEventListener('progress', (event) => {
     if (event.lengthComputable) {
       const percentLoaded = Math.round((event.loaded / event.total) * 100);
       isLoadingAudio.value = percentLoaded;
     }
   })
-  if (audioElement) {
-    audioElement.addEventListener('timeupdate', updateProgress)
+  if (audioService) {
+    audioService.addEventListener('timeupdate', updateProgress)
   }
+  store.dispatch('playTrack', store.getters.startingTrack)
 })
 
 const togglePlayPause = () => {
-  isPlaying.value = !isPlaying.value
-  //const audioElement = document.querySelector('audio')
-  if (isPlaying.value) {
-    audioElement.play()
+  if (store.getters.isPlaying) {
+    audioService.pause()
+    store.dispatch('pauseTrack')
   } else {
-    audioElement.pause()
+    audioService.play()
+    store.dispatch('playTrack', currentTrack.value)
   }
 }
 
 const skipForward = () => {
-  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id);
+  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id)
+
   if (currentIndex >= tracklist.value.length - 1) {
     console.log('Already on the last track');
     return;
@@ -141,9 +130,10 @@ const skipForward = () => {
   }
 
   // Update the audio source
-  audioElement.src = startingTrack.value.mp3;
+  audioService.setAudioSource(startingTrack.value.mp3)
+  store.dispatch('setStartingTrack', startingTrack.value.mp3)
 
-  console.log('Skipping forward...');
+  console.log('Skipping forward...', startingTrack.value.title);
 }
 
 const skipBackward = () => {
@@ -166,36 +156,39 @@ const skipBackward = () => {
   }
 
   // Update the audio source
-  audioElement.src = startingTrack.value.mp3;
+  audioService.setAudioSource(startingTrack.value.mp3)
+  store.dispatch('setStartingTrack', startingTrack.value.mp3)
 
-  console.log('Skipping backward...');
+  console.log('Skipping backward...', startingTrack.value.title);
 }
 
 const updateProgress = () => {
-  //const audioElement = document.querySelector('audio')
-  if (audioElement) {
-    progressBar.value = (audioElement.currentTime / audioElement.duration) * 100;
+  progressBar.value = (audioService.currentTime / audioService.duration) * 100
 
-    // Calculate elapsed time
-    const minutes = Math.floor(audioElement.currentTime / 60);
-    const seconds = Math.floor(audioElement.currentTime % 60);
-    elapsedTime.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  const currentTime = audioService.getCurrentTime(); // Hypothetical method
+  const duration = audioService.getDuration();
+  
+  if (currentTime && duration) {
+    progressBar.value = (currentTime / duration) * 100;
 
-    // Calculate remaining time
-    const totalMinutes = Math.floor(audioElement.duration / 60);
-    const totalSeconds = Math.floor(audioElement.duration % 60);
+    const minutes = Math.floor(currentTime / 60);
+    const seconds = Math.floor(currentTime % 60);
+    elapsedTime.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+
+    const totalMinutes = Math.floor(duration / 60);
+    const totalSeconds = Math.floor(duration % 60);
     const remainingMinutes = totalMinutes - minutes;
     let remainingSeconds = totalSeconds - seconds;
 
     if (remainingSeconds < 0) {
-      remainingSeconds += 60; // Add 60 seconds if needed
+      remainingSeconds += 60;
     }
-    remainingTime.value = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    remainingTime.value = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 }
 const startScrubbing = () => {
   isScrubbing.value = true
-};
+}
 
 const scrub = (event) => {
   if (!isScrubbing.value) return
@@ -206,15 +199,18 @@ const scrub = (event) => {
   const rect = target.getBoundingClientRect();
   const x = isTouchEvent? event.touches[0].clientX - rect.left : event.clientX - rect.left;
   const percentage = x / rect.width;
-  const seekPosition = audioElement.duration * percentage;
-  audioElement.currentTime = seekPosition;
-};
+  const seekPosition = audioService.duration * percentage;
+  audioService.setCurrentTime(seekPosition)
+}
 
 const stopScrubbing = () => {
   isScrubbing.value = false
 }
 
-const dismiss = () => modalController.dismiss()
+const dismiss = async (startingTrack) => {
+  await modalController.dismiss()
+  store.dispatch('setShowMiniPlayer', true)
+}
 </script>
 <style>
 .toolbar-background {
