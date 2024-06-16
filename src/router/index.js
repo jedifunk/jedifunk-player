@@ -11,7 +11,7 @@ const routes = [
     component: Tab,
     children: [
       {
-        path: '',
+        path: '/',
         redirect: '/tabs/home'
       },
       {
