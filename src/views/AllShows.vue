@@ -19,7 +19,7 @@
   </ion-page>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { 
   IonContent, 
   IonHeader, 
@@ -58,7 +58,7 @@ onMounted(async () => {
   }
 })
 
-function selectedYear(year: string) {
+function selectedYear(year) {
   store.setYearParam(year)
   router.push({ name: 'Year', params: { yearParam: year } })
 }

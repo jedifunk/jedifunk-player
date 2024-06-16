@@ -52,7 +52,7 @@
     </div>
   </ion-content>
 </template>
-<script setup lang="ts">
+<script setup>
 import {  
   IonHeader,
   IonToolbar,
@@ -67,7 +67,9 @@ import {
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, pauseOutline } from 'ionicons/icons'
-import audioService from '@/utils/audioService'
+import AudioService from '@/utils/audioService'
+
+let audioService = AudioService.getInstance()
 
 const store = useMainStore()
 const tracklist = computed(() => store.showTracks)

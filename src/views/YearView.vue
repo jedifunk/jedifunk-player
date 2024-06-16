@@ -23,7 +23,7 @@
     </ion-content>
   </ion-page>
 </template>
-<script setup lang="ts">
+<script setup>
 import {
   IonContent, 
   IonHeader, 
@@ -62,7 +62,7 @@ onIonViewWillEnter(async () => {
 })
 
 // click event for show selection
-const selectedDate = (date: string) => {
+const selectedDate = (date) => {
   store.setDateParam(date)
   router.push({ name: 'Date', params: { dateParam: date } })
 }

@@ -5,7 +5,7 @@
   </ion-app>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
 import { computed, onMounted } from 'vue'
 import { useMainStore } from '@/stores/index'

@@ -17,13 +17,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
+<script setup>
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
 import { useMainStore } from '@/stores/index'
-import audioService from '@/utils/audioService'
 import Player from '@/components/PlayerComponent.vue'
+import AudioService from '@/utils/audioService'
+
+let audioService = AudioService.getInstance()
 
 const store = useMainStore()
 const currentTrack = computed(() => store.currentTrack)

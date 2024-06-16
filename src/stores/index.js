@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
-import audioService from '@/utils/audioService';
+import AudioService from '@/utils/audioService'
+
+let audioService = AudioService.getInstance()
 
 export const useMainStore = defineStore({
   id: 'main',

@@ -54,7 +54,7 @@
     </ion-content>
   </ion-page>
 </template>
-<script setup lang="ts">
+<script setup>
 import {
   IonContent, 
   IonHeader, 
@@ -124,7 +124,7 @@ const groupedTracks = computed(() => {
   return groups
 })
 
-const openPlayer = async (track: object) => {
+const openPlayer = async (track) => {
   // set tracklist for the show
   store.setShowTracks(store.singleShow.tracks)
   // set the selected track clicked
@@ -138,7 +138,7 @@ const openPlayer = async (track: object) => {
   await modal.present()
 }
 
-const toggleLikeStatue = (track: object) => {
+const toggleLikeStatue = (track) => {
   store.toggleLikeStatus(track)
 }
 </script>

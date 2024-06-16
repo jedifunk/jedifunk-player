@@ -25,7 +25,7 @@
           </ion-item>
 
           <ion-item-options side="end"> 
-            <ion-item-option @click="toggleLikeStatue(track)">
+            <ion-item-option @click="toggleLikeStatus(track)">
               <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
             </ion-item-option>
             <ion-item-option color="secondary">
@@ -40,7 +40,7 @@
     </ion-content>
   </ion-page>
 </template>
-<script setup lang="ts">
+<script setup>
 import {
   IonPage,
   IonHeader,
@@ -84,7 +84,7 @@ const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
 }
 
-const openPlayer = async (track: object) => {
+const openPlayer = async (track) => {
 
   // set the selected track clicked
   store.setStartingTrack(track)
@@ -97,7 +97,7 @@ const openPlayer = async (track: object) => {
   await modal.present()
 }
 
-const toggleLikeStatue = (track: object) => {
+const toggleLikeStatus = (track) => {
   store.toggleLikeStatus(track)
 }
 

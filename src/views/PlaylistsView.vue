@@ -11,7 +11,7 @@
     </ion-content>
   </ion-page>
 </template>
-<script setup lang="ts">
+<script setup>
 import {
   IonPage,
   IonHeader,

@@ -1,4 +1,4 @@
-export function formatDuration(duration: number): string {
+export function formatDuration(duration) {
   const hours = Math.floor(duration / 3600000); // Convert milliseconds to hours
   const minutes = Math.floor((duration % 3600000) / 60000); // Remaining milliseconds converted to minutes
   const seconds = Math.floor(((duration % 3600000) % 60000) / 1000); // Remaining milliseconds converted to seconds
