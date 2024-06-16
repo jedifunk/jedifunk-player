@@ -6,7 +6,7 @@ const headers = {
 
 export async function getYears() {
   try {
-    const response = await fetch(`http://phish.in/api/v1/years.json?include_show_counts=true`, {headers});
+    const response = await fetch(`https://phish.in/api/v1/years.json?include_show_counts=true`, {headers});
     const data = await response.json()
     return data
   } catch (error) {
