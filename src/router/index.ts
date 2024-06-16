@@ -17,13 +17,18 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'home',
-        name: 'Home',
-        component: () => import('@/views/HomePage.vue'),
+        name: 'Shows',
+        component: () => import('@/views/AllShows.vue'),
       },
       {
-        path: 'settings',
-        name: 'Settings',
-        component: () => import('@/views/SettingsView.vue'),
+        path: 'playlists',
+        name: 'Playlists',
+        component: () => import('@/views/PlaylistsView.vue'),
+      },
+      {
+        path: 'liked',
+        name: 'Liked',
+        component: () => import('@/views/LikedView.vue'),
       },
       {
         path: 'home/:yearParam',

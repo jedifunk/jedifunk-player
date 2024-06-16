@@ -5,14 +5,14 @@
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ store.state.yearParam }}</ion-title>
+        <ion-title>{{ store.yearParam }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
       <div class="loading" v-if="isLoading"><ion-spinner name="dots"></ion-spinner></div>
       <ion-list v-else>
-        <ion-item v-for="show in shows.data.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
+        <ion-item v-for="show in store.shows.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
           <ion-label>
             <h2>{{ show.date }}</h2>
             <p>{{ show.venue.name }}</p>
@@ -41,25 +41,29 @@ import {
 
 import { ref } from 'vue'
 import { getShows } from '@/utils/fetch'
-import { useStore } from 'vuex'
+import { useMainStore } from '@/stores/index'
 import { useRouter, useRoute } from 'vue-router'
 
-const store = useStore()
+const store = useMainStore()
 const isLoading = ref(true)
-const shows = ref([])
 const route = useRoute()
 const router = useRouter()
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
-  await getShows(route.params.yearParam)
-  shows.value = store.getters.shows
-  isLoading.value = false
+  try {
+    const shows = await getShows(route.params.yearParam);
+    store.setShows(shows.data)
+  } catch (error) {
+    console.error('failed to set shows:', error)
+  } finally {
+    isLoading.value = false
+  }
 })
 
 // click event for show selection
 const selectedDate = (date: string) => {
-  store.commit('setDateParam', date)
+  store.setDateParam(date)
   router.push({ name: 'Date', params: { dateParam: date } })
 }
 </script>

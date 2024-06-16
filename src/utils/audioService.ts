@@ -2,7 +2,8 @@ class AudioService {
   private static instance: AudioService;
 
   private audioElement: HTMLAudioElement | null = null;
-  private eventListeners: { [key: string]: Function[] } = {};
+  private eventListeners: { [key: string]: Function[] } = {}
+  private nextTrackUrl: string | null = null
 
   private constructor() {
     this.initAudioElement();
@@ -18,20 +19,43 @@ class AudioService {
   private initAudioElement() {
     if (!this.audioElement) {
       this.audioElement = new Audio();
+      this.attachEventListeners()
     }
   }
 
-  public setAudioSource(sourceUrl: string) {
+  private attachEventListeners() {
     if (this.audioElement) {
+      this.audioElement.addEventListener('ended', () => this.handlePlaybackEnd());
+    }
+  }
+
+  public setAudioSource(sourceUrl: string, nextTrackUrl?: string) {
+    if (this.audioElement) {
+      this.audioElement.removeEventListener('ended', this.handlePlaybackEnd);
       this.audioElement.src = sourceUrl;
       this.audioElement.load();
+      this.attachEventListeners(); // Reattach event listeners
+
+      if (nextTrackUrl) {
+        console.log(nextTrackUrl)
+        this.nextTrackUrl = nextTrackUrl;
+      }
     } else {
       console.error('audioElement is not initialized.');
     }
   }
 
+  private handlePlaybackEnd() {
+    console.log('end:', this.nextTrackUrl)
+    if (this.nextTrackUrl) {
+      this.setAudioSource(this.nextTrackUrl);
+    }
+  }
+
   public play() {
-    this.audioElement?.play();
+    if (this.audioElement) {
+      this.audioElement.play().catch(error => console.error("Failed to play audio:", error));
+    }
   }
 
   public pause() {

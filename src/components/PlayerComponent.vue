@@ -1,7 +1,7 @@
 <template>
   <ion-header class="ion-no-border">
     <ion-toolbar>
-      <ion-title>{{ store.state.dateParam }}</ion-title>
+      <ion-title>{{ store.dateParam }}</ion-title>
       <ion-buttons slot="start">
         <ion-button @click="dismiss(startingTrack)">
           <ion-icon slot="icon-only" :icon="chevronDown"></ion-icon>
@@ -42,7 +42,7 @@
             <ion-icon slot="icon-only" size="large" :icon="playSkipBackOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="togglePlayPause">
-            <ion-icon slot="icon-only" size="large" :icon="store.getters.isPlaying ? pauseOutline : playOutline"></ion-icon>
+            <ion-icon slot="icon-only" size="large" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="skipForward">
             <ion-icon slot="icon-only" size="large" :icon="playSkipForwardOutline"></ion-icon>
@@ -65,20 +65,20 @@ import {
 } from '@ionic/vue'
 
 import { ref, onMounted, nextTick, computed } from 'vue'
-import { useStore } from 'vuex'
+import { useMainStore } from '@/stores/index'
 import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, pauseOutline } from 'ionicons/icons'
 import audioService from '@/utils/audioService'
 
-const store = useStore()
-const tracklist = computed(() => store.getters.showTracks)
-const startingTrack = computed(() => store.getters.startingTrack)
+const store = useMainStore()
+const tracklist = computed(() => store.showTracks)
+const startingTrack = computed(() => store.startingTrack)
 const isLoadingAudio = ref(0)
 const progressBar = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
 const isScrubbing = ref(false)
-const currentTrack = computed(() => store.getters.currentTrack)
-const comingFromShow = computed(() => store.getters.comingFromShow)
+const currentTrack = computed(() => store.currentTrack)
+const comingFromShow = computed(() => store.comingFromShow)
 
 onMounted(async () => {
   await nextTick()
@@ -99,16 +99,16 @@ onMounted(async () => {
   if (audioService) {
     audioService.addEventListener('timeupdate', updateProgress)
   }
-  store.dispatch('playTrack', store.getters.startingTrack)
+  store.playTrack(store.startingTrack)
 })
 
 const togglePlayPause = () => {
-  if (store.getters.isPlaying) {
+  if (store.isPlaying) {
     audioService.pause()
-    store.dispatch('pauseTrack')
+    store.pauseTrack()
   } else {
     audioService.play()
-    store.dispatch('playTrack', currentTrack.value)
+    store.playTrack(currentTrack.value)
   }
 }
 
@@ -136,7 +136,7 @@ const skipForward = () => {
   audioService.setAudioSource(nextTrack.mp3);
   audioService.play()
   // Dispatch the action to update the Vuex store with the new starting track
-  store.dispatch('setStartingTrack', nextTrack);
+  store.setStartingTrack(nextTrack)
 
   console.log('Skipping forward to:', nextTrack.title);
 }
@@ -167,7 +167,7 @@ const skipBackward = () => {
   audioService.play();
 
   // Dispatch the action to update the Vuex store with the new starting track
-  store.dispatch('setStartingTrack', prevTrack);
+  store.setStartingTrack(prevTrack);
 
   console.log('Skipping backward to:', prevTrack.title);
 }
@@ -219,7 +219,7 @@ const stopScrubbing = () => {
 
 const dismiss = async (startingTrack) => {
   await modalController.dismiss()
-  store.dispatch('setShowMiniPlayer', true)
+  store.setShowMiniPlayer(true)
 }
 </script>
 <style>

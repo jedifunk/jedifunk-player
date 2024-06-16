@@ -14,11 +14,11 @@
       </div>
       <div v-else>
         <div class="show-details ion-padding">
-          <h1>{{ singleShow.data.date }}</h1>
-          <h3>{{ singleShow.data.venue.name }}</h3>
+          <h1>{{ store.singleShow.date }}</h1>
+          <h3>{{ store.singleShow.venue.name }}</h3>
           <p>
-            {{ singleShow.data.venue.location }}
-            <span>{{ formatDuration(singleShow.data.duration) }}</span>
+            {{ store.singleShow.venue.location }}
+            <span>{{ formatDuration(store.singleShow.duration) }}</span>
           </p>
         </div>
         <div>
@@ -35,8 +35,11 @@
                 </ion-item>
   
                 <ion-item-options side="end"> 
-                  <ion-item-option>
-                    <ion-icon slot="icon-only" :icon="heart"></ion-icon>
+                  <ion-item-option @click="toggleLikeStatue(track)">
+                    <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
+                  </ion-item-option>
+                  <ion-item-option color="secondary">
+                    <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
                   </ion-item-option>
                   <ion-item-option color="tertiary">
                     <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
@@ -72,36 +75,46 @@ import {
 } from '@ionic/vue'
 
 import { ref, computed } from 'vue'
-import { useStore } from 'vuex'
+import { useMainStore } from '@/stores/index'
 import { useRoute } from 'vue-router'
-import { heart, listOutline } from 'ionicons/icons'
+import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, list } from 'ionicons/icons'
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
 import Player from '@/components/PlayerComponent.vue'
 
 const route = useRoute()
-const store = useStore()
-const singleShow = ref([])
+const store = useMainStore()
 const isLoading = ref(true)
+const isLiked = ref({})
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
-  await getSingleShow(route.params.dateParam)
-  singleShow.value = store.getters.singleShow 
-  console.log(singleShow.value)
-  isLoading.value = false
+  try {
+    const singleShow = await getSingleShow(route.params.dateParam)
+    store.setSingleShow(singleShow.data) 
+  } catch (error) {
+    console.error('failed to set single show:', error)
+  } finally {
+    isLoading.value = false
+  }
+  console.log(store.singleShow)
 
-  if (singleShow.value.data && Array.isArray(singleShow.value.data.tracks)) {
-    singleShow.value.data.tracks.forEach((track) => {
-      track.formattedDuration = formatDuration(track.duration); // Manually computing formatted duration for each track
+  if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
+    store.singleShow.tracks.forEach((track) => {
+      track.formattedDuration = formatDuration(track.duration)
+      isLiked.value[track.id] = false
     })
   }
 })
 
+const isTrackLiked = (trackId) => {
+  return !! store.isLiked[trackId]
+}
+
 const groupedTracks = computed(() => {
   const groups = {}
-  if (singleShow.value.data && Array.isArray(singleShow.value.data.tracks)) {
-    singleShow.value.data.tracks.forEach(track => {
+  if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
+    store.singleShow.tracks.forEach(track => {
       if (!groups[track.set_name]) {
         groups[track.set_name] = [];
       }
@@ -113,16 +126,20 @@ const groupedTracks = computed(() => {
 
 const openPlayer = async (track: object) => {
   // set tracklist for the show
-  store.dispatch('setShowTracks', singleShow.value.data.tracks)
+  store.setShowTracks(store.singleShow.tracks)
   // set the selected track clicked
-  store.dispatch('setStartingTrack', track)
-  store.dispatch('setComingFromShow', true)
+  store.setStartingTrack(track)
+  store.setComingFromShow(true)
 
   const modal = await modalController.create({
     component: Player,
   })
 
   await modal.present()
+}
+
+const toggleLikeStatue = (track: object) => {
+  store.toggleLikeStatus(track)
 }
 </script>
 <style>

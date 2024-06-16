@@ -6,7 +6,7 @@
         <p>{{ startingTrack.show_date }} | {{ startingTrack.venue_name }}, {{ startingTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayPause">
-        <ion-icon slot="icon-only" size="small" :icon="store.getters.isPlaying ? pauseOutline : playOutline"></ion-icon>
+        <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
       </ion-button>
     </div>
     <div class="progress">
@@ -21,13 +21,13 @@
 import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
 import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
-import { useStore } from 'vuex'
+import { useMainStore } from '@/stores/index'
 import audioService from '@/utils/audioService'
 import Player from '@/components/PlayerComponent.vue'
 
-const store = useStore()
-const currentTrack = computed(() => store.getters.currentTrack)
-const startingTrack = computed(() => store.getters.startingTrack)
+const store = useMainStore()
+const currentTrack = computed(() => store.currentTrack)
+const startingTrack = computed(() => store.startingTrack)
 const progressBar = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
@@ -50,12 +50,12 @@ onMounted( async() => {
 })
 
 const togglePlayPause = () => {
-  if (store.getters.isPlaying) {
+  if (store.isPlaying) {
     audioService.pause()
-    store.dispatch('pauseTrack')
+    store.pauseTrack()
   } else {
     audioService.play()
-    store.dispatch('playTrack', currentTrack.value)
+    store.playTrack(currentTrack.value)
   }
 }
 
@@ -85,8 +85,8 @@ const updateProgress = () => {
 }
 
 const handleModalSwitch = async () => {
-  store.dispatch('setShowMiniPlayer', false)
-  store.dispatch('setComingFromShow', false)
+  store.setShowMiniPlayer(false)
+  store.setComingFromShow(false)
   const modal = await modalController.create({
     component: Player
   })

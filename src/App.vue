@@ -7,12 +7,19 @@
 
 <script setup lang="ts">
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
-//import { defineComponent } from 'vue'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+import { computed, onMounted } from 'vue'
+import { useMainStore } from '@/stores/index'
 import MiniPlayer from '@/components/MiniPlayer.vue'
 
-const store = useStore()
-const showMiniPlayer = computed(() => store.getters.showMiniPlayer)
-const currentTrack = computed(() => store.getters.startingTrack)
+const store = useMainStore()
+const showMiniPlayer = computed(() => store.showMiniPlayer)
+const currentTrack = computed(() => store.startingTrack)
+
+onMounted(() => {
+  try {
+    store.loadLikedListFromLocalStorage();
+  } catch (error) {
+    console.error('Error executing method:', error);
+  }
+})
 </script>

@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Options</ion-title>
+        <ion-title>Playlists</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -23,10 +23,10 @@ import {
 } from '@ionic/vue'
 
 onIonViewWillEnter(() => {
-  console.log('settings ion initialize')
+  console.log('playlists ion initialize')
 })
 
 onIonViewWillLeave(() => {
-  console.log('settings ion destoryed')
+  console.log('playlists ion destoryed')
 })
 </script>
