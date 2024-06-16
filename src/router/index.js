@@ -30,6 +30,11 @@ const routes = [
         component: () => import('@/views/LikedView.vue'),
       },
       {
+        path: 'tags',
+        name: 'Tags',
+        component: () => import('@/views/TagsView.vue'),
+      },
+      {
         path: 'home/:yearParam',
         name: 'Year',
         component: () => import('@/views/YearView.vue'),
