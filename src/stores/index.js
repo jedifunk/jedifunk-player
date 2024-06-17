@@ -20,7 +20,8 @@ export const useMainStore = defineStore({
     isLiked: {},
     isLikedList: [],
     taggedList: [],
-    isTagged: {}
+    isTagged: {},
+    playlists: []
   }),
   getters: {
     getYears: state => state.years,
@@ -45,9 +46,9 @@ export const useMainStore = defineStore({
         return false;
       }
     },
-    getTaggedListForTrack(trackId) {
-      return this.taggedList.filter(t => t.trackId === trackId)
-    }
+    maxPlaylistId() {
+      return Math.max(...this.playlists.map(playlist => playlist.id));
+    }  
   },
   actions: {
     setYears(yearsData) {
@@ -174,6 +175,38 @@ export const useMainStore = defineStore({
         }
       } catch (error) {
         console.error('Error in loadTaggedDataFromLocalStorage:', error);
+      }
+    },
+    addTrackToPlaylist(playlistId, track) {
+      const existingPlaylistIndex = this.playlists.findIndex(playlist => playlist.id === playlistId);
+
+      if (existingPlaylistIndex!== -1) {
+        // If the playlist exists, add the track to it
+        this.playlists[existingPlaylistIndex].tracks.push(track);
+      }
+
+      // Optionally, save the updated playlists to localStorage
+      localStorage.setItem('playlists', JSON.stringify(this.playlists));
+    },
+    loadPlaylistsFromLocalStorage() {
+      try {
+        const storedPlaylists = localStorage.getItem('playlists');
+        if (storedPlaylists) {
+          try {
+            // Parse the stored JSON string back into an object
+            const parsedPlaylists = JSON.parse(storedPlaylists);
+    
+            // Update the store's state with the retrieved data
+            this.playlists = parsedPlaylists;
+    
+            // Optionally, trigger reactivity if needed
+            this.$patch({ playlists: parsedPlaylists });
+          } catch (parseError) {
+            console.error('Error parsing localStorage data:', parseError);
+          }
+        }
+      } catch (error) {
+        console.error('Error in loadPlaylistsFromLocalStorage:', error);
       }
     },
   }

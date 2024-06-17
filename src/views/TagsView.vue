@@ -30,12 +30,11 @@ import {
   IonItem,
   IonLabel,
   IonSpinner,
-  modalController,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { tags } from '@/utils/helpers'

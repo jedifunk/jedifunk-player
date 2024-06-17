@@ -25,6 +25,11 @@ const routes = [
         component: () => import('@/views/PlaylistsView.vue'),
       },
       {
+        path: 'playlists/:pathname',
+        name: 'Single Playlist',
+        component: () => import('@/views/SinglePlaylistView.vue'),
+      },
+      {
         path: 'liked',
         name: 'Liked',
         component: () => import('@/views/LikedView.vue'),

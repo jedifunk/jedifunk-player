@@ -2,10 +2,12 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Favorites</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>{{ title }}</ion-title>
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
       <div class="loading" v-if="isLoading">
         <ion-spinner name="dots"></ion-spinner>
@@ -31,12 +33,13 @@
             <ion-item-option color="secondary" @click="openTags(track)">
               <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
             </ion-item-option>
-            <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
+            <ion-item-option color="tertiary">
               <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
-        </ion-list>
+      </ion-list>
+
     </ion-content>
   </ion-page>
 </template>
@@ -54,34 +57,47 @@ import {
   IonItemOptions,
   IonItemOption,
   IonIcon,
+  IonButtons,
+  IonBackButton,
   IonSpinner,
   modalController,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { computed, ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
-import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
+
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags } from 'ionicons/icons'
 
 const store = useMainStore()
+const route = useRoute()
 const isLoading = ref(true)
 const tracks = ref([])
+const title = ref('')
 
-onIonViewWillEnter(() => {
-  isLoading.value = true
+onIonViewWillEnter(async () => {
+  isLoading.value = true;
+  const targetPathname = route.params.pathname
+  console.log(store.playlists)
   try {
-    const list = store.isLikedList
-    tracks.value = list.sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
+    // Search through the playlists in the store state
+    const playlist = store.playlists.find(playlist => playlist.pathname === targetPathname);
+    if (playlist) {
+      title.value = playlist.name
+      tracks.value = playlist.tracks
+    } else {
+      console.log(`No playlist found for pathname: ${targetPathname}`);
+    }
   } catch (error) {
-    console.error('failed to get liked tracks:', error)
+    console.error('Failed to get filtered tracks:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 
 const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
@@ -117,22 +133,11 @@ const openTags = async (track) => {
     componentProps: {
       track: track
     },
-    breakpoints: [0,.5,.80],
-    initialBreakpoint: .80,
+    breakpoints: [0,.5,.8],
+    initialBreakpoint: .8,
     canDismiss: true,
     handleBehavior: 'cycle',
     showBackdrop: false,
-  })
-  await modal.present()
-}
-
-const openPlaylistSelectModal = async (track) => {
-  const modal = await modalController.create({ 
-    component: PlaylistSelectModal,
-    componentProps: {
-      track: track
-    },
-    canDismiss: true
   })
   await modal.present()
 }
@@ -146,10 +151,8 @@ onIonViewWillLeave(() => {
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
 }
 .track-meta p {
-  margin-top: 3px;
   font-size: 12px;
 }
 </style>

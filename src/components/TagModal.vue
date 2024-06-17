@@ -40,7 +40,6 @@ const selectTag = (tag) => {
 
 const dismiss = async () => {
   await modalController.dismiss()
-  
 }
 </script>
 <style>
