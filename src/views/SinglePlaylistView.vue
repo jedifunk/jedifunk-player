@@ -1,11 +1,14 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
         </ion-buttons>
         <ion-title>{{ title }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="deletePlaylist(pId)"><ion-icon slot="icon-only" :icon="trashOutline"></ion-icon></ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -33,7 +36,7 @@
             <ion-item-option color="secondary" @click="openTags(track)">
               <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
             </ion-item-option>
-            <ion-item-option color="tertiary">
+            <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
               <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
@@ -58,6 +61,7 @@ import {
   IonItemOption,
   IonIcon,
   IonButtons,
+  IonButton,
   IonBackButton,
   IonSpinner,
   modalController,
@@ -66,29 +70,32 @@ import {
 } from '@ionic/vue'
 
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
+import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags } from 'ionicons/icons'
+import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
+const router = useRouter()
 const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')
+const pId = ref()
 
 onIonViewWillEnter(async () => {
   isLoading.value = true;
   const targetPathname = route.params.pathname
-  console.log(store.playlists)
   try {
     // Search through the playlists in the store state
     const playlist = store.playlists.find(playlist => playlist.pathname === targetPathname);
     if (playlist) {
       title.value = playlist.name
       tracks.value = playlist.tracks
+      pId.value = playlist.id
     } else {
       console.log(`No playlist found for pathname: ${targetPathname}`);
     }
@@ -142,9 +149,26 @@ const openTags = async (track) => {
   await modal.present()
 }
 
+const openPlaylistSelectModal = async (track) => {
+  const modal = await modalController.create({ 
+    component: PlaylistSelectModal,
+    componentProps: {
+      track: track
+    },
+    canDismiss: true
+  })
+  await modal.present()
+}
+
 onIonViewWillLeave(() => {
   console.log('liked ion destoryed')
 })
+
+const deletePlaylist = async (playlistId) => {
+  await store.deletePlaylistById(playlistId)
+  router.push({name: 'Playlists'})
+  console.log('deleted')
+}
 </script>
 <style>
 .track > .flex {

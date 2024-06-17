@@ -177,16 +177,32 @@ export const useMainStore = defineStore({
         console.error('Error in loadTaggedDataFromLocalStorage:', error);
       }
     },
-    addTrackToPlaylist(playlistId, track) {
-      const existingPlaylistIndex = this.playlists.findIndex(playlist => playlist.id === playlistId);
+    toggleTrackInPlaylist(playlistId, track) {
+      const playlistIndex = this.playlists.findIndex(playlist => playlist.id === playlistId);
+  
+      if (playlistIndex!== -1) {
+        const playlist = this.playlists[playlistIndex];
+        const trackId = track.id;
+  
+        // Check if the track is already in the playlist
+        const isTrackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist.id === trackId);
+  
+        if (isTrackInPlaylist) {
+          // Track is already in the playlist, so remove it
+          playlist.tracks = playlist.tracks.filter(trackInPlaylist => trackInPlaylist.id!== trackId);
+        } else {
+          // Track is not in the playlist, so add it
+          playlist.tracks.push({...track});
+        }
+  
+        // Update the playlist in the store
+        this.playlists[playlistIndex] = playlist;
 
-      if (existingPlaylistIndex!== -1) {
-        // If the playlist exists, add the track to it
-        this.playlists[existingPlaylistIndex].tracks.push(track);
+        // Optionally, save the updated playlists to localStorage
+        localStorage.setItem('playlists', JSON.stringify(this.playlists))
+
+        return!isTrackInPlaylist;
       }
-
-      // Optionally, save the updated playlists to localStorage
-      localStorage.setItem('playlists', JSON.stringify(this.playlists));
     },
     loadPlaylistsFromLocalStorage() {
       try {
@@ -209,5 +225,8 @@ export const useMainStore = defineStore({
         console.error('Error in loadPlaylistsFromLocalStorage:', error);
       }
     },
+    deletePlaylistById(id) {
+      this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+    }
   }
 })

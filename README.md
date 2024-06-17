@@ -4,7 +4,8 @@ Personal audio player for use with Phish.in API
 
 ### TODO
 - [ ] Play next track in AudioServices
-- [ ] Remember and preselect playlists associated with a track
+- [x] Delete playlist
+- [ ] Add to Playlist checkbox reactivity
 - [ ] Add to Playlist search functionality
 - [ ] Abstract like, tag, playlist into resuable components
 - [ ] Improve performance

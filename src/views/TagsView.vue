@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-title>Tags</ion-title>
       </ion-toolbar>
@@ -35,11 +35,9 @@ import {
 } from '@ionic/vue'
 
 import { ref } from 'vue'
-import { useMainStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { tags } from '@/utils/helpers'
 
-const store = useMainStore()
 const router = useRouter()
 const isLoading = ref(true)
 

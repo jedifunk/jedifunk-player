@@ -10,7 +10,10 @@
     <ion-searchbar></ion-searchbar>
     <ion-list>
       <ion-item v-for="playlist in playlists" :key="playlist.id">
-        <ion-checkbox @click="addToSelectedPlaylist(playlist.id)">{{ playlist.name }}</ion-checkbox>
+        <ion-checkbox
+          :checked="selectionStatus[playlist.id]"
+          @click="toggleSelectPlaylist(playlist.id)"
+        >{{ playlist.name }} {{ selectionStatus[playlist.id] }}</ion-checkbox>
       </ion-item>
     </ion-list>
     <ion-fab vertical="bottom" horizontal="center">
@@ -34,15 +37,33 @@ import {
   modalController
 } from '@ionic/vue'
 
+import { ref, onMounted } from 'vue';
 import { useMainStore } from '@/stores/index'
 
 import CreatePlaylistModal from '@/components/CreatePlaylistModal.vue'
 
 const store = useMainStore()
+const isLoading = ref(true)
+const playlists = ref([])
+const selectionStatus = ref({})
 const props = defineProps({
   track: Object
 })
-const playlists = store.playlists
+
+onMounted(() => {
+  isLoading.value = true;
+  try {
+    playlists.value = store.playlists
+    playlists.value.forEach(playlist => {
+      const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist.id === Number(props.track.id))
+      selectionStatus.value[playlist.id] = trackInPlaylist
+    });
+  } catch (error) {
+    console.error('Failed to get filtered tracks:', error);
+  } finally {
+    isLoading.value = false;
+  }
+})
 
 const openCreatePlaylist = async () => {
   const createModal = await modalController.create({ 
@@ -57,9 +78,24 @@ const openCreatePlaylist = async () => {
   await createModal.present()
 }
 
-const addToSelectedPlaylist = (playlistId) => {
-  store.addTrackToPlaylist(playlistId, props.track)
+const toggleSelectPlaylist = (playlistId) => {
+  const trackAddedOrRemoved = store.toggleTrackInPlaylist(playlistId, props.track)
+  selectionStatus.value[playlistId] = trackAddedOrRemoved
+  console.log('added:', trackAddedOrRemoved)
 };
+
+// const isTrackInPlaylist = (playlistId, track) => {
+//   const targetPlaylist = playlists.value.find(playlist => playlist.id === playlistId);
+  
+//   if (!targetPlaylist) {
+//     console.log('No playlist found with ID:', playlistId);
+//     return false;
+//   }
+
+//   const trackExists = targetPlaylist.tracks.some(trackInPlaylist => trackInPlaylist.id === Number(track.id));
+//   console.log('Is track in playlist?', trackExists);
+//   return trackExists;
+// };
 
 const dismiss = async () => {
   await modalController.dismiss()

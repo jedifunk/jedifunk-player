@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
@@ -33,7 +33,7 @@
             <ion-item-option color="secondary" @click="openTags(track)">
               <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
             </ion-item-option>
-            <ion-item-option color="tertiary">
+            <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
               <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
@@ -60,6 +60,7 @@ import {
   IonButtons,
   IonBackButton,
   IonSpinner,
+  modalController,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
@@ -69,6 +70,7 @@ import { useRoute } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
+import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, list } from 'ionicons/icons'
 
@@ -134,6 +136,17 @@ const openTags = async (track) => {
     canDismiss: true,
     handleBehavior: 'cycle',
     showBackdrop: false,
+  })
+  await modal.present()
+}
+
+const openPlaylistSelectModal = async (track) => {
+  const modal = await modalController.create({ 
+    component: PlaylistSelectModal,
+    componentProps: {
+      track: track
+    },
+    canDismiss: true
   })
   await modal.present()
 }

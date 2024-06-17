@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-title>Playlists</ion-title>
       </ion-toolbar>
@@ -11,9 +11,17 @@
         <ion-spinner name="dots"></ion-spinner>
       </div>
       <ion-list v-else>
-        <ion-item v-for="playlist in playlists" :key="playlist.id" :button="true" @click="handleSelectedPlaylist(playlist.pathname)">
-          <ion-label>{{ playlist.name }}</ion-label>
-        </ion-item>
+        <ion-item-sliding v-for="playlist in playlists" :key="playlist.id">
+          <ion-item :button="true" @click="handleSelectedPlaylist(playlist.pathname)">
+            <ion-label>{{ playlist.name }}</ion-label>
+          </ion-item>
+
+          <ion-item-options>
+            <ion-item-option color="danger">
+              <ion-icon slot="icon-only" :icon="trashOutline" @click="deletePlaylist(playlist.id)"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
       
     </ion-content>
@@ -28,11 +36,17 @@ import {
   IonContent,
   IonList,
   IonItem,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
   IonLabel,
   IonSpinner,
+  IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
+
+import { trashOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useMainStore } from '@/stores/index'
@@ -54,6 +68,11 @@ onIonViewWillEnter(() => {
   }
   
 })
+
+const deletePlaylist = async (playlistId) => {
+  await store.deletePlaylistById(playlistId)
+  playlists.value = store.playlists
+}
 
 const handleSelectedPlaylist = (pathname) => {
   router.push({ name: 'Single Playlist', params: { pathname: pathname } })

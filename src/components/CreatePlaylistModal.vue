@@ -99,8 +99,6 @@ const createPlaylist = () => {
   // Update the store with the new playlist
   store.playlists.push(newPlaylist);
 
-  console.log(newPlaylist); // Log the new playlist for now, consider storing it appropriately
-
   // Optionally, reset the playlistName after creation
   playlistName.value = 'My Jams'
   props.onClose()
