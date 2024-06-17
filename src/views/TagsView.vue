@@ -10,33 +10,12 @@
       <div class="loading" v-if="isLoading">
         <ion-spinner name="dots"></ion-spinner>
       </div>
-      <ion-list v-else class="tracks">
-        <ion-item-sliding v-for="track in tracks" :key="track.id">
-          <ion-item :button="true" :detail="false" @click="openPlayer(track)">
-            <ion-label class="track">
-              <div class="flex">
-                <div class="track-meta flex column">
-                  {{ track.title }}
-                  <p>{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
-                </div>
-                <div>{{ track.formattedDuration }}</div>
-              </div>
-            </ion-label>
-          </ion-item>
-
-          <ion-item-options side="end"> 
-            <ion-item-option @click="toggleLikeStatus(track)">
-              <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option color="secondary">
-              <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option color="tertiary">
-              <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-        </ion-list>
+      <ion-list>
+        <ion-item v-for="tag in tags" :key="tag.id" class="tag-item" :button="true" @click="selectedTag(tag.abbr)">
+          <span class="ion-padding">{{ tag.emoji }}</span><ion-label>{{ tag.name }}</ion-label>
+        </ion-item>
+      </ion-list>
+      
     </ion-content>
   </ion-page>
 </template>
@@ -50,55 +29,28 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
-  IonIcon,
   IonSpinner,
   modalController,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useMainStore } from '@/stores/index'
-import Player from '@/components/PlayerComponent.vue'
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, list } from 'ionicons/icons'
+import { useRouter } from 'vue-router'
+import { tags } from '@/utils/helpers'
 
 const store = useMainStore()
+const router = useRouter()
 const isLoading = ref(true)
-const tracks = ref([])
 
 onIonViewWillEnter(() => {
   isLoading.value = true
-  try {
-    tracks.value = store.isLikedList
-  } catch (error) {
-    console.error('failed to get liked tracks:', error)
-  } finally {
-    isLoading.value = false
-  }
+  isLoading.value = false
 })
 
-const isTrackLiked = (trackId) => {
-  return !! store.isLiked[trackId]
-}
-
-const openPlayer = async (track) => {
-
-  // set the selected track clicked
-  store.setStartingTrack(track)
-  store.setComingFromShow(true)
-
-  const modal = await modalController.create({
-    component: Player,
-  })
-
-  await modal.present()
-}
-
-const toggleLikeStatus = (track) => {
-  store.toggleLikeStatus(track)
+const selectedTag = (abbr) => {
+  router.push({ name: 'Single Tag', params: { tag: abbr } })
 }
 
 onIonViewWillLeave(() => {
@@ -106,12 +58,4 @@ onIonViewWillLeave(() => {
 })
 </script>
 <style>
-.track > .flex {
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-.track-meta p {
-  font-size: 12px;
-}
 </style>

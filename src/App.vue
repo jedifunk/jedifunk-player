@@ -18,6 +18,7 @@ const currentTrack = computed(() => store.startingTrack)
 onMounted(() => {
   try {
     store.loadLikedListFromLocalStorage();
+    store.loadTaggedDataFromLocalStorage();
   } catch (error) {
     console.error('Error executing method:', error);
   }

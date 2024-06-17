@@ -2,10 +2,12 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Favorites</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>{{ route.params.tag }}</ion-title>
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
       <div class="loading" v-if="isLoading">
         <ion-spinner name="dots"></ion-spinner>
@@ -36,7 +38,8 @@
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
-        </ion-list>
+      </ion-list>
+
     </ion-content>
   </ion-page>
 </template>
@@ -54,29 +57,39 @@ import {
   IonItemOptions,
   IonItemOption,
   IonIcon,
+  IonButtons,
+  IonBackButton,
   IonSpinner,
-  modalController,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { computed, ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
+
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, list } from 'ionicons/icons'
 
 const store = useMainStore()
+const route = useRoute()
 const isLoading = ref(true)
 const tracks = ref([])
 
-onIonViewWillEnter(() => {
+onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    const list = store.isLikedList
-    tracks.value = list.sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
+    const tagName = route.params.tag.trim().toLowerCase()
+
+    // Normalize tag names in the comparison
+    const taggedTrackIds = Object.keys(store.isTagged).filter(trackId => {
+      return store.isTagged[trackId].some(tag => tag.name.trim().toLowerCase() === tagName);
+    });
+    const filteredTracks = store.taggedList.filter(track => taggedTrackIds.includes(track.id.toString()));
+    tracks.value = filteredTracks;
   } catch (error) {
-    console.error('failed to get liked tracks:', error)
+    console.error('Failed to get filtered tracks:', error);
   } finally {
     isLoading.value = false
   }
@@ -116,8 +129,8 @@ const openTags = async (track) => {
     componentProps: {
       track: track
     },
-    breakpoints: [0,.5,.80],
-    initialBreakpoint: .80,
+    breakpoints: [0,.5,.8],
+    initialBreakpoint: .8,
     canDismiss: true,
     handleBehavior: 'cycle',
     showBackdrop: false,
@@ -134,10 +147,8 @@ onIonViewWillLeave(() => {
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
 }
 .track-meta p {
-  margin-top: 3px;
   font-size: 12px;
 }
 </style>

@@ -26,7 +26,7 @@
             <h4 class="set-title ion-padding-start">{{ setName }}</h4>
             <ion-list class="tracks">
 
-              <ion-item-sliding v-for="track in tracks" :key="track.id">
+              <ion-item-sliding v-for="(track, index) in tracks" :key="track.id">
                 <ion-item :button="true" :detail="false" @click="openPlayer(track)">
                   <ion-label class="track">
                     <div>{{ track.title }}</div>
@@ -38,8 +38,8 @@
                   <ion-item-option @click="toggleLikeStatue(track)">
                     <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
                   </ion-item-option>
-                  <ion-item-option color="secondary">
-                    <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
+                  <ion-item-option color="secondary" @click="openTags(track)">
+                    <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
                   </ion-item-option>
                   <ion-item-option color="tertiary">
                     <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
@@ -81,6 +81,7 @@ import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, li
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
 import Player from '@/components/PlayerComponent.vue'
+import TagModal from '@/components/TagModal.vue'
 
 const route = useRoute()
 const store = useMainStore()
@@ -111,6 +112,17 @@ const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
 }
 
+const isTrackTagged = computed(() => {
+  if (!store.singleShow ||!Array.isArray(store.singleShow.tracks)) {
+    return []; // Return an empty array if tracks are not available
+  }
+
+  return store.singleShow.tracks.map(track => {
+    // Assuming isTagged is a method that takes a track ID and returns a boolean
+    return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
+  });
+});
+
 const groupedTracks = computed(() => {
   const groups = {}
   if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
@@ -140,6 +152,21 @@ const openPlayer = async (track) => {
 
 const toggleLikeStatue = (track) => {
   store.toggleLikeStatus(track)
+}
+
+const openTags = async (track) => {
+  const modal = await modalController.create({ 
+    component: TagModal,
+    componentProps: {
+      track: track
+    },
+    breakpoints: [0,.5,.8],
+    initialBreakpoint: .8,
+    canDismiss: true,
+    handleBehavior: 'cycle',
+    showBackdrop: false,
+  })
+  await modal.present()
 }
 </script>
 <style>

@@ -35,6 +35,11 @@ const routes = [
         component: () => import('@/views/TagsView.vue'),
       },
       {
+        path: 'tags/:tag',
+        name: 'Single Tag',
+        component: () => import('@/views/SingleTagView.vue'),
+      },
+      {
         path: 'home/:yearParam',
         name: 'Year',
         component: () => import('@/views/YearView.vue'),
