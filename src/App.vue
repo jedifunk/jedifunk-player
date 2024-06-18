@@ -7,7 +7,7 @@
 
 <script setup>
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import { computed, onMounted } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { useMainStore } from '@/stores/index'
 import MiniPlayer from '@/components/MiniPlayer.vue'
 
@@ -15,7 +15,7 @@ const store = useMainStore()
 const showMiniPlayer = computed(() => store.showMiniPlayer)
 const currentTrack = computed(() => store.startingTrack)
 
-onMounted(() => {
+onBeforeMount(() => {
   try {
     store.loadLikedListFromLocalStorage();
     store.loadTaggedDataFromLocalStorage();

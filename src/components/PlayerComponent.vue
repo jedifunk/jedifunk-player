@@ -86,7 +86,8 @@ onMounted(async () => {
   await nextTick()
   
   if (comingFromShow.value) {
-    audioService.setAudioSource(startingTrack.value.mp3)
+    const nextTrack = audioService.getNextTrack(startingTrack.value, tracklist.value)
+    audioService.setAudioSource(startingTrack.value.mp3, nextTrack.mp3)
   }
 
   audioService.addEventListener('canplaythrough', () => {
