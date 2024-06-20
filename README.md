@@ -11,7 +11,7 @@ Personal Phish audio player.
 - [ ] BUG: clicking track in another playlist, show, list errors out
 - [ ] Clicking previous track restarts current track, then another click to go back a track
 - [ ] Tags added to localStorage
-- [ ] Add to Playlist checkbox reactivity
+- [x] Add to Playlist checkbox reactivity
 - [ ] Add to Playlist search functionality
 - [ ] Abstract like, tag, playlist into resuable components
 - [ ] Improve performance

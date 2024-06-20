@@ -12,7 +12,7 @@
       <ion-item v-for="playlist in playlists" :key="playlist.id">
         <ion-checkbox
           :checked="selectionStatus[playlist.id]"
-          @click="toggleSelectPlaylist(playlist.id)"
+          @ionChange="toggleSelectPlaylist(playlist.id)"
         >{{ playlist.name }} {{ selectionStatus[playlist.id] }}</ion-checkbox>
       </ion-item>
     </ion-list>
@@ -81,21 +81,7 @@ const openCreatePlaylist = async () => {
 const toggleSelectPlaylist = (playlistId) => {
   const trackAddedOrRemoved = store.toggleTrackInPlaylist(playlistId, props.track)
   selectionStatus.value[playlistId] = trackAddedOrRemoved
-  console.log('added:', trackAddedOrRemoved)
 };
-
-// const isTrackInPlaylist = (playlistId, track) => {
-//   const targetPlaylist = playlists.value.find(playlist => playlist.id === playlistId);
-  
-//   if (!targetPlaylist) {
-//     console.log('No playlist found with ID:', playlistId);
-//     return false;
-//   }
-
-//   const trackExists = targetPlaylist.tracks.some(trackInPlaylist => trackInPlaylist.id === Number(track.id));
-//   console.log('Is track in playlist?', trackExists);
-//   return trackExists;
-// };
 
 const dismiss = async () => {
   await modalController.dismiss()
