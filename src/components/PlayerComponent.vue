@@ -28,9 +28,8 @@
           </div>
         </div>
         <div class="progress">
-          <div class="progress-bar-container" @mousedown="startScrubbing" @mousemove="scrub" @mouseup="stopScrubbing" @touchstart="startScrubbing" @touchmove.prevent="scrub" @touchend="stopScrubbing">
+          <div class="progress-bar-container" @mousedown="audioService.startScrubbing" @mousemove="audioService.scrub" @mouseup="audioService.stopScrubbing" @touchstart="audioService.startScrubbing" @touchmove.prevent="audioService.scrub" @touchend="audioService.stopScrubbing">
             <div class="progress-bar" :style="{ width: `${progressBar}%` }"></div> 
-            <div class="loading-indicator" :style="{ width: `${isLoadingAudio}%` }"></div>
           </div>
           <div class="pb-time flex">
             <div class="pb-current">{{ elapsedTime }}</div>
@@ -41,7 +40,7 @@
           <ion-button fill="clear" @click="skipBackward">
             <ion-icon slot="icon-only" size="large" :icon="playSkipBackOutline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" @click="togglePlayPause">
+          <ion-button fill="clear" @click="togglePlayback">
             <ion-icon slot="icon-only" size="large" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="skipForward">
@@ -64,7 +63,7 @@ import {
   modalController
 } from '@ionic/vue'
 
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, onUnmounted } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, pauseOutline } from 'ionicons/icons'
 import AudioService from '@/utils/audioService'
@@ -74,156 +73,84 @@ let audioService = AudioService.getInstance()
 const store = useMainStore()
 const tracklist = computed(() => store.showTracks)
 const startingTrack = computed(() => store.startingTrack)
-const isLoadingAudio = ref(0)
+const newTrackUrl = ref(null)
 const progressBar = ref(0)
+const currentTime = ref(0)
+const duration = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
-const isScrubbing = ref(false)
-const currentTrack = computed(() => store.currentTrack)
 const comingFromShow = computed(() => store.comingFromShow)
+
+const normalizedUrl = url => url.toLowerCase().trim()
 
 onMounted(async () => {
   await nextTick()
-  
+
+  // Determine the starting track based on whether we're coming from a show
+  let startingTrackNormalizedMp3 = ''
+
   if (comingFromShow.value) {
-    const nextTrack = audioService.getNextTrack(startingTrack.value, tracklist.value)
-    audioService.setAudioSource(startingTrack.value.mp3, nextTrack.mp3)
+    const tUrls = tracklist.value.map(track => track.mp3)
+    audioService.setTracks(tUrls)
+    audioService.initPlayer()
+    startingTrackNormalizedMp3 = normalizedUrl(startingTrack.value.mp3 || '');
+
+    if (startingTrackNormalizedMp3) {
+      const trackIndex = audioService.tracks.findIndex(track => normalizedUrl(track) === startingTrackNormalizedMp3);
+      if (trackIndex!== -1) {
+        audioService.gotoTrack(trackIndex, true);
+        store.setIsPlaying(true);
+      }
+    }
   }
 
-  audioService.addEventListener('canplaythrough', () => {
-    isLoadingAudio.value = 100; // Fully loaded
-  })
-  audioService.addEventListener('progress', (event) => {
-    if (event.lengthComputable) {
-      const percentLoaded = Math.round((event.loaded / event.total) * 100);
-      isLoadingAudio.value = percentLoaded;
-    }
-  })
   if (audioService) {
-    audioService.addEventListener('timeupdate', updateProgress)
+    audioService.addEventListener('progressUpdate', (data) => {
+      currentTime.value = data.currentTime;
+      duration.value = data.duration;
+      progressBar.value = data.progressBar;
+      elapsedTime.value = data.elapsedTime;
+      remainingTime.value = data.remainingTime;
+    })
+    audioService.addEventListener('trackChanged', (data) => trackChanged(data))
   }
-  store.playTrack(store.startingTrack)
 })
 
-const togglePlayPause = () => {
-  if (store.isPlaying) {
-    audioService.pause()
-    store.pauseTrack()
+const trackChanged = (track) => {
+  newTrackUrl.value = track.trackUrl
+  // Find the index of the track with the matching mp3 URL
+  const trackIndex = tracklist.value.findIndex(track => normalizedUrl(track.mp3) === newTrackUrl.value);
+  
+  // If a matching track is found, retrieve the track object
+  if (trackIndex!== -1) {
+    const matchedTrack = tracklist.value[trackIndex];
+    store.updateStartingTrack(matchedTrack)
   } else {
-    audioService.play()
-    store.playTrack(currentTrack.value)
+    console.log("No matching track found.");
   }
+}
+
+const togglePlayback = () => {
+  audioService.togglePlayPause()
+  store.setIsPlaying(store.isPlaying =! store.isPlaying)
 }
 
 const skipForward = () => {
-  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id);
-
-  if (currentIndex >= tracklist.value.length - 1) {
-    console.log('Already on the last track');
-    return;
-  }
-
-  // Find the next track in the list
-  const nextIndex = currentIndex + 1;
-  const nextTrack = tracklist.value[nextIndex];
-
-  if (!nextTrack) {
-    console.log('No more tracks to play.');
-    return;
-  }
-
-  // Set the next track as the starting track
-  startingTrack.value = nextTrack;
-
-  // Update the audio source to the next track
-  audioService.setAudioSource(nextTrack.mp3);
-  audioService.play()
-  // Dispatch the action to update the Vuex store with the new starting track
-  store.setStartingTrack(nextTrack)
-
-  console.log('Skipping forward to:', nextTrack.title);
+  audioService.playNext();
 }
 
 const skipBackward = () => {
-  const currentIndex = tracklist.value.findIndex(track => track.id === startingTrack.value.id);
-
-  if (currentIndex <= 0) {
-    console.log('Already on the first track');
-    return;
-  }
-
-  // Calculate the index of the previous track
-  const prevIndex = currentIndex - 1;
-  const prevTrack = tracklist.value[prevIndex];
-
-  if (!prevTrack) {
-    console.log('No previous track to go back to.');
-    return;
-  }
-
-  // Set the previous track as the starting track
-  startingTrack.value = prevTrack;
-
-  // Update the audio source to the previous track
-  audioService.setAudioSource(prevTrack.mp3);
-  // Explicitly tell the audio service to play the new track
-  audioService.play();
-
-  // Dispatch the action to update the Vuex store with the new starting track
-  store.setStartingTrack(prevTrack);
-
-  console.log('Skipping backward to:', prevTrack.title);
+  audioService.playPrevious();
 }
 
-const updateProgress = () => {
-  progressBar.value = (audioService.currentTime / audioService.duration) * 100
-
-  const currentTime = audioService.getCurrentTime(); // Hypothetical method
-  const duration = audioService.getDuration();
-  
-  if (currentTime && duration) {
-    progressBar.value = (currentTime / duration) * 100;
-
-    const minutes = Math.floor(currentTime / 60);
-    const seconds = Math.floor(currentTime % 60);
-    elapsedTime.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-
-    const totalMinutes = Math.floor(duration / 60);
-    const totalSeconds = Math.floor(duration % 60);
-    const remainingMinutes = totalMinutes - minutes;
-    let remainingSeconds = totalSeconds - seconds;
-
-    if (remainingSeconds < 0) {
-      remainingSeconds += 60;
-    }
-    remainingTime.value = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
-}
-const startScrubbing = () => {
-  isScrubbing.value = true
-}
-
-const scrub = (event) => {
-  if (!isScrubbing.value) return
-
-  const isTouchEvent = event.type === 'touchmove'
-  const target = isTouchEvent? event.targetTouches[0].target : event.currentTarget
-
-  const rect = target.getBoundingClientRect();
-  const x = isTouchEvent? event.touches[0].clientX - rect.left : event.clientX - rect.left;
-  const percentage = x / rect.width;
-  const seekPosition = audioService.getDuration() * percentage;
-  audioService.setCurrentTime(seekPosition)
-}
-
-const stopScrubbing = () => {
-  isScrubbing.value = false
-}
-
-const dismiss = async (startingTrack) => {
+const dismiss = async () => {
   await modalController.dismiss()
   store.setShowMiniPlayer(true)
 }
+onUnmounted(() => {
+  audioService.removeEventListener('progressUpdate')
+  audioService.removeEventListener('trackChanged', (data) => trackChanged(data))
+})
 </script>
 <style>
 .toolbar-background {
@@ -255,21 +182,18 @@ const dismiss = async (startingTrack) => {
 }
 .progress-bar-container {
   width: 100%;
+  height: 10px;
   border-radius: 5px;
   cursor: pointer;
   position: relative;
+  background-color: var(--ion-color-light);
 }
-.loading-indicator, .progress-bar {
-  height: 10px;
+.progress-bar {
+  height: 100%;
   border-radius: 5px;
   position: absolute;
   top: 0;
   left: 0;
-}
-.loading-indicator {
-  background-color: var(--ion-color-light);
-}
-.progress-bar {
   background-color: var(--ion-color-primary);
   z-index: 1;
 }

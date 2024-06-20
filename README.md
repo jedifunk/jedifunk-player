@@ -1,10 +1,13 @@
 # Jedifunk Player
 
-Personal audio player for use with Phish.in API
+Personal Phish audio player.
+- Uses phish.in API for track audio and metadata
+- Gapless.js from ReListen for audio player
 
 ### TODO
-- [ ] Play next track in AudioServices
+- [x] Play next track in AudioServices
 - [x] Delete playlist
+- [ ] Audio player to accept playlists, not just tracklists
 - [ ] Add to Playlist checkbox reactivity
 - [ ] Add to Playlist search functionality
 - [ ] Abstract like, tag, playlist into resuable components

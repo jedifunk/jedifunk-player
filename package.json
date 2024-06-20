@@ -20,11 +20,11 @@
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
     "@vueuse/core": "^10.11.0",
+    "gapless.js": "^1.0.0",
     "ionicons": "^7.0.0",
     "pinia": "^2.1.7",
     "vue": "^3.3.0",
-    "vue-router": "^4.2.0",
-    "vuex": "^4.1.0"
+    "vue-router": "^4.2.0"
   },
   "devDependencies": {
     "@capacitor/cli": "6.0.0",

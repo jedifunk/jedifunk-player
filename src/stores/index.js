@@ -75,8 +75,8 @@ export const useMainStore = defineStore({
     setShowMiniPlayer(value) {
       this.showMiniPlayer = value;
     },
-    setIsPlaying(playing) {
-      this.isPlaying = playing;
+    setIsPlaying(isPlaying) {
+      this.isPlaying = isPlaying;
     },
     setCurrentTrack(track) {
       this.currentTrack = track;
@@ -124,15 +124,6 @@ export const useMainStore = defineStore({
       } catch (error) {
         console.error('Error in loadLikedListFromLocalStorage:', error);
       }
-    },
-    playTrack(track) {
-      this.setCurrentTrack(track);
-      audioService.play();
-      this.setIsPlaying(true);
-    },
-    pauseTrack() {
-      this.setIsPlaying(false);
-      audioService.pause();
     },
     addTag(tag, track) {
       const trackId = track.id;
@@ -227,6 +218,9 @@ export const useMainStore = defineStore({
     },
     deletePlaylistById(id) {
       this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+    },
+    updateStartingTrack(newTrack) {
+      this.startingTrack = newTrack
     }
   }
 })

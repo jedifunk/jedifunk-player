@@ -5,7 +5,7 @@
         <h6>{{ startingTrack.title }}</h6>
         <p>{{ startingTrack.show_date }} | {{ startingTrack.venue_name }}, {{ startingTrack.venue_location }}</p>
       </div>
-      <ion-button fill="clear" size="small" @click="togglePlayPause">
+      <ion-button fill="clear" size="small" @click="togglePlayback">
         <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
       </ion-button>
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
 import { useMainStore } from '@/stores/index'
@@ -28,17 +28,30 @@ import AudioService from '@/utils/audioService'
 let audioService = AudioService.getInstance()
 
 const store = useMainStore()
-const currentTrack = computed(() => store.currentTrack)
+const tracklist = computed(() => store.showTracks)
 const startingTrack = computed(() => store.startingTrack)
+const currentTime = ref(0)
+const duration = ref(0)
 const progressBar = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
+const newTrackUrl = ref(null)
 let ctm = null
+
+const normalizedUrl = url => url.toLowerCase().trim()
 
 onMounted( async() => {
   await nextTick()
+
   if (audioService) {
-    audioService.addEventListener('timeupdate', updateProgress)
+    audioService.addEventListener('progressUpdate', (data) => {
+      currentTime.value = data.currentTime;
+      duration.value = data.duration;
+      progressBar.value = data.progressBar;
+      elapsedTime.value = data.elapsedTime;
+      remainingTime.value = data.remainingTime;
+    })
+    audioService.addEventListener('trackChanged', (data) => trackChanged(data))
   }
   ctm = document.querySelector('.current-track-meta')
   if (ctm) {
@@ -51,38 +64,22 @@ onMounted( async() => {
   }
 })
 
-const togglePlayPause = () => {
-  if (store.isPlaying) {
-    audioService.pause()
-    store.pauseTrack()
-  } else {
-    audioService.play()
-    store.playTrack(currentTrack.value)
-  }
+const togglePlayback = () => {
+  audioService.togglePlayPause()
+  store.setIsPlaying(store.isPlaying =! store.isPlaying)
 }
 
-const updateProgress = () => {
-  progressBar.value = (audioService.currentTime / audioService.duration) * 100
-
-  const currentTime = audioService.getCurrentTime(); // Hypothetical method
-  const duration = audioService.getDuration();
+const trackChanged = (track) => {
+  newTrackUrl.value = track.trackUrl
+  // Find the index of the track with the matching mp3 URL
+  const trackIndex = tracklist.value.findIndex(track => normalizedUrl(track.mp3) === newTrackUrl.value);
   
-  if (currentTime && duration) {
-    progressBar.value = (currentTime / duration) * 100;
-
-    const minutes = Math.floor(currentTime / 60);
-    const seconds = Math.floor(currentTime % 60);
-    elapsedTime.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-
-    const totalMinutes = Math.floor(duration / 60);
-    const totalSeconds = Math.floor(duration % 60);
-    const remainingMinutes = totalMinutes - minutes;
-    let remainingSeconds = totalSeconds - seconds;
-
-    if (remainingSeconds < 0) {
-      remainingSeconds += 60;
-    }
-    remainingTime.value = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+  // If a matching track is found, retrieve the track object
+  if (trackIndex!== -1) {
+    const matchedTrack = tracklist.value[trackIndex];
+    store.updateStartingTrack(matchedTrack)
+  } else {
+    console.log("No matching track found.");
   }
 }
 
@@ -95,6 +92,10 @@ const handleModalSwitch = async () => {
 
   await modal.present()
 }
+onUnmounted(() => {
+  audioService.removeEventListener('progressUpdate')
+  audioService.removeEventListener('trackChanged')
+})
 </script>
 <style>
 .mini-player {
@@ -133,11 +134,8 @@ const handleModalSwitch = async () => {
 p.anim {
   animation: backAndForth 15s linear infinite;
 }
-.mini-player .progress-bar {
+.mini-player .progress-bar-container {
   height: 2px;
-}
-audio {
-  display: none;
 }
 @keyframes backAndForth {
   0% { transform: translateX(0); }
