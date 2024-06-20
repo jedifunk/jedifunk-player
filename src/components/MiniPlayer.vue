@@ -2,8 +2,8 @@
   <div class="mini-player">
     <div class="flex">
       <div class="current-track-meta" @click="handleModalSwitch">
-        <h6>{{ startingTrack.title }}</h6>
-        <p>{{ startingTrack.show_date }} | {{ startingTrack.venue_name }}, {{ startingTrack.venue_location }}</p>
+        <h6>{{ currentTrack.title }}</h6>
+        <p>{{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayback">
         <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
@@ -28,8 +28,8 @@ import AudioService from '@/utils/audioService'
 let audioService = AudioService.getInstance()
 
 const store = useMainStore()
-const tracklist = computed(() => store.showTracks)
-const startingTrack = computed(() => store.startingTrack)
+const tracklist = computed(() => store.Tracks)
+const currentTrack = computed(() => store.currentTrack)
 const currentTime = ref(0)
 const duration = ref(0)
 const progressBar = ref(0)
@@ -77,7 +77,7 @@ const trackChanged = (track) => {
   // If a matching track is found, retrieve the track object
   if (trackIndex!== -1) {
     const matchedTrack = tracklist.value[trackIndex];
-    store.updateStartingTrack(matchedTrack)
+    store.setCurrentTrack(matchedTrack)
   } else {
     console.log("No matching track found.");
   }
@@ -85,7 +85,7 @@ const trackChanged = (track) => {
 
 const handleModalSwitch = async () => {
   store.setShowMiniPlayer(false)
-  store.setComingFromShow(false)
+  store.setComingFrom('miniplayer')
   const modal = await modalController.create({
     component: Player
   })

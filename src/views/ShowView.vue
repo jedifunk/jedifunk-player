@@ -99,7 +99,6 @@ onIonViewWillEnter(async () => {
   } finally {
     isLoading.value = false
   }
-  console.log(store.singleShow)
 
   if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
     store.singleShow.tracks.forEach((track) => {
@@ -139,10 +138,10 @@ const groupedTracks = computed(() => {
 
 const openPlayer = async (track) => {
   // set tracklist for the show
-  store.setShowTracks(store.singleShow.tracks)
+  store.setTracks(store.singleShow.tracks)
   // set the selected track clicked
-  store.setStartingTrack(track)
-  store.setComingFromShow(true)
+  store.setCurrentTrack(track)
+  store.setComingFrom('show')
 
   const modal = await modalController.create({
     component: Player,

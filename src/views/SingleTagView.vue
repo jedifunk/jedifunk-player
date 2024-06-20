@@ -72,7 +72,7 @@ import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
 import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, list } from 'ionicons/icons'
+import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
@@ -109,10 +109,10 @@ const isTrackTagged = computed(() => {
 });
 
 const openPlayer = async (track) => {
-
+  store.setTracks(tracks.value)
   // set the selected track clicked
-  store.setStartingTrack(track)
-  store.setComingFromShow(true)
+  store.setCurrentTrack(track)
+  store.setComingFrom('other')
 
   const modal = await modalController.create({
     component: Player,

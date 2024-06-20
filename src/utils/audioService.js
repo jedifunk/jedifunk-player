@@ -30,7 +30,6 @@ class AudioService {
           this.updateProgress(track)
         },
         onStartNewTrack: (track) => {
-          //track && console.log('new track', track)
           this.trackChanged(track.trackUrl)
         }
       });

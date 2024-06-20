@@ -3,7 +3,7 @@
     <ion-toolbar>
       <ion-title>{{ store.dateParam }}</ion-title>
       <ion-buttons slot="start">
-        <ion-button @click="dismiss(startingTrack)">
+        <ion-button @click="dismiss(currentTrack)">
           <ion-icon slot="icon-only" :icon="chevronDown"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -20,11 +20,11 @@
       <div class="flex column">
         <div class="track-details">
           <div class="track-header flex">
-            <h2>{{ startingTrack.title }}</h2>
-            <h6>{{ startingTrack.formattedDuration }}</h6>
+            <h2>{{ currentTrack.title }}</h2>
+            <h6>{{ currentTrack.formattedDuration }}</h6>
           </div>
           <div class="track-meta">
-            {{ startingTrack.show_date }} | {{ startingTrack.venue_name }}, {{ startingTrack.venue_location }}
+            {{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}
           </div>
         </div>
         <div class="progress">
@@ -69,34 +69,36 @@ import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, 
 import AudioService from '@/utils/audioService'
 
 let audioService = AudioService.getInstance()
-
 const store = useMainStore()
-const tracklist = computed(() => store.showTracks)
-const startingTrack = computed(() => store.startingTrack)
+
+const tracklist = computed(() => store.Tracks)
+const currentTrack = computed(() => store.currentTrack)
+const comingFrom = ref(null)
 const newTrackUrl = ref(null)
 const progressBar = ref(0)
 const currentTime = ref(0)
 const duration = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
-const comingFromShow = computed(() => store.comingFromShow)
 
 const normalizedUrl = url => url.toLowerCase().trim()
 
 onMounted(async () => {
   await nextTick()
+  comingFrom.value = store.comingFrom
 
   // Determine the starting track based on whether we're coming from a show
-  let startingTrackNormalizedMp3 = ''
+  let currentTrackNormalizedMp3 = ''
 
-  if (comingFromShow.value) {
+  if (comingFrom.value === 'show' || comingFrom.value === 'other') {
     const tUrls = tracklist.value.map(track => track.mp3)
+
     audioService.setTracks(tUrls)
     audioService.initPlayer()
-    startingTrackNormalizedMp3 = normalizedUrl(startingTrack.value.mp3 || '');
+    currentTrackNormalizedMp3 = normalizedUrl(currentTrack.value.mp3 || '');
 
-    if (startingTrackNormalizedMp3) {
-      const trackIndex = audioService.tracks.findIndex(track => normalizedUrl(track) === startingTrackNormalizedMp3);
+    if (currentTrackNormalizedMp3) {
+      const trackIndex = audioService.tracks.findIndex(track => normalizedUrl(track) === currentTrackNormalizedMp3);
       if (trackIndex!== -1) {
         audioService.gotoTrack(trackIndex, true);
         store.setIsPlaying(true);
@@ -124,7 +126,7 @@ const trackChanged = (track) => {
   // If a matching track is found, retrieve the track object
   if (trackIndex!== -1) {
     const matchedTrack = tracklist.value[trackIndex];
-    store.updateStartingTrack(matchedTrack)
+    store.setCurrentTrack(matchedTrack)
   } else {
     console.log("No matching track found.");
   }

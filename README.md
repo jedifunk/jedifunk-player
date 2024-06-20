@@ -7,7 +7,10 @@ Personal Phish audio player.
 ### TODO
 - [x] Play next track in AudioServices
 - [x] Delete playlist
-- [ ] Audio player to accept playlists, not just tracklists
+- [x] Audio player to accept playlists, not just tracklists
+- [ ] BUG: clicking track in another playlist, show, list errors out
+- [ ] Clicking previous track restarts current track, then another click to go back a track
+- [ ] Tags added to localStorage
 - [ ] Add to Playlist checkbox reactivity
 - [ ] Add to Playlist search functionality
 - [ ] Abstract like, tag, playlist into resuable components

@@ -1,7 +1,4 @@
 import { defineStore } from 'pinia';
-import AudioService from '@/utils/audioService'
-
-let audioService = AudioService.getInstance()
 
 export const useMainStore = defineStore({
   id: 'main',
@@ -9,14 +6,13 @@ export const useMainStore = defineStore({
     years: [],
     shows: {},
     singleShow: {},
-    showTracks: [],
-    startingTrack: {},
+    tracks: [],
     yearParam: null,
     dateParam: null,
     showMiniPlayer: false,
     isPlaying: false,
     currentTrack: {},
-    comingFromShow: false,
+    comingFrom: 'show',
     isLiked: {},
     isLikedList: [],
     taggedList: [],
@@ -27,8 +23,7 @@ export const useMainStore = defineStore({
     getYears: state => state.years,
     getShows: state => state.shows,
     getSingleShow: state => state.singleShow,
-    getShowTracks: state => state.showTracks,
-    getStartingTrack: state => state.startingTrack,
+    getTracks: state => state.Tracks,
     getYearParam: state => state.yearParam,
     getDateParam: state => state.dateParam,
     getShowMiniPlayer: state => state.showMiniPlayer,
@@ -60,11 +55,8 @@ export const useMainStore = defineStore({
     setSingleShow(value) {
       this.singleShow = value;
     },
-    setShowTracks(value) {
-      this.showTracks = value;
-    },
-    setStartingTrack(value) {
-      this.startingTrack = value;
+    setTracks(value) {
+      this.Tracks = value;
     },
     setYearParam(year) {
       this.yearParam = year;
@@ -81,8 +73,13 @@ export const useMainStore = defineStore({
     setCurrentTrack(track) {
       this.currentTrack = track;
     },
-    setComingFromShow(track) {
-      this.comingFromShow = track;
+    setComingFrom(value) {
+      const validOptions = ["show", "other", "miniplayer"];
+      if (validOptions.includes(value)) {
+          this.comingFrom = value;
+      } else {
+        console.error("Invalid value for comingFrom:", value);
+      }
     },
     toggleLikeStatus(track) {
       const trackId = track.id;
@@ -218,9 +215,6 @@ export const useMainStore = defineStore({
     },
     deletePlaylistById(id) {
       this.playlists = this.playlists.filter(playlist => playlist.id !== id)
-    },
-    updateStartingTrack(newTrack) {
-      this.startingTrack = newTrack
     }
   }
 })

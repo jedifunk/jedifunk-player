@@ -118,10 +118,10 @@ const isTrackTagged = computed(() => {
 });
 
 const openPlayer = async (track) => {
-
+  store.setTracks(tracks.value)
   // set the selected track clicked
-  store.setStartingTrack(track)
-  store.setComingFromShow(true)
+  store.setCurrentTrack(track)
+  store.setComingFrom('other')
 
   const modal = await modalController.create({
     component: Player,

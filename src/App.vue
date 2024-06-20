@@ -13,7 +13,7 @@ import MiniPlayer from '@/components/MiniPlayer.vue'
 
 const store = useMainStore()
 const showMiniPlayer = computed(() => store.showMiniPlayer)
-const currentTrack = computed(() => store.startingTrack)
+const currentTrack = computed(() => store.currentTrack)
 
 onBeforeMount(() => {
   try {
