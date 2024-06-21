@@ -7,7 +7,6 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
       <div class="loading" v-if="isLoading">
         <ion-spinner name="dots"></ion-spinner>

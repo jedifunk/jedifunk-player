@@ -17,8 +17,9 @@ Personal Phish audio player.
 - [x] Tags: add to localStorage
 - [x] Add to Playlist checkbox reactivity
 - [ ] Playlist: add search functionality
-- [ ] Pinia: clean up and combine actions
-- [ ] Abstract like, tag, playlist into resuable components
+- [x] Pinia: clean up and combine actions
+- [x] Abstract like, tag, playlist into resuable components
+- [ ] Style: FIX alignment of track time when venue is long
 - [ ] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
