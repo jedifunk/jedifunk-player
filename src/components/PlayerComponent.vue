@@ -81,6 +81,10 @@ const duration = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
 
+const firstClickTime = ref(null)
+const secondClickTime = ref(null)
+const isFirstClick = ref(false)
+
 const normalizedUrl = url => url.toLowerCase().trim()
 
 onMounted(async () => {
@@ -142,7 +146,24 @@ const skipForward = () => {
 }
 
 const skipBackward = () => {
-  audioService.playPrevious();
+  if (!firstClickTime.value) {
+    // First click, reset the track and set the time and flag
+    audioService.resetCurrentTrack()
+    audioService.play()
+    firstClickTime.value = Date.now()
+    isFirstClick.value = true
+    // Set a timeout to reset the values if no second click happens within 1 second
+    setTimeout(() => {
+      firstClickTime.value = null
+      isFirstClick.value = false
+    }, 1000); // Timeout set to 1 second
+  } else if (isFirstClick.value && Date.now() - firstClickTime.value <= 1000) {
+    // Second click within 1 second, clear the times and unflag
+    firstClickTime.value = null
+    secondClickTime.value = Date.now()
+    isFirstClick.value = false
+    audioService.playPrevious()
+  }
 }
 
 const dismiss = async () => {

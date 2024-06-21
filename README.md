@@ -9,11 +9,14 @@ Personal Phish audio player.
 - [x] Delete playlist
 - [x] Audio player to accept playlists, not just tracklists
 - [ ] BUG: clicking track in another playlist, show, list errors out
-- [ ] Clicking previous track restarts current track, then another click to go back a track
+- [x] Clicking previous track restarts current track, then another click to go back a track
+- [ ] Add "playing" icon to current track in list views, or highlight its row
 - [ ] Tags added to localStorage
-- [ ] Add to Playlist checkbox reactivity
+- [x] Add to Playlist checkbox reactivity
 - [ ] Add to Playlist search functionality
 - [ ] Abstract like, tag, playlist into resuable components
 - [ ] Improve performance
+- [ ] Improve playback
+- [ ] Allow download to local for faster play
 - [ ] Move data (like, tag, playlist, etc) to supabase or similar
 - [ ] Build to native app
