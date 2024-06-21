@@ -13,7 +13,7 @@
         <ion-checkbox
           :checked="selectionStatus[playlist.id]"
           @ionChange="toggleSelectPlaylist(playlist.id)"
-        >{{ playlist.name }} {{ selectionStatus[playlist.id] }}</ion-checkbox>
+        >{{ playlist.name }}</ion-checkbox>
       </ion-item>
     </ion-list>
     <ion-fab vertical="bottom" horizontal="center">

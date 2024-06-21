@@ -16,7 +16,7 @@
         <ion-spinner name="dots"></ion-spinner>
       </div>
       <ion-list v-else class="tracks">
-        <ion-item-sliding v-for="(track, index) in tracks" :key="track.id">
+        <ion-item-sliding v-for="track in tracks" :key="track.id">
           <TrackComponent :track="track" @click="openPlayer(track)"/>
 
           <ion-item-options side="end"> 
@@ -24,7 +24,7 @@
               <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
             </ion-item-option>
             <ion-item-option color="secondary" @click="openTags(track)">
-              <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
+              <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
             </ion-item-option>
             <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
               <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
@@ -44,8 +44,6 @@ import {
   IonToolbar,
   IonContent,
   IonList,
-  IonItem,
-  IonLabel,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
@@ -59,7 +57,7 @@ import {
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
@@ -67,7 +65,7 @@ import TagModal from '@/components/TagModal.vue'
 import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 import TrackComponent from '@/components/TrackComponent.vue'
 
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, trashOutline } from 'ionicons/icons'
+import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
@@ -101,12 +99,12 @@ const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
 }
 
-const isTrackTagged = computed(() => {
-  return tracks.value.map(track => {
-    // Assuming isTagged is a method that takes a track ID and returns a boolean
-    return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
-  });
-});
+// const isTrackTagged = computed(() => {
+//   return tracks.value.map(track => {
+//     // Assuming isTagged is a method that takes a track ID and returns a boolean
+//     return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
+//   });
+// });
 
 const openPlayer = async (track) => {
   store.setTracks(tracks.value)
@@ -131,11 +129,7 @@ const openTags = async (track) => {
     componentProps: {
       track: track
     },
-    breakpoints: [0,.5,.8],
-    initialBreakpoint: .8,
     canDismiss: true,
-    handleBehavior: 'cycle',
-    showBackdrop: false,
   })
   await modal.present()
 }

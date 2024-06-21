@@ -1,49 +1,94 @@
 <template>
+  <ion-toolbar>
+    <ion-title>Tag</ion-title>
+    <ion-buttons slot="start">
+      <ion-button @click="dismiss">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
   <ion-content>
+    <ion-button @click="openCreateTag">New Tag</ion-button>
     <ion-list>
-      <ion-list-header>
-        <ion-title>Tags</ion-title>
-      </ion-list-header>
-      <ion-item v-for="tag in tags" :key="tag.id" class="tag-item">
-        <ion-checkbox :checked="store.getIsTagged(props.track.id, tag.id)" @click="selectTag(tag)"><span>{{ tag.emoji }}</span> {{ tag.name }}</ion-checkbox>
+      <ion-item v-for="tag in tags" :key="tag.id">
+        <ion-checkbox
+          :checked="selectionStatus[tag.id]"
+          @ionChange="toggleSelectTag(tag.id)"
+        >{{ tag.name }}</ion-checkbox>
       </ion-item>
     </ion-list>
-    <ion-button @click="dismiss" size="small" expand="block">Close</ion-button>
+    <ion-fab vertical="bottom" horizontal="center">
+      <ion-fab-button size="small" @click="dismiss">Done</ion-fab-button>
+    </ion-fab>
   </ion-content>
 </template>
 <script setup>
 import {
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
   IonContent,
   IonList,
-  IonListHeader,
-  IonTitle,
   IonItem,
   IonCheckbox,
-  IonButton,
+  IonFab,
+  IonFabButton,
   modalController
 } from '@ionic/vue'
 
-import { ref } from 'vue'
-import { useMainStore } from '@/stores'
-import { tags } from '@/utils/helpers'
+import { ref, onMounted } from 'vue';
+import { useMainStore } from '@/stores/index'
+
+import CreateTagModal from '@/components/CreateTagModal.vue'
 
 const store = useMainStore()
-const selectedTags = ref([])
+const isLoading = ref(true)
+const tags = ref([])
+const selectionStatus = ref({})
 const props = defineProps({
   track: Object
 })
 
-const selectTag = (tag) => {
-  selectedTags.value.push(tag)
-  store.addTag(tag, props.track)
+onMounted(() => {
+  isLoading.value = true;
+  try {
+    tags.value = store.tags
+    tags.value.forEach(tag => {
+      const trackInTag = tag.tracks.some(trackInTag => trackInTag.id === Number(props.track.id))
+      selectionStatus.value[tag.id] = trackInTag
+    });
+  } catch (error) {
+    console.error('Failed to get filtered tracks:', error);
+  } finally {
+    isLoading.value = false;
+  }
+})
+
+const openCreateTag = async () => {
+  const createModal = await modalController.create({ 
+    component: CreateTagModal,
+    componentProps: {
+      onClose: () => createModal.dismiss()
+    },
+    breakpoints: [0,.5],
+    initialBreakpoint: .5,
+    canDismiss: true
+  })
+  await createModal.present()
 }
+
+const toggleSelectTag = (tagId) => {
+  const trackAddedOrRemoved = store.toggleTagged(tagId, props.track)
+  selectionStatus.value[tagId] = trackAddedOrRemoved
+};
 
 const dismiss = async () => {
   await modalController.dismiss()
 }
 </script>
 <style>
-.tag-item span {
-  font-size: 21px;
+ion-fab-button {
+  width: 100px;
+  --border-radius: 5px;
+  --box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
 }
 </style>

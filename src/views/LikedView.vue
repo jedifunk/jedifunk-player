@@ -19,7 +19,7 @@
               <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
             </ion-item-option>
             <ion-item-option color="secondary" @click="openTags(track)">
-              <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
+              <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
             </ion-item-option>
             <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
               <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
@@ -76,12 +76,12 @@ const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
 }
 
-const isTrackTagged = computed(() => {
-  return tracks.value.map(track => {
-    // Assuming isTagged is a method that takes a track ID and returns a boolean
-    return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
-  });
-});
+// const isTrackTagged = computed(() => {
+//   return tracks.value.map(track => {
+//     // Assuming isTagged is a method that takes a track ID and returns a boolean
+//     return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
+//   });
+// });
 
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
@@ -107,11 +107,7 @@ const openTags = async (track) => {
     componentProps: {
       track: track
     },
-    breakpoints: [0,.5,.80],
-    initialBreakpoint: .80,
     canDismiss: true,
-    handleBehavior: 'cycle',
-    showBackdrop: false,
   })
   await modal.present()
 }

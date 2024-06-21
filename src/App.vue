@@ -17,9 +17,7 @@ const currentTrack = computed(() => store.currentTrack)
 
 onBeforeMount(() => {
   try {
-    store.loadLikedListFromLocalStorage();
-    store.loadTaggedDataFromLocalStorage();
-    store.loadPlaylistsFromLocalStorage();
+    store.getFromLocalStorage()
   } catch (error) {
     console.error('Error executing method:', error);
   }

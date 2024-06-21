@@ -10,10 +10,18 @@
       <div class="loading" v-if="isLoading">
         <ion-spinner name="dots"></ion-spinner>
       </div>
-      <ion-list>
-        <ion-item v-for="tag in tags" :key="tag.id" class="tag-item" :button="true" @click="selectedTag(tag.abbr)">
-          <span class="ion-padding">{{ tag.emoji }}</span><ion-label>{{ tag.name }}</ion-label>
-        </ion-item>
+      <ion-list v-else>
+        <ion-item-sliding v-for="tag in tags" :key="tag.id">
+          <ion-item :button="true" @click="handleSelectedTag(tag.pathname)">
+            <ion-label>{{ tag.name }}</ion-label>
+          </ion-item>
+
+          <ion-item-options>
+            <ion-item-option color="danger">
+              <ion-icon slot="icon-only" :icon="trashOutline" @click="deleteTag(tag.id)"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
       
     </ion-content>
@@ -28,26 +36,46 @@ import {
   IonContent,
   IonList,
   IonItem,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
   IonLabel,
   IonSpinner,
+  IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { tags } from '@/utils/helpers'
+import { trashOutline } from 'ionicons/icons'
 
+import { ref } from 'vue'
+import { useMainStore } from '@/stores/index'
+import { useRouter } from 'vue-router'
+
+const store = useMainStore()
 const router = useRouter()
 const isLoading = ref(true)
+const tags = ref([])
 
 onIonViewWillEnter(() => {
   isLoading.value = true
-  isLoading.value = false
+  try {
+    tags.value = store.tags
+  } catch (error) {
+    console.error('Failed to get tags', error)
+  } finally {
+    isLoading.value = false
+  }
+  
 })
 
-const selectedTag = (abbr) => {
-  router.push({ name: 'Single Tag', params: { tag: abbr } })
+const deleteTag = async (tagId) => {
+  await store.deleteTagById(tagId)
+  tags.value = store.tags
+}
+
+const handleSelectedTag = (pathname) => {
+  router.push({ name: 'Single Tag', params: { tag: pathname } })
 }
 
 onIonViewWillLeave(() => {

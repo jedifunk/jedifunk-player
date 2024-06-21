@@ -15,8 +15,7 @@ export const useMainStore = defineStore({
     comingFrom: 'show',
     isLiked: {},
     isLikedList: [],
-    taggedList: [],
-    isTagged: {},
+    tags: [],
     playlists: []
   }),
   getters: {
@@ -97,72 +96,80 @@ export const useMainStore = defineStore({
       localStorage.setItem('isLiked', JSON.stringify(this.isLiked));
       localStorage.setItem('isLikedList', JSON.stringify(this.isLikedList))
     },
-    loadLikedListFromLocalStorage() {
-      try {
-        const storedIsLiked = localStorage.getItem('isLiked')
-        const storedIsLikedList = localStorage.getItem('isLikedList');
-        if (storedIsLiked && storedIsLikedList) {
-          try {
-            // Parse the stored JSON strings back into objects
-            const parsedIsLiked = JSON.parse(storedIsLiked);
-            const parsedIsLikedList = JSON.parse(storedIsLikedList);
+    // loadLikedListFromLocalStorage() {
+    //   try {
+    //     const storedIsLiked = localStorage.getItem('isLiked')
+    //     const storedIsLikedList = localStorage.getItem('isLikedList');
+    //     if (storedIsLiked && storedIsLikedList) {
+    //       try {
+    //         // Parse the stored JSON strings back into objects
+    //         const parsedIsLiked = JSON.parse(storedIsLiked);
+    //         const parsedIsLikedList = JSON.parse(storedIsLikedList);
     
-            // Update the store's state with the retrieved data
-            this.isLiked = parsedIsLiked;
-            this.isLikedList = parsedIsLikedList;
+    //         // Update the store's state with the retrieved data
+    //         this.isLiked = parsedIsLiked;
+    //         this.isLikedList = parsedIsLikedList;
     
-            // Optionally, trigger reactivity if needed
-            this.$patch({ isLiked: parsedIsLiked, isLikedList: parsedIsLikedList });
-            //this.isLikedList.splice(0, this.isLikedList.length,...parsedData)
-          } catch (parseError) {
-            console.error('Error parsing localStorage data:', parseError);
-          }
+    //         // Optionally, trigger reactivity if needed
+    //         this.$patch({ isLiked: parsedIsLiked, isLikedList: parsedIsLikedList });
+    //         //this.isLikedList.splice(0, this.isLikedList.length,...parsedData)
+    //       } catch (parseError) {
+    //         console.error('Error parsing localStorage data:', parseError);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('Error in loadLikedListFromLocalStorage:', error);
+    //   }
+    // },
+    // loadTaggedDataFromLocalStorage() {
+    //   try {
+    //     const storedIsTagged = localStorage.getItem('isTagged');
+    //     const storedTaggedList = localStorage.getItem('taggedList');
+    //     if (storedIsTagged && storedTaggedList) {
+    //       try {
+    //         // Parse the stored JSON strings back into objects
+    //         const parsedIsTagged = JSON.parse(storedIsTagged);
+    //         const parsedTaggedList = JSON.parse(storedTaggedList);
+    
+    //         // Update the store's state with the retrieved data
+    //         this.isTagged = parsedIsTagged;
+    //         this.taggedList = parsedTaggedList;
+    
+    //         // Optionally, trigger reactivity if needed
+    //         this.$patch({ isTagged: parsedIsTagged, taggedList: parsedTaggedList });
+    //       } catch (parseError) {
+    //         console.error('Error parsing localStorage data:', parseError);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('Error in loadTaggedDataFromLocalStorage:', error);
+    //   }
+    // },
+    toggleTagged(tagId, track) {
+      const tagIndex = this.tags.findIndex(tag => tag.id === tagId);
+  
+      if (tagIndex!== -1) {
+        const tag = this.tags[tagIndex];
+        const trackId = track.id;
+  
+        // Check if the track is already in the tag
+        const isTrackInTag = tag.tracks.some(trackTagged => trackTagged.id === trackId);
+  
+        if (isTrackInTag) {
+          // Track is already in the tag, so remove it
+          tag.tracks = tag.tracks.filter(trackTagged => trackTagged.id!== trackId);
+        } else {
+          // Track is not in the tag, so add it
+          tag.tracks.push({...track});
         }
-      } catch (error) {
-        console.error('Error in loadLikedListFromLocalStorage:', error);
-      }
-    },
-    addTag(tag, track) {
-      const trackId = track.id;
-      
-      if (!this.isTagged[trackId]) {
-        // Initialize the track's tags array if it doesn't exist yet
-        this.isTagged[trackId] = [];
-      }
-    
-      // Add the new tag to the track's tags array
-      this.isTagged[trackId].push(tag);
-    
-      // If the track is not already in the taggedList, add it
-      if (!this.taggedList.some(t => t.id === trackId)) {
-        this.taggedList.push({...track}); // Spread operator to create a copy of the track object
-      }
-      
-      localStorage.setItem('isTagged', JSON.stringify(this.isTagged));
-      localStorage.setItem('taggedList', JSON.stringify(this.taggedList))
-    },
-    loadTaggedDataFromLocalStorage() {
-      try {
-        const storedIsTagged = localStorage.getItem('isTagged');
-        const storedTaggedList = localStorage.getItem('taggedList');
-        if (storedIsTagged && storedTaggedList) {
-          try {
-            // Parse the stored JSON strings back into objects
-            const parsedIsTagged = JSON.parse(storedIsTagged);
-            const parsedTaggedList = JSON.parse(storedTaggedList);
-    
-            // Update the store's state with the retrieved data
-            this.isTagged = parsedIsTagged;
-            this.taggedList = parsedTaggedList;
-    
-            // Optionally, trigger reactivity if needed
-            this.$patch({ isTagged: parsedIsTagged, taggedList: parsedTaggedList });
-          } catch (parseError) {
-            console.error('Error parsing localStorage data:', parseError);
-          }
-        }
-      } catch (error) {
-        console.error('Error in loadTaggedDataFromLocalStorage:', error);
+  
+        // Update the tag in the store
+        this.tags[tagIndex] = tag;
+
+        // Optionally, save the updated tags to localStorage
+        localStorage.setItem('tags', JSON.stringify(this.tags))
+
+        return!isTrackInTag;
       }
     },
     toggleTrackInPlaylist(playlistId, track) {
@@ -192,29 +199,56 @@ export const useMainStore = defineStore({
         return!isTrackInPlaylist;
       }
     },
-    loadPlaylistsFromLocalStorage() {
-      try {
-        const storedPlaylists = localStorage.getItem('playlists');
-        if (storedPlaylists) {
-          try {
-            // Parse the stored JSON string back into an object
-            const parsedPlaylists = JSON.parse(storedPlaylists);
+    // loadPlaylistsFromLocalStorage() {
+    //   try {
+    //     const storedPlaylists = localStorage.getItem('playlists');
+    //     if (storedPlaylists) {
+    //       try {
+    //         // Parse the stored JSON string back into an object
+    //         const parsedPlaylists = JSON.parse(storedPlaylists);
     
-            // Update the store's state with the retrieved data
-            this.playlists = parsedPlaylists;
+    //         // Update the store's state with the retrieved data
+    //         this.playlists = parsedPlaylists;
     
-            // Optionally, trigger reactivity if needed
-            this.$patch({ playlists: parsedPlaylists });
-          } catch (parseError) {
-            console.error('Error parsing localStorage data:', parseError);
-          }
-        }
-      } catch (error) {
-        console.error('Error in loadPlaylistsFromLocalStorage:', error);
-      }
-    },
+    //         // Optionally, trigger reactivity if needed
+    //         this.$patch({ playlists: parsedPlaylists });
+    //       } catch (parseError) {
+    //         console.error('Error parsing localStorage data:', parseError);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('Error in loadPlaylistsFromLocalStorage:', error);
+    //   }
+    // },
     deletePlaylistById(id) {
       this.playlists = this.playlists.filter(playlist => playlist.id !== id)
-    }
+    },
+    deleteTagById(id) {
+      this.tags = this.tags.filter(tag => tag.id !== id)
+    },
+    getFromLocalStorage() {
+      const storedPlaylists = localStorage.getItem('playlists');
+      const storedIsLiked = localStorage.getItem('isLiked')
+      const storedIsLikedList = localStorage.getItem('isLikedList');
+      const storedTags = localStorage.getItem('tags')
+
+      if (storedPlaylists) {
+        this.playlists = JSON.parse(storedPlaylists)
+        this.$patch({ playlists: this.playlists })
+      }
+      if (storedIsLiked) {
+        this.isLiked = JSON.parse(storedIsLiked)
+        this.$patch({ isLiked: this.isLiked })
+      }
+      if (storedIsLikedList) {
+        this.isLikedList = JSON.parse(storedIsLikedList)
+        this.$patch({ isLikedList: this.isLikedList })
+      }
+      if (storedTags) {
+        this.tags = JSON.parse(storedTags)
+        this.$patch({ tags: this.tags })
+      }
+
+    },
   }
 })

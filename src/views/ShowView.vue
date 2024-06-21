@@ -33,7 +33,7 @@
                     <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
                   </ion-item-option>
                   <ion-item-option color="secondary" @click="openTags(track)">
-                    <ion-icon slot="icon-only" :icon="isTrackTagged[index] ? pricetags : pricetagsOutline"></ion-icon>
+                    <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
                   </ion-item-option>
                   <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
                     <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
