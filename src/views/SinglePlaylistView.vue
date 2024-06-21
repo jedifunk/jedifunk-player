@@ -17,17 +17,7 @@
       </div>
       <ion-list v-else class="tracks">
         <ion-item-sliding v-for="(track, index) in tracks" :key="track.id">
-          <ion-item :button="true" :detail="false" @click="openPlayer(track)">
-            <ion-label class="track">
-              <div class="flex">
-                <div class="track-meta flex column">
-                  {{ track.title }}
-                  <p>{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
-                </div>
-                <div>{{ track.formattedDuration }}</div>
-              </div>
-            </ion-label>
-          </ion-item>
+          <TrackComponent :track="track" @click="openPlayer(track)"/>
 
           <ion-item-options side="end"> 
             <ion-item-option @click="toggleLikeStatus(track)">
@@ -75,6 +65,7 @@ import { useMainStore } from '@/stores/index'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
 import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
+import TrackComponent from '@/components/TrackComponent.vue'
 
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags, trashOutline } from 'ionicons/icons'
 

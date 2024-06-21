@@ -25,14 +25,8 @@
           <div v-for="(tracks, setName) in groupedTracks" :key="setName">
             <h4 class="set-title ion-padding-start">{{ setName }}</h4>
             <ion-list class="tracks">
-
               <ion-item-sliding v-for="(track, index) in tracks" :key="track.id">
-                <ion-item :button="true" :detail="false" @click="openPlayer(track)">
-                  <ion-label class="track">
-                    <div>{{ track.title }}</div>
-                    <div>{{ track.formattedDuration }}</div>
-                  </ion-label>
-                </ion-item>
+                <TrackComponent :track="track" :show="true" @click="openPlayer(track)" />
   
                 <ion-item-options side="end"> 
                   <ion-item-option @click="toggleLikeStatue(track)">
@@ -61,7 +55,6 @@ import {
   IonPage,  
   IonToolbar,
   IonList,
-  IonItem,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
@@ -83,6 +76,7 @@ import { formatDuration } from '@/utils/helpers'
 import Player from '@/components/PlayerComponent.vue'
 import TagModal from '@/components/TagModal.vue'
 import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
+import TrackComponent from '@/components/TrackComponent.vue'
 
 const route = useRoute()
 const store = useMainStore()
