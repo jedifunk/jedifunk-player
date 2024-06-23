@@ -38,16 +38,17 @@ const store = useMainStore()
 const isLoading = ref(true)
 const { tracks } = defineProps(['tracks'])
 
-onMounted(() => {
-  isLoading.value = true
-})
+// onMounted(() => {
+//   isLoading.value = true
+//   console.log(tracks)
+// })
 
 const isTrackLiked = (trackId) => {
   return !! store.isLiked[trackId]
 }
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
-  store.setTracks(tracks.value)
+  store.setTracks(tracks)
   // set the selected track clicked
   store.setCurrentTrack(track)
   store.setComingFrom('other')
@@ -91,15 +92,3 @@ const openPlaylistSelectModal = async (track) => {
 //   });
 // });
 </script>
-<style>
-.track > .flex {
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-.track-meta p {
-  margin-top: 3px;
-  font-size: 12px;
-}
-</style>

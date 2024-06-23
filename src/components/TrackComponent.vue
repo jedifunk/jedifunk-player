@@ -1,16 +1,15 @@
 <template>
   <ion-item :button="true" :detail="false">
-    <ion-label class="track">
-      <div class="flex">
-        <div class="track-meta flex column" ref="tm">
-          <div :class="{'playing': tracksMatch}">
-            <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
-            {{ track.title }}</div>
-          <p v-if="!show">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
-        </div>
-        <div>{{ track.formattedDuration }}</div>
+    <div class="track flex">
+      <div class="track-meta flex column" ref="tm">
+        <ion-label :class="{'playing': tracksMatch}">
+          <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
+          {{ track.title }}
+        </ion-label>
+        <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
       </div>
-    </ion-label>
+      <div>{{ track.formattedDuration }}</div>
+    </div>
   </ion-item>
 </template>
 <script setup>
@@ -26,35 +25,43 @@ import { barcodeOutline } from 'ionicons/icons';
 const store = useMainStore()
 const { show, track } = defineProps(['track', 'show'])
 const tm = ref(null)
+const p = ref(null)
 const currentTrack = computed(() => store.currentTrack)
 const tracksMatch = ref(false)
+const isLoading = ref(true)
+
+const animate = computed(() => {
+  if (tm.value && p.value ) {
+    animate.value = p.value.scrollWidth > tm.value.clientWidth
+  }
+  return animate
+})
 
 onMounted(async () => {
-  await nextTick()
-
-  if (!show) {
-    const para = tm.value.querySelector('p')
-    const parentWidth = tm.value.clientWidth
-    const pWidth = para.scrollWidth
-    //console.log('p:', para, 'parent:', parentWidth, 'pw:', pWidth)
-    if (pWidth > parentWidth) {
-      para?.classList.add('anim')
-    }
+  isLoading.value = true;
+  try {
+    await nextTick()
+  } catch (error) {
+    console.error('Failed to get filtered tracks:', error);
+  } finally {
+    isLoading.value = false;
   }
 })
 
 watchEffect(() => {
   tracksMatch.value = currentTrack.value.id === track.id
 })
+
 </script>
 <style>
-.track > .flex {
+.track {
   width: 100%;
   justify-content: space-between;
   align-items: center;
+  margin: 10px auto;
 }
 .track-meta {
-  max-width: 75%;
+  max-width: calc(100% - 75px);
   overflow-x: hidden;
 }
 .track-meta p {
@@ -70,6 +77,7 @@ p.anim {
   align-items: center;
   color: var(--ion-color-primary);
 }
+
 @keyframes backAndForth {
   0% { transform: translateX(0); }
   10% { transform: translateX(0); }

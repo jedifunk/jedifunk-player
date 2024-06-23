@@ -13,13 +13,15 @@ Personal Phish audio player.
 - [x] Clicking previous track restarts current track, then another click to go back a track
 - [x] Tracks: Add "playing" icon to current track in list views, or highlight its row
 - [ ] Tracks: Upgrade playing icon to animated audiobar
+- [ ] Tracks: FIX animation of venue
 - [x] Tags: switch to ionChange
 - [x] Tags: add to localStorage
 - [x] Add to Playlist checkbox reactivity
 - [ ] Playlist: add search functionality
 - [x] Pinia: clean up and combine actions
 - [x] Abstract like, tag, playlist into resuable components
-- [ ] Style: FIX alignment of track time when venue is long
+- [ ] Router: adjust routes to be cleaner
+- [x] Style: FIX alignment of track time when venue is long
 - [ ] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode

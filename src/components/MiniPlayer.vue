@@ -1,9 +1,9 @@
 <template>
   <div class="mini-player">
     <div class="flex">
-      <div class="current-track-meta" @click="handleModalSwitch">
+      <div ref="ctm" class="current-track-meta" @click="handleModalSwitch">
         <h6>{{ currentTrack.title }}</h6>
-        <p>{{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
+        <p ref="para" :class="{'anim': shouldAnimate}">{{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayback">
         <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
@@ -36,9 +36,17 @@ const progressBar = ref(0)
 const elapsedTime = ref('00:00')
 const remainingTime = ref('00:00')
 const newTrackUrl = ref(null)
-let ctm = null
+const ctm = ref(null)
+const para = ref(null)
 
 const normalizedUrl = url => url.toLowerCase().trim()
+
+const shouldAnimate = computed(() => {
+  if (!ctm.value ||!para.value) return false;
+  const ctmWidth = ctm.value.clientWidth;
+  const pScrollWidth = para.value.scrollWidth;
+  return pScrollWidth > ctmWidth;
+})
 
 onMounted( async() => {
   await nextTick()
@@ -52,15 +60,6 @@ onMounted( async() => {
       remainingTime.value = data.remainingTime;
     })
     audioService.addEventListener('trackChanged', (data) => trackChanged(data))
-  }
-  ctm = document.querySelector('.current-track-meta')
-  if (ctm) {
-    const para = document.querySelector('.current-track-meta p')
-    const parentWidth = ctm.clientWidth
-    const pWidth = para.scrollWidth
-    if (pWidth > parentWidth) {
-      para?.classList.add('anim')
-    }
   }
 })
 
