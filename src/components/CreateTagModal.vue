@@ -19,12 +19,12 @@
 import {
   IonContent,
   IonInput,
-  IonButton,
-  modalController
+  IonButton
 } from '@ionic/vue'
 
 import { ref, onMounted, watchEffect } from 'vue'
 import { useMainStore } from '@/stores'
+import { v4 as uuidv4 } from 'uuid'
 
 const store = useMainStore()
 const tagName = ref('Sick Tag')
@@ -72,18 +72,8 @@ const createTag = () => {
   // check if name is taken
   if (!isValidName.value) return
 
-  let newTagId
-  // Check if the tags array in the store is empty
-  if (store.tags.length === 0) {
-    // If empty, use 0 as the starting ID
-    newTagId = 0;
-  } else {
-    // If not empty, fetch the current maximum ID from the store
-    const maxId = store.maxTagId;
-
-    // Calculate the new ID for the tag
-    newTagId = maxId + 1;
-  }
+  // create unique ID
+  const newTagId = uuidv4()
 
   // Convert the tag name to URL path friendly format
   const pathname = tagName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -97,7 +87,7 @@ const createTag = () => {
   };
 
   // Update the store with the new tag
-  store.tags.push(newTag);
+  store.addTag(newTag);
 
   // Optionally, reset the tagName after creation
   tagName.value = 'Sick Tag'

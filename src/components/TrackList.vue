@@ -85,10 +85,4 @@ const openPlaylistSelectModal = async (track) => {
   })
   await modal.present()
 }
-// const isTrackTagged = computed(() => {
-//   return tracks.value.map(track => {
-//     // Assuming isTagged is a method that takes a track ID and returns a boolean
-//     return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
-//   });
-// });
 </script>

@@ -25,6 +25,7 @@ import {
 
 import { ref, onMounted, watchEffect } from 'vue'
 import { useMainStore } from '@/stores'
+import { v4 as uuidv4 } from 'uuid'
 
 const store = useMainStore()
 const playlistName = ref('My Jams')
@@ -72,18 +73,8 @@ const createPlaylist = () => {
   // check if name is taken
   if (!isValidName.value) return
 
-  let newPlaylistId
-  // Check if the playlists array in the store is empty
-  if (store.playlists.length === 0) {
-    // If empty, use 0 as the starting ID
-    newPlaylistId = 0;
-  } else {
-    // If not empty, fetch the current maximum ID from the store
-    const maxId = store.maxPlaylistId;
-
-    // Calculate the new ID for the playlist
-    newPlaylistId = maxId + 1;
-  }
+  // create unique ID
+  const newPlaylistId = uuidv4()
 
   // Convert the playlist name to URL path friendly format
   const pathname = playlistName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -97,7 +88,7 @@ const createPlaylist = () => {
   };
 
   // Update the store with the new playlist
-  store.playlists.push(newPlaylist);
+  store.addPlaylist(newPlaylist);
 
   // Optionally, reset the playlistName after creation
   playlistName.value = 'My Jams'

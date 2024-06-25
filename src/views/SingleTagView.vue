@@ -36,7 +36,7 @@ import {
 } from '@ionic/vue'
 
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Tracklist from '@/components/TrackList.vue'
 
@@ -44,6 +44,7 @@ import { trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
+const router = useRouter()
 const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')

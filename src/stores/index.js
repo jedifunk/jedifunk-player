@@ -19,10 +19,6 @@ export const useMainStore = defineStore({
     playlists: []
   }),
   getters: {
-    getYears: state => state.years,
-    getShows: state => state.shows,
-    getSingleShow: state => state.singleShow,
-    getTracks: state => state.Tracks,
     maxPlaylistId() {
       return Math.max(...this.playlists.map(playlist => playlist.id));
     }  
@@ -54,6 +50,22 @@ export const useMainStore = defineStore({
     },
     setCurrentTrack(track) {
       this.currentTrack = track;
+    },
+    addTag(tag) {
+      this.tags.push(tag)
+      localStorage.setItem('tags', JSON.stringify(this.tags))
+    },
+    addPlaylist(playlist) {
+      this.playlists.push(playlist)
+      localStorage.setItem('playlists', JSON.stringify(this.playlists))
+    },
+    deletePlaylistById(id) {
+      this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+      localStorage.setItem('playlists', JSON.stringify(this.playlists))
+    },
+    deleteTagById(id) {
+      this.tags = this.tags.filter(tag => tag.id !== id)
+      localStorage.setItem('tags', JSON.stringify(this.tags))
     },
     setComingFrom(value) {
       const validOptions = ["show", "other", "miniplayer"];
@@ -132,12 +144,6 @@ export const useMainStore = defineStore({
 
         return!isTrackInPlaylist;
       }
-    },
-    deletePlaylistById(id) {
-      this.playlists = this.playlists.filter(playlist => playlist.id !== id)
-    },
-    deleteTagById(id) {
-      this.tags = this.tags.filter(tag => tag.id !== id)
     },
     getFromLocalStorage() {
       const storedPlaylists = localStorage.getItem('playlists');

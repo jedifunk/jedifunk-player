@@ -21,27 +21,7 @@
           </p>
         </div>
         <div>
-          <div v-for="(tracks, setName) in groupedTracks" :key="setName">
-            <h4 class="set-title ion-padding-start">{{ setName }}</h4>
-            <ion-list class="tracks">
-              <ion-item-sliding v-for="(track, index) in tracks" :key="track.id">
-                <TrackComponent :track="track" :show="true" @click="openPlayer(track)" />
-  
-                <ion-item-options side="end"> 
-                  <ion-item-option @click="toggleLikeStatue(track)">
-                    <ion-icon slot="icon-only" :icon="isTrackLiked(track.id) ? bookmark : bookmarkOutline"></ion-icon>
-                  </ion-item-option>
-                  <ion-item-option color="secondary" @click="openTags(track)">
-                    <ion-icon slot="icon-only" :icon="pricetagsOutline"></ion-icon>
-                  </ion-item-option>
-                  <ion-item-option color="tertiary" @click="openPlaylistSelectModal(track)">
-                    <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
-                  </ion-item-option>
-                </ion-item-options>
-              </ion-item-sliding>
-
-            </ion-list>
-          </div>
+          <SetList :groupedTracks="groupedTracks"/>
         </div>  
       </div>
     </ion-content>
@@ -53,29 +33,19 @@ import {
   IonHeader, 
   IonPage,  
   IonToolbar,
-  IonList,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
-  IonIcon,
-  IonLabel,
   IonButtons,
   IonBackButton,
   onIonViewWillEnter,
-  modalController,
   IonSpinner
 } from '@ionic/vue'
+import SetList from '@/components/SetList.vue'
 
 import { ref, computed } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { useRoute } from 'vue-router'
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline, pricetags } from 'ionicons/icons'
+
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
-import Player from '@/components/PlayerComponent.vue'
-import TagModal from '@/components/TagModal.vue'
-import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
-import TrackComponent from '@/components/TrackComponent.vue'
 
 const route = useRoute()
 const store = useMainStore()
@@ -101,21 +71,6 @@ onIonViewWillEnter(async () => {
   }
 })
 
-const isTrackLiked = (trackId) => {
-  return !! store.isLiked[trackId]
-}
-
-const isTrackTagged = computed(() => {
-  if (!store.singleShow ||!Array.isArray(store.singleShow.tracks)) {
-    return []; // Return an empty array if tracks are not available
-  }
-
-  return store.singleShow.tracks.map(track => {
-    // Assuming isTagged is a method that takes a track ID and returns a boolean
-    return store.isTagged.hasOwnProperty(track.id) && store.isTagged[track.id].length > 0;
-  });
-});
-
 const groupedTracks = computed(() => {
   const groups = {}
   if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
@@ -128,50 +83,6 @@ const groupedTracks = computed(() => {
   }
   return groups
 })
-
-const openPlayer = async (track) => {
-  // set tracklist for the show
-  store.setTracks(store.singleShow.tracks)
-  // set the selected track clicked
-  store.setCurrentTrack(track)
-  store.setComingFrom('show')
-
-  const modal = await modalController.create({
-    component: Player,
-  })
-
-  await modal.present()
-}
-
-const toggleLikeStatue = (track) => {
-  store.toggleLikeStatus(track)
-}
-
-const openTags = async (track) => {
-  const modal = await modalController.create({ 
-    component: TagModal,
-    componentProps: {
-      track: track
-    },
-    breakpoints: [0,.5,.8],
-    initialBreakpoint: .8,
-    canDismiss: true,
-    handleBehavior: 'cycle',
-    showBackdrop: false,
-  })
-  await modal.present()
-}
-
-const openPlaylistSelectModal = async (track) => {
-  const modal = await modalController.create({ 
-    component: PlaylistSelectModal,
-    componentProps: {
-      track: track
-    },
-    canDismiss: true
-  })
-  await modal.present()
-}
 </script>
 <style>
 .show-details {
@@ -179,14 +90,6 @@ const openPlaylistSelectModal = async (track) => {
 }
 .show-details p span {
   float: right;
-}
-.item {
-  --inner-padding: 0;
-}
-.tracks .track {
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
 }
 .loading {
   display: flex;

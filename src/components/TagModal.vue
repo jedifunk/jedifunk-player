@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-content>
-    <ion-button @click="openCreateTag">New Tag</ion-button>
+    <ion-button class="ion-padding" expand="block" @click="openCreateTag">New Tag</ion-button>
     <ion-list>
       <ion-item v-for="tag in tags" :key="tag.id">
         <ion-checkbox
@@ -64,16 +64,20 @@ onMounted(() => {
 })
 
 const openCreateTag = async () => {
-  const createModal = await modalController.create({ 
+  const createTagModal = await modalController.create({ 
     component: CreateTagModal,
     componentProps: {
-      onClose: () => createModal.dismiss()
+      onClose: () => createTagModal.dismiss()
     },
     breakpoints: [0,.5],
     initialBreakpoint: .5,
-    canDismiss: true
+    canDismiss: true,
   })
-  await createModal.present()
+  await createTagModal.present()
+
+  createTagModal.onDidDismiss = ((detail, role) => {
+    console.log('create tag modal did dismiss', detail, role)
+  })
 }
 
 const toggleSelectTag = (tagId) => {

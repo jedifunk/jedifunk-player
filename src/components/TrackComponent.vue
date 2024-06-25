@@ -72,7 +72,7 @@ watchEffect(() => {
 p.anim {
   animation: backAndForth 15s linear infinite;
 }
-.playing {
+.track .playing {
   display: flex;
   align-items: center;
   color: var(--ion-color-primary);
