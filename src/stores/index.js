@@ -16,7 +16,8 @@ export const useMainStore = defineStore({
     isLiked: {},
     isLikedList: [],
     tags: [],
-    playlists: []
+    playlists: [],
+    userId: null
   }),
   getters: {
     maxPlaylistId() {

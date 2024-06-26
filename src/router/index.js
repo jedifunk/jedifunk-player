@@ -53,6 +53,11 @@ const routes = [
         path: 'home/:yearParam/:dateParam',
         name: 'Date',
         component: () => import('@/views/ShowView.vue'),
+      },
+      {
+        path: 'home/user/:userParam',
+        name: 'User',
+        component: () => import('@/views/UserView.vue')
       }
     ],
   },
