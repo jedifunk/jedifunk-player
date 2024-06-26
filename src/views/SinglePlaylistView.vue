@@ -77,6 +77,6 @@ const deletePlaylist = async (playlistId) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('liked ion destoryed')
+  console.log('single playlist ion will leave')
 })
 </script>

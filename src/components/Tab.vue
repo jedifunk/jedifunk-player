@@ -3,7 +3,7 @@
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="Shows" href="/tabs/home">
+        <ion-tab-button tab="shows" href="/tabs/home">
           <ion-icon :icon="calendarOutline" />
           <ion-label>Shows</ion-label>
         </ion-tab-button>
@@ -27,28 +27,15 @@
   </ion-page>
 </template>
 
-<script>
-  import { 
-    IonTabs,
-    IonTabBar,
-    IonTabButton,
-    IonIcon,
-    IonPage,
-    IonRouterOutlet, 
-    IonLabel,
-  } from '@ionic/vue';
-  import { calendarOutline, bookmarkOutline, listOutline, pricetagsOutline } from 'ionicons/icons'
-
-  export default {
-    name: 'TabComponent',
-    components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, },
-    data() {
-      return {
-        calendarOutline,
-        bookmarkOutline,
-        listOutline,
-        pricetagsOutline
-      };
-    },
-  };
+<script setup>
+import { 
+  IonTabs,
+  IonTabBar,
+  IonTabButton,
+  IonIcon,
+  IonPage,
+  IonRouterOutlet, 
+  IonLabel,
+} from '@ionic/vue';
+import { calendarOutline, bookmarkOutline, listOutline, pricetagsOutline } from 'ionicons/icons'
 </script>

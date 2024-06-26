@@ -77,6 +77,6 @@ const deleteTag = async (tagId) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('liked ion destoryed')
+  console.log('single tag ion will leave')
 })
 </script>

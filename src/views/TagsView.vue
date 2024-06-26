@@ -79,7 +79,7 @@ const handleSelectedTag = (pathname) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('liked ion destoryed')
+  console.log('tags ion will leave')
 })
 </script>
 <style>

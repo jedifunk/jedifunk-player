@@ -35,27 +35,26 @@ import {
   IonToolbar,
   IonButtons,
   IonBackButton,
-  onIonViewWillEnter,
+  onIonViewWillLeave,
   IonSpinner
 } from '@ionic/vue'
 import SetList from '@/components/SetList.vue'
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { useRoute } from 'vue-router'
 
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
 
-const route = useRoute()
 const store = useMainStore()
 const isLoading = ref(true)
 const isLiked = ref({})
 
-onIonViewWillEnter(async () => {
+onMounted(async () => {
   isLoading.value = true
   try {
-    const singleShow = await getSingleShow(route.params.dateParam)
+    const singleShow = await getSingleShow(store.dateParam)
     store.setSingleShow(singleShow.data) 
   } catch (error) {
     console.error('failed to set single show:', error)
@@ -82,6 +81,9 @@ const groupedTracks = computed(() => {
     })
   }
   return groups
+})
+onIonViewWillLeave(() => {
+  console.log('show view will leave')
 })
 </script>
 <style>

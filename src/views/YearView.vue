@@ -35,37 +35,40 @@ import {
   IonLabel,
   IonButtons,
   IonBackButton,
-  onIonViewWillEnter,
-  IonSpinner
+  IonSpinner,
+  onIonViewWillLeave
 } from '@ionic/vue'
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { getShows } from '@/utils/fetch'
 import { useMainStore } from '@/stores/index'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const store = useMainStore()
 const isLoading = ref(true)
-const route = useRoute()
 const router = useRouter()
 
-onIonViewWillEnter(async () => {
-  isLoading.value = true
+onMounted(async () => {
+  isLoading.value = true;
   try {
-    const shows = await getShows(route.params.yearParam);
+    const shows = await getShows(store.yearParam);
     store.setShows(shows.data)
+    console.log('fetched shows:', store.shows)
   } catch (error) {
     console.error('failed to set shows:', error)
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 })
-
 // click event for show selection
 const selectedDate = (date) => {
   store.setDateParam(date)
   router.push({ name: 'Date', params: { dateParam: date } })
 }
+
+onIonViewWillLeave(() => {
+  console.log('year view will leave:')
+})
 </script>
 <style>
 a {

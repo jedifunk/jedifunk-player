@@ -79,7 +79,7 @@ const handleSelectedPlaylist = (pathname) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('liked ion destoryed')
+  console.log('playlists ion will leave')
 })
 </script>
 <style>

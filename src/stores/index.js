@@ -112,7 +112,6 @@ export const useMainStore = defineStore({
         // Update the tag in the store
         this.tags[tagIndex] = tag;
 
-        // Optionally, save the updated tags to localStorage
         localStorage.setItem('tags', JSON.stringify(this.tags))
 
         return!isTrackInTag;
@@ -139,7 +138,6 @@ export const useMainStore = defineStore({
         // Update the playlist in the store
         this.playlists[playlistIndex] = playlist;
 
-        // Optionally, save the updated playlists to localStorage
         localStorage.setItem('playlists', JSON.stringify(this.playlists))
 
         return!isTrackInPlaylist;
