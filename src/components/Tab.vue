@@ -10,7 +10,7 @@
 
         <ion-tab-button tab="liked" href="/tabs/liked">
           <ion-icon :icon="bookmarkOutline" />
-          <ion-label>Favorites</ion-label>
+          <ion-label>Liked</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="tags" href="/tabs/tags">

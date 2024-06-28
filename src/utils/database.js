@@ -110,3 +110,49 @@ export async function removeTrackFromPlaylist(playlistId, trackId) {
     console.error('Error removing track from playlist:', error.message);
   }
 }
+
+export async function getUserLikes(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .select('*, tracks (*)')
+
+      if (error) {
+        console.error('Error fetching likes:', error);
+      }
+      
+    return data
+  } catch (error) {
+    console.error('failed to get likes', error)
+  }
+}
+
+export async function addTrackToLikes(trackId, userId) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .insert([{track_id: trackId, user_id: userId}])
+      .single()
+
+      if (error) {
+        console.error('Error adding to likes:', error);
+      }
+  } catch (error) {
+    console.error('failed to add track to likes', error)
+  }
+}
+
+export async function removeTrackFromLikes(trackId, userId) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .delete()
+      .match({ track_id: trackId, user_id: userId });
+
+      if (error) {
+        console.error('Error removing from likes:', error);
+      }
+  } catch (error) {
+    console.error('failed to remove track from likes', error)
+  }
+}

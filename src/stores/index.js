@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import { supabase, tagTrack, untagTrack, getUserTagsWithTracks, getUserPlaylistsWithTracks } from '@/utils/database'
-import { addTrackToPlaylist, removeTrackFromPlaylist } from '../utils/database';
+import * as sb from '@/utils/database'
 
 export const useMainStore = defineStore({
   id: 'main',
@@ -15,8 +14,7 @@ export const useMainStore = defineStore({
     isPlaying: false,
     currentTrack: {},
     comingFrom: 'show',
-    isLiked: {},
-    isLikedList: [],
+    likes: [],
     tags: [],
     playlists: [],
     user: {}
@@ -48,6 +46,9 @@ export const useMainStore = defineStore({
     setPlaylists(value) {
       this.playlists = value
     },
+    setLikes(likes) {
+      this.likes = likes
+    },
     setYearParam(year) {
       this.yearParam = year;
     },
@@ -69,14 +70,14 @@ export const useMainStore = defineStore({
         user_id: this.user.id
       }
       try {
-        const insertResult = await supabase
+        const insertResult = await sb.supabase
          .from('tags')
          .insert([tagData])
          .single();
     
         if (insertResult.error) throw insertResult.error;
     
-        const updatedTags = await getUserTagsWithTracks(this.user.id)
+        const updatedTags = await sb.getUserTagsWithTracks(this.user.id)
         
         if (updatedTags.error) throw updatedTags.error
 
@@ -86,19 +87,18 @@ export const useMainStore = defineStore({
       }
     },
     async addPlaylist(playlist) {
-      console.log('add triggered')
       const playlistData = {
         ...playlist,
         user_id: this.user.id
       }
       try {
-        const insertPlaylist = await supabase
+        const insertPlaylist = await sb.supabase
           .from('playlists')
           .insert([playlistData])
           .single()
         if (insertPlaylist.error) throw insertPlaylist.error
 
-        const updatedPlaylists = await getUserPlaylistsWithTracks(this.user.id)
+        const updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
         if (updatedPlaylists.error) throw updatedPlaylists.error
 
         this.playlists = updatedPlaylists
@@ -107,26 +107,26 @@ export const useMainStore = defineStore({
       }
     },
     async deletePlaylistById(playlistId) {
-      const { data, error } = await supabase
+      const { data, error } = await sb.supabase
         .from('playlists')
         .delete()
         .match({ id: playlistId})
       if (error) throw error
 
-      const updatedPlaylists = await getUserPlaylistsWithTracks(this.user.id)
+      const updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
 
       if (updatedPlaylists.fetchError) throw updatedPlaylists.fetchError
 
       this.playlists = updatedPlaylists
     },
     async deleteTagById(tagId) {
-      const { data, error } = await supabase
+      const { data, error } = await sb.supabase
         .from('tags')
         .delete()
         .match({ id: tagId})
       if (error) throw error
 
-      const updatedTags = await getUserTagsWithTracks(this.user.id)
+      const updatedTags = await sb.getUserTagsWithTracks(this.user.id)
 
       if (updatedTags.fetchError) throw updatedTags.fetchError
 
@@ -140,21 +140,30 @@ export const useMainStore = defineStore({
         console.error("Invalid value for comingFrom:", value);
       }
     },
-    toggleLikeStatus(track) {
+    async toggleLikeStatus(track) {
       const trackId = track.id;
-      const isCurrentlyLiked = this.isLiked[trackId] || false;
-      this.isLiked[trackId] =!isCurrentlyLiked;
+      let isLiked = false;
 
-      if (!isCurrentlyLiked) {
-        this.isLikedList.push(track);
-      } else {
-        const index = this.isLikedList.findIndex(t => t.id === trackId);
-        if (index!== -1) {
-          this.isLikedList.splice(index, 1);
+      // Check if the track is already liked
+      for (let like of this.likes) {
+        if (like.track_id === trackId) {
+          isLiked = true
+          break
         }
       }
-      localStorage.setItem('isLiked', JSON.stringify(this.isLiked));
-      localStorage.setItem('isLikedList', JSON.stringify(this.isLikedList))
+
+      if (!isLiked) {
+        await sb.addTrackToLikes(track.id, this.user.id)
+      } else {
+        await sb.removeTrackFromLikes(track.id, this.user.id)
+      }
+
+      const updatedLikes = await sb.getUserLikes(this.user.id)
+      if (updatedLikes.fetchError) throw updatedLikes.fetchError
+
+      this.likes = updatedLikes
+
+      return!isLiked
     },
     async toggleTagged(tagId, track) {
       // find correct tag
@@ -175,14 +184,14 @@ export const useMainStore = defineStore({
             ...tag,
             tracks: tag.tracks.filter(trackTagged => trackTagged.id !== trackId)
           }
-          await untagTrack(tagId, trackId)
+          await sb.untagTrack(tagId, trackId)
         } else {
           // Track is not in the tag, so add it
           updatedTag = {
             ...tag,
             tracks: [...tag.tracks, {...track}]
           }
-          await tagTrack(
+          await sb.tagTrack(
             track.duration,
             track.id,
             track.mp3,
@@ -196,7 +205,7 @@ export const useMainStore = defineStore({
         }
   
         // Update the tag in the store
-        const updatedTagsFromDB = await getUserTagsWithTracks(this.user.id)
+        const updatedTagsFromDB = await sb.getUserTagsWithTracks(this.user.id)
 
         this.tags = updatedTagsFromDB
         return!isTrackInTag;
@@ -220,14 +229,14 @@ export const useMainStore = defineStore({
             ...playlist,
             tracks: playlist.tracks.filter(trackInPlaylist => trackInPlaylist.id!== trackId)
           }
-          await removeTrackFromPlaylist(playlistId, trackId)
+          await sb.removeTrackFromPlaylist(playlistId, trackId)
         } else {
           // Track is not in the playlist, so add it
           updatedPlaylist = {
             ...playlist,
             tracks: [...playlist.tracks, {...track}]
           }
-          await addTrackToPlaylist(
+          await sb.addTrackToPlaylist(
             track.duration,
             track.id,
             track.mp3,
@@ -241,34 +250,11 @@ export const useMainStore = defineStore({
         }
   
         // Update the playlist in the store
-        const updatedPlaylistsFromDB = await getUserPlaylistsWithTracks(this.user.id)
+        const updatedPlaylistsFromDB = await sb.getUserPlaylistsWithTracks(this.user.id)
 
         this.playlists = updatedPlaylistsFromDB
         return!isTrackInPlaylist;
       }
     },
-    getFromLocalStorage() {
-      const storedPlaylists = localStorage.getItem('playlists');
-      const storedIsLiked = localStorage.getItem('isLiked')
-      const storedIsLikedList = localStorage.getItem('isLikedList');
-      const storedTags = localStorage.getItem('tags')
-
-      if (storedPlaylists) {
-        this.playlists = JSON.parse(storedPlaylists)
-        this.$patch({ playlists: this.playlists })
-      }
-      if (storedIsLiked) {
-        this.isLiked = JSON.parse(storedIsLiked)
-        this.$patch({ isLiked: this.isLiked })
-      }
-      if (storedIsLikedList) {
-        this.isLikedList = JSON.parse(storedIsLikedList)
-        this.$patch({ isLikedList: this.isLikedList })
-      }
-      if (storedTags) {
-        this.tags = JSON.parse(storedTags)
-        this.$patch({ tags: this.tags })
-      }
-    }
   }
 })

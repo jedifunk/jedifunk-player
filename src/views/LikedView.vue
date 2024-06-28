@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Favorites</ion-title>
+        <ion-title>Liked Tracks</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -33,11 +33,11 @@ const store = useMainStore()
 const isLoading = ref(true)
 const tracks = ref([])
 
-onIonViewWillEnter(() => {
+onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    const list = store.isLikedList
-    tracks.value = list.sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
+    const list = JSON.parse(JSON.stringify(await store.likes))
+    tracks.value = list.map(item => item.tracks).sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
   } catch (error) {
     console.error('failed to get liked tracks:', error)
   } finally {

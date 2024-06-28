@@ -41,7 +41,7 @@ const store = useMainStore()
 const { groupedTracks } = defineProps(['groupedTracks'])
 
 const isTrackLiked = (trackId) => {
-  return !! store.isLiked[trackId]
+  return !! store.likes[trackId]
 }
 
 const openPlayer = async (track) => {

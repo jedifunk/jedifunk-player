@@ -1,26 +1,33 @@
 <template>
-  <ion-item :button="true" :detail="false">
-    <div class="track flex">
-      <div class="track-meta flex column" ref="tm">
-        <ion-label :class="{'playing': tracksMatch}">
-          <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
-          {{ track.title }}
-        </ion-label>
-        <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+  <ion-item-sliding>
+    <ion-item :button="true" :detail="false" @click="openPlayer(track)">
+      <div class="track flex">
+        <div class="track-meta flex column" ref="tm">
+          <ion-label :class="{'playing': tracksMatch}">
+            <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
+            {{ track.title }}
+          </ion-label>
+          <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+        </div>
+        <div>{{ track.formattedDuration }}</div>
       </div>
-      <div>{{ track.formattedDuration }}</div>
-    </div>
-  </ion-item>
+    </ion-item>
+    <TrackOptions :track="track" />
+  </ion-item-sliding>
 </template>
 <script setup>
 import {
   IonItem,
   IonLabel,
+  IonItemSliding,
   IonIcon
 } from '@ionic/vue'
+import Player from '@/components/PlayerComponent.vue'
+import TrackOptions from '@/components/TrackOptions.vue'
+import { barcodeOutline } from 'ionicons/icons'
+
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
 import { useMainStore } from '@/stores'
-import { barcodeOutline } from 'ionicons/icons';
 
 const store = useMainStore()
 const { show, track } = defineProps(['track', 'show'])
@@ -52,6 +59,19 @@ watchEffect(() => {
   tracksMatch.value = currentTrack.value.id === track.id
 })
 
+const openPlayer = async (track) => {
+  // set tracks for use in player tracklist
+  store.setTracks(tracks)
+  // set the selected track clicked
+  store.setCurrentTrack(track)
+  store.setComingFrom('other')
+
+  const modal = await modalController.create({
+    component: Player,
+  })
+
+  await modal.present()
+}
 </script>
 <style>
 .track {
