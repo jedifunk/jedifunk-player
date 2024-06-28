@@ -53,7 +53,6 @@ onMounted(async () => {
   try {
     const shows = await getShows(store.yearParam);
     store.setShows(shows.data)
-    console.log('fetched shows:', store.shows)
   } catch (error) {
     console.error('failed to set shows:', error)
   } finally {

@@ -31,7 +31,7 @@ import TagModal from '@/components/TagModal.vue'
 import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline } from 'ionicons/icons'
 
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useMainStore } from '@/stores/index'
 
 const store = useMainStore()

@@ -1,4 +1,5 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
+import { supabase, tagTrack, untagTrack, getUserTagsWithTracks } from '@/utils/database'
 
 export const useMainStore = defineStore({
   id: 'main',
@@ -17,7 +18,7 @@ export const useMainStore = defineStore({
     isLikedList: [],
     tags: [],
     playlists: [],
-    userId: null
+    user: {}
   }),
   getters: {
     maxPlaylistId() {
@@ -25,6 +26,9 @@ export const useMainStore = defineStore({
     }  
   },
   actions: {
+    setUser(user) {
+      this.user = user
+    },
     setYears(yearsData) {
       this.years = yearsData;
     },
@@ -36,6 +40,9 @@ export const useMainStore = defineStore({
     },
     setTracks(value) {
       this.Tracks = value;
+    },
+    setTags(value) {
+      this.tags = value
     },
     setYearParam(year) {
       this.yearParam = year;
@@ -52,9 +59,28 @@ export const useMainStore = defineStore({
     setCurrentTrack(track) {
       this.currentTrack = track;
     },
-    addTag(tag) {
-      this.tags.push(tag)
-      localStorage.setItem('tags', JSON.stringify(this.tags))
+    async addTag(tag) {
+      const userId = this.user.id
+      const tagData = {
+        ...tag,
+        user_id: userId
+      }
+      try {
+        const insertResult = await supabase
+         .from('tags')
+         .insert([tagData])
+         .single();
+    
+        if (insertResult.error) throw insertResult.error;
+    
+        const updatedTags = await getUserTagsWithTracks(this.user.id)
+        
+        if (updatedTags.error) throw updatedTags.error
+
+        this.tags = updatedTags
+      } catch (error) {
+        console.error('Error inserting tag:', error.message);
+      }
     },
     addPlaylist(playlist) {
       this.playlists.push(playlist)
@@ -64,9 +90,21 @@ export const useMainStore = defineStore({
       this.playlists = this.playlists.filter(playlist => playlist.id !== id)
       localStorage.setItem('playlists', JSON.stringify(this.playlists))
     },
-    deleteTagById(id) {
-      this.tags = this.tags.filter(tag => tag.id !== id)
-      localStorage.setItem('tags', JSON.stringify(this.tags))
+    async deleteTagById(tagId) {
+      const { data, error } = await supabase
+        .from('tags')
+        .delete()
+        .match({ id: tagId})
+      if (error) throw error
+
+      const {data: updatedTags, error: fetchError} = await supabase
+        .from('tags')
+        .select('*')
+
+      if (fetchError) throw fetchError
+
+      this.tags = updatedTags
+      //this.tags = this.tags.filter(tag => tag.id !== id)
     },
     setComingFrom(value) {
       const validOptions = ["show", "other", "miniplayer"];
@@ -92,29 +130,52 @@ export const useMainStore = defineStore({
       localStorage.setItem('isLiked', JSON.stringify(this.isLiked));
       localStorage.setItem('isLikedList', JSON.stringify(this.isLikedList))
     },
-    toggleTagged(tagId, track) {
+    async toggleTagged(tagId, track) {
+      console.log('toggle start', this.tags)
+      // find correct tag
       const tagIndex = this.tags.findIndex(tag => tag.id === tagId);
-  
-      if (tagIndex!== -1) {
+      console.log('tagIndex', tagIndex)
+      if (tagIndex !== -1) {
         const tag = this.tags[tagIndex];
         const trackId = track.id;
+        console.log('tracks', tag.tracks)
   
         // Check if the track is already in the tag
-        const isTrackInTag = tag.tracks.some(trackTagged => trackTagged.id === trackId);
+        const isTrackInTag = tag.tracks.some(trackTagged => trackTagged !== null && trackTagged.id !== null && trackTagged.id === trackId);
+
+        let updatedTag = tag
   
         if (isTrackInTag) {
           // Track is already in the tag, so remove it
-          tag.tracks = tag.tracks.filter(trackTagged => trackTagged.id!== trackId);
+          updatedTag = {
+            ...tag,
+            tracks: tag.tracks.filter(trackTagged => trackTagged.id !== trackId)
+          }
+          await untagTrack(tagId, trackId)
         } else {
           // Track is not in the tag, so add it
-          tag.tracks.push({...track});
+          updatedTag = {
+            ...tag,
+            tracks: [...tag.tracks, {...track}]
+          }
+          await tagTrack(
+            track.duration,
+            track.id,
+            track.mp3,
+            track.show_date,
+            track.title,
+            tag.id,
+            this.user.id,
+            track.venue_location,
+            track.venue_name
+          );
         }
   
         // Update the tag in the store
-        this.tags[tagIndex] = tag;
+        const updatedTagsFromDB = await getUserTagsWithTracks(this.user.id)
 
-        localStorage.setItem('tags', JSON.stringify(this.tags))
-
+        this.tags = updatedTagsFromDB
+        //this.$patch({ tags: {[tagIndex]: updatedTag} })
         return!isTrackInTag;
       }
     },

@@ -22,7 +22,6 @@
 <script setup>
 import {
   IonList,
-  IonItem,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
@@ -35,7 +34,6 @@ import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
 import TrackComponent from '@/components/TrackComponent.vue'
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline } from 'ionicons/icons'
 
-import { ref, onMounted } from 'vue'
 import { useMainStore } from '@/stores'
 
 const store = useMainStore()
@@ -70,11 +68,7 @@ const openTags = async (track) => {
     componentProps: {
       track: track
     },
-    breakpoints: [0,.5,.8],
-    initialBreakpoint: .8,
     canDismiss: true,
-    handleBehavior: 'cycle',
-    showBackdrop: false,
   })
   await modal.present()
 }

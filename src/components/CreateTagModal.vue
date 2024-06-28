@@ -24,7 +24,6 @@ import {
 
 import { ref, onMounted, watchEffect } from 'vue'
 import { useMainStore } from '@/stores'
-import { v4 as uuidv4 } from 'uuid'
 
 const store = useMainStore()
 const tagName = ref('Sick Tag')
@@ -72,18 +71,13 @@ const createTag = () => {
   // check if name is taken
   if (!isValidName.value) return
 
-  // create unique ID
-  const newTagId = uuidv4()
-
   // Convert the tag name to URL path friendly format
   const pathname = tagName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   // Create the tag object with the new ID
   const newTag = {
-    id: newTagId,
     name: tagName.value,
     pathname: pathname,
-    tracks: []
   };
 
   // Update the store with the new tag

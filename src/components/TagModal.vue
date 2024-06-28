@@ -35,7 +35,7 @@ import {
   modalController
 } from '@ionic/vue'
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/index'
 
 import CreateTagModal from '@/components/CreateTagModal.vue'
@@ -48,12 +48,12 @@ const props = defineProps({
   track: Object
 })
 
-onMounted(() => {
+onMounted(async () => {
   isLoading.value = true;
   try {
     tags.value = store.tags
     tags.value.forEach(tag => {
-      const trackInTag = tag.tracks.some(trackInTag => trackInTag.id === Number(props.track.id))
+      const trackInTag = tag.tracks.some(trackInTag => trackInTag !== null && trackInTag.id !== null && trackInTag.id !== undefined && trackInTag.id === Number(props.track.id));
       selectionStatus.value[tag.id] = trackInTag
     });
   } catch (error) {
@@ -62,6 +62,11 @@ onMounted(() => {
     isLoading.value = false;
   }
 })
+
+watch(() => store.tags, (newTags, oldTags) => {
+  console.log('tag modal watcher', newTags)
+  tags.value = newTags
+}, {deep: true})
 
 const openCreateTag = async () => {
   const createTagModal = await modalController.create({ 
@@ -80,8 +85,8 @@ const openCreateTag = async () => {
   })
 }
 
-const toggleSelectTag = (tagId) => {
-  const trackAddedOrRemoved = store.toggleTagged(tagId, props.track)
+const toggleSelectTag = async (tagId) => {
+  const trackAddedOrRemoved = await store.toggleTagged(tagId, props.track)
   selectionStatus.value[tagId] = trackAddedOrRemoved
 };
 

@@ -48,7 +48,7 @@ import {
 
 import { trashOutline } from 'ionicons/icons'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
 
@@ -57,7 +57,7 @@ const router = useRouter()
 const isLoading = ref(true)
 const tags = ref([])
 
-onIonViewWillEnter(() => {
+onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
     tags.value = store.tags
@@ -66,12 +66,14 @@ onIonViewWillEnter(() => {
   } finally {
     isLoading.value = false
   }
-  
+})
+
+watch(() => store.tags, (newTags, oldTags) => {
+  tags.value = newTags
 })
 
 const deleteTag = async (tagId) => {
   await store.deleteTagById(tagId)
-  tags.value = store.tags
 }
 
 const handleSelectedTag = (pathname) => {

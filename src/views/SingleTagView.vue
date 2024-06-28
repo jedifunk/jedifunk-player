@@ -58,7 +58,7 @@ onIonViewWillEnter(async () => {
     const tag = store.tags.find(tag => tag.pathname === targetPathname);
     if (tag) {
       title.value = tag.name
-      tracks.value = tag.tracks
+      tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []
       tId.value = tag.id
     } else {
       console.log(`No tag found for pathname: ${targetPathname}`);
@@ -73,7 +73,6 @@ onIonViewWillEnter(async () => {
 const deleteTag = async (tagId) => {
   await store.deleteTagById(tagId)
   router.push({name: 'Tags'})
-  console.log('deleted')
 }
 
 onIonViewWillLeave(() => {

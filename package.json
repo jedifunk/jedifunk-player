@@ -19,6 +19,7 @@
     "@capacitor/status-bar": "6.0.0",
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "@supabase/supabase-js": "^2.44.0",
     "@vueuse/core": "^10.11.0",
     "gapless.js": "^1.0.0",
     "ionicons": "^7.0.0",
