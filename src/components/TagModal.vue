@@ -48,7 +48,7 @@ const props = defineProps({
   track: Object
 })
 
-onMounted(async () => {
+onMounted(() => {
   isLoading.value = true;
   try {
     tags.value = store.tags
@@ -63,8 +63,7 @@ onMounted(async () => {
   }
 })
 
-watch(() => store.tags, (newTags, oldTags) => {
-  console.log('tag modal watcher', newTags)
+watch(() => store.tags, (newTags) => {
   tags.value = newTags
 }, {deep: true})
 

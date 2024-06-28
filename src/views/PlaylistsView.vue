@@ -48,7 +48,7 @@ import {
 
 import { trashOutline } from 'ionicons/icons'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
 
@@ -66,12 +66,14 @@ onIonViewWillEnter(() => {
   } finally {
     isLoading.value = false
   }
-  
+})
+
+watch(() => store.playlists, (newPlaylits) => {
+  playlists.value = newPlaylits
 })
 
 const deletePlaylist = async (playlistId) => {
   await store.deletePlaylistById(playlistId)
-  playlists.value = store.playlists
 }
 
 const handleSelectedPlaylist = (pathname) => {

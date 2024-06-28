@@ -25,7 +25,6 @@ import {
 
 import { ref, onMounted, watchEffect } from 'vue'
 import { useMainStore } from '@/stores'
-import { v4 as uuidv4 } from 'uuid'
 
 const store = useMainStore()
 const playlistName = ref('My Jams')
@@ -73,19 +72,14 @@ const createPlaylist = () => {
   // check if name is taken
   if (!isValidName.value) return
 
-  // create unique ID
-  const newPlaylistId = uuidv4()
-
   // Convert the playlist name to URL path friendly format
   const pathname = playlistName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   // Create the playlist object with the new ID
   const newPlaylist = {
-    id: newPlaylistId,
     name: playlistName.value,
-    pathname: pathname,
-    tracks: []
-  };
+    pathname: pathname
+  }
 
   // Update the store with the new playlist
   store.addPlaylist(newPlaylist);

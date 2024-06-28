@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-content>
-    <ion-button @click="openCreatePlaylist">New Playlist</ion-button>
+    <ion-button class="ion-padding" expand="block" @click="openCreatePlaylist">New Playlist</ion-button>
     <ion-searchbar></ion-searchbar>
     <ion-list>
       <ion-item v-for="playlist in playlists" :key="playlist.id">
@@ -37,7 +37,7 @@ import {
   modalController
 } from '@ionic/vue'
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/index'
 
 import CreatePlaylistModal from '@/components/CreatePlaylistModal.vue'
@@ -55,7 +55,7 @@ onMounted(() => {
   try {
     playlists.value = store.playlists
     playlists.value.forEach(playlist => {
-      const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist.id === Number(props.track.id))
+      const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id !== undefined && trackInPlaylist.id === Number(props.track.id))
       selectionStatus.value[playlist.id] = trackInPlaylist
     });
   } catch (error) {
@@ -64,6 +64,10 @@ onMounted(() => {
     isLoading.value = false;
   }
 })
+
+watch(() => store.playlists, (newPlaylists) => {
+  playlists.value = newPlaylists
+}, {deep: true})
 
 const openCreatePlaylist = async () => {
   const createModal = await modalController.create({ 
@@ -76,6 +80,10 @@ const openCreatePlaylist = async () => {
     canDismiss: true
   })
   await createModal.present()
+
+  createModal.onDidDismiss = ((detail, role) => {
+    console.log('create playlist modal did dismiss', detail, role)
+  })
 }
 
 const toggleSelectPlaylist = (playlistId) => {

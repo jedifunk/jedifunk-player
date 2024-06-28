@@ -40,7 +40,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Tracklist from '@/components/TrackList.vue'
 
-import { trashOutline } from 'ionicons/icons'
+import { play, trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
@@ -58,7 +58,7 @@ onIonViewWillEnter(async () => {
     const playlist = store.playlists.find(playlist => playlist.pathname === targetPathname);
     if (playlist) {
       title.value = playlist.name
-      tracks.value = playlist.tracks
+      tracks.value = playlist.tracks ? playlist.tracks.filter(track => track !== null) : []
       pId.value = playlist.id
     } else {
       console.log(`No playlist found for pathname: ${targetPathname}`);
@@ -73,7 +73,6 @@ onIonViewWillEnter(async () => {
 const deletePlaylist = async (playlistId) => {
   await store.deletePlaylistById(playlistId)
   router.push({name: 'Playlists'})
-  console.log('deleted')
 }
 
 onIonViewWillLeave(() => {

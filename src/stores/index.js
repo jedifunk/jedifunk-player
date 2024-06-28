@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { supabase, tagTrack, untagTrack, getUserTagsWithTracks } from '@/utils/database'
+import { supabase, tagTrack, untagTrack, getUserTagsWithTracks, getUserPlaylistsWithTracks } from '@/utils/database'
+import { addTrackToPlaylist, removeTrackFromPlaylist } from '../utils/database';
 
 export const useMainStore = defineStore({
   id: 'main',
@@ -44,6 +45,9 @@ export const useMainStore = defineStore({
     setTags(value) {
       this.tags = value
     },
+    setPlaylists(value) {
+      this.playlists = value
+    },
     setYearParam(year) {
       this.yearParam = year;
     },
@@ -60,10 +64,9 @@ export const useMainStore = defineStore({
       this.currentTrack = track;
     },
     async addTag(tag) {
-      const userId = this.user.id
       const tagData = {
         ...tag,
-        user_id: userId
+        user_id: this.user.id
       }
       try {
         const insertResult = await supabase
@@ -82,13 +85,39 @@ export const useMainStore = defineStore({
         console.error('Error inserting tag:', error.message);
       }
     },
-    addPlaylist(playlist) {
-      this.playlists.push(playlist)
-      localStorage.setItem('playlists', JSON.stringify(this.playlists))
+    async addPlaylist(playlist) {
+      console.log('add triggered')
+      const playlistData = {
+        ...playlist,
+        user_id: this.user.id
+      }
+      try {
+        const insertPlaylist = await supabase
+          .from('playlists')
+          .insert([playlistData])
+          .single()
+        if (insertPlaylist.error) throw insertPlaylist.error
+
+        const updatedPlaylists = await getUserPlaylistsWithTracks(this.user.id)
+        if (updatedPlaylists.error) throw updatedPlaylists.error
+
+        this.playlists = updatedPlaylists
+      } catch (error) {
+        console.error('Error inserting playlist', error)
+      }
     },
-    deletePlaylistById(id) {
-      this.playlists = this.playlists.filter(playlist => playlist.id !== id)
-      localStorage.setItem('playlists', JSON.stringify(this.playlists))
+    async deletePlaylistById(playlistId) {
+      const { data, error } = await supabase
+        .from('playlists')
+        .delete()
+        .match({ id: playlistId})
+      if (error) throw error
+
+      const updatedPlaylists = await getUserPlaylistsWithTracks(this.user.id)
+
+      if (updatedPlaylists.fetchError) throw updatedPlaylists.fetchError
+
+      this.playlists = updatedPlaylists
     },
     async deleteTagById(tagId) {
       const { data, error } = await supabase
@@ -97,14 +126,11 @@ export const useMainStore = defineStore({
         .match({ id: tagId})
       if (error) throw error
 
-      const {data: updatedTags, error: fetchError} = await supabase
-        .from('tags')
-        .select('*')
+      const updatedTags = await getUserTagsWithTracks(this.user.id)
 
-      if (fetchError) throw fetchError
+      if (updatedTags.fetchError) throw updatedTags.fetchError
 
       this.tags = updatedTags
-      //this.tags = this.tags.filter(tag => tag.id !== id)
     },
     setComingFrom(value) {
       const validOptions = ["show", "other", "miniplayer"];
@@ -131,14 +157,12 @@ export const useMainStore = defineStore({
       localStorage.setItem('isLikedList', JSON.stringify(this.isLikedList))
     },
     async toggleTagged(tagId, track) {
-      console.log('toggle start', this.tags)
       // find correct tag
       const tagIndex = this.tags.findIndex(tag => tag.id === tagId);
-      console.log('tagIndex', tagIndex)
+
       if (tagIndex !== -1) {
         const tag = this.tags[tagIndex];
         const trackId = track.id;
-        console.log('tracks', tag.tracks)
   
         // Check if the track is already in the tag
         const isTrackInTag = tag.tracks.some(trackTagged => trackTagged !== null && trackTagged.id !== null && trackTagged.id === trackId);
@@ -175,11 +199,10 @@ export const useMainStore = defineStore({
         const updatedTagsFromDB = await getUserTagsWithTracks(this.user.id)
 
         this.tags = updatedTagsFromDB
-        //this.$patch({ tags: {[tagIndex]: updatedTag} })
         return!isTrackInTag;
       }
     },
-    toggleTrackInPlaylist(playlistId, track) {
+    async toggleTrackInPlaylist(playlistId, track) {
       const playlistIndex = this.playlists.findIndex(playlist => playlist.id === playlistId);
   
       if (playlistIndex!== -1) {
@@ -187,21 +210,40 @@ export const useMainStore = defineStore({
         const trackId = track.id;
   
         // Check if the track is already in the playlist
-        const isTrackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist.id === trackId);
-  
+        const isTrackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id === trackId);
+        
+        let updatedPlaylist = playlist
+
         if (isTrackInPlaylist) {
           // Track is already in the playlist, so remove it
-          playlist.tracks = playlist.tracks.filter(trackInPlaylist => trackInPlaylist.id!== trackId);
+          updatedPlaylist = {
+            ...playlist,
+            tracks: playlist.tracks.filter(trackInPlaylist => trackInPlaylist.id!== trackId)
+          }
+          await removeTrackFromPlaylist(playlistId, trackId)
         } else {
           // Track is not in the playlist, so add it
-          playlist.tracks.push({...track});
+          updatedPlaylist = {
+            ...playlist,
+            tracks: [...playlist.tracks, {...track}]
+          }
+          await addTrackToPlaylist(
+            track.duration,
+            track.id,
+            track.mp3,
+            track.show_date,
+            track.title,
+            playlist.id,
+            this.user.id,
+            track.venue_location,
+            track.venue_name
+          )
         }
   
         // Update the playlist in the store
-        this.playlists[playlistIndex] = playlist;
+        const updatedPlaylistsFromDB = await getUserPlaylistsWithTracks(this.user.id)
 
-        localStorage.setItem('playlists', JSON.stringify(this.playlists))
-
+        this.playlists = updatedPlaylistsFromDB
         return!isTrackInPlaylist;
       }
     },
