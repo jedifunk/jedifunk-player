@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
@@ -9,15 +9,22 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
-      <ion-list v-else>
+      <ion-list v-else lines="none">
         <ion-item v-for="show in store.shows.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
-          <ion-label>
-            <h2>{{ show.date }}</h2>
-            <p>{{ show.venue.name }}</p>
-            <p>{{ show.venue.location }}</p>
-          </ion-label>
+          <div class="show-wrapper">
+            <div class="show-art">
+              <div>
+                <ion-icon :icon="musicalNotes"></ion-icon>
+              </div>
+            </div>
+            <ion-label>
+              <h2>{{ show.date }}</h2>
+              <p>{{ show.venue.name }}</p>
+              <p>{{ show.venue.location }}</p>
+            </ion-label>
+          </div>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -35,7 +42,7 @@ import {
   IonLabel,
   IonButtons,
   IonBackButton,
-  IonSpinner,
+  IonIcon,
   onIonViewWillLeave
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
@@ -44,6 +51,7 @@ import { ref, onMounted } from 'vue'
 import { getShows } from '@/utils/fetch'
 import { useMainStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
+import { musicalNotes } from 'ionicons/icons'
 
 const store = useMainStore()
 const isLoading = ref(true)
@@ -74,10 +82,21 @@ onIonViewWillLeave(() => {
 a {
   text-decoration: none;
 }
-.loading {
+.show-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin: 10px 0;
+}
+.show-art div {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  background: var(--ion-color-tertiary);
+}
+.show-art ion-icon {
+  fill: black;
 }
 </style>

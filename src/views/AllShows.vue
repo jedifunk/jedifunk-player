@@ -1,13 +1,13 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-title>All Shows</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
-      <ion-list v-else>
+      <ion-list v-else lines="none">
         <ion-item v-for="year in store.years.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.date)">
           <ion-label>
             <h1>{{  year.date }}</h1>
@@ -67,11 +67,5 @@ function selectedYear(year) {
 <style>
 a {
   text-decoration: none;
-}
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
 }
 </style>

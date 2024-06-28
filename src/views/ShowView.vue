@@ -1,17 +1,22 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button></ion-back-button>
         </ion-buttons>
+        <ion-title>{{ store.singleShow.date }}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
+    <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
       <div v-else>
         <div class="show-details ion-padding">
-          <h1>{{ store.singleShow.date }}</h1>
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <h1>{{ store.singleShow.date }}</h1>
+            </ion-toolbar>
+          </ion-header>
           <h3>{{ store.singleShow.venue.name }}</h3>
           <p>
             {{ store.singleShow.venue.location }}
@@ -31,17 +36,16 @@ import {
   IonHeader, 
   IonPage,  
   IonToolbar,
+  IonTitle,
   IonButtons,
   IonBackButton,
-  onIonViewWillLeave,
-  IonSpinner
+  onIonViewWillLeave
 } from '@ionic/vue'
 import SetList from '@/components/SetList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, computed, onMounted } from 'vue'
 import { useMainStore } from '@/stores/index'
-import { useRoute } from 'vue-router'
 
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
@@ -92,10 +96,10 @@ onIonViewWillLeave(() => {
 .show-details p span {
   float: right;
 }
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+.show-details ion-toolbar {
+  --background: transparent;
+}
+.show-details h1 {
+  margin: 0;
 }
 </style>

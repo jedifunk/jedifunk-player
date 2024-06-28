@@ -1,13 +1,20 @@
 <template>
   <ion-item-sliding>
     <ion-item :button="true" :detail="false" @click="openPlayer(track)">
-      <div class="track flex">
-        <div class="track-meta flex column" ref="tm">
-          <ion-label :class="{'playing': tracksMatch}">
-            <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
-            {{ track.title }}
-          </ion-label>
-          <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+      <div class="track flex"> 
+        <div class="track-inner flex">
+          <div class="track-art">
+            <div class="">
+              <ion-icon :icon="musicalNote"></ion-icon>
+            </div>
+          </div>
+          <div class="track-meta flex column" ref="tm">
+            <ion-label :class="{'playing': tracksMatch}">
+              <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
+              {{ track.title }}
+            </ion-label>
+            <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+          </div>
         </div>
         <div>{{ formatDuration(track.duration) }}</div>
       </div>
@@ -25,7 +32,7 @@ import {
 } from '@ionic/vue'
 import Player from '@/components/PlayerComponent.vue'
 import TrackOptions from '@/components/TrackOptions.vue'
-import { barcodeOutline } from 'ionicons/icons'
+import { barcodeOutline, musicalNote } from 'ionicons/icons'
 
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
 import { useMainStore } from '@/stores'
@@ -80,11 +87,26 @@ const openPlayer = async (track) => {
   width: 100%;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin: 10px auto;
 }
-.track-meta {
+.track-inner {
+  gap: 1rem;
+  align-items: center;
   max-width: calc(100% - 75px);
   overflow-x: hidden;
+}
+.track-art div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: var(--ion-color-primary);
+  border-radius: 5px;
+}
+.track-art ion-icon {
+  fill: black;
 }
 .track-meta p {
   margin: 0;

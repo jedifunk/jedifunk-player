@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content>
+    <ion-content :fullscreen="true">
       <div>{{ store.user.username }}</div>
     </ion-content>
   </ion-page>

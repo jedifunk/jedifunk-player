@@ -1,11 +1,11 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-title>Liked Tracks</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
+    <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
       <Tracklist v-else :tracks="tracks"/>
     </ion-content>

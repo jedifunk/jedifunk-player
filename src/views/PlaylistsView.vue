@@ -1,12 +1,12 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-title>Playlists</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
       <ion-list v-else>
         <ion-item-sliding v-for="playlist in playlists" :key="playlist.id">
