@@ -7,9 +7,7 @@
     </ion-header>
 
     <ion-content>
-      <div class="loading" v-if="isLoading">
-        <ion-spinner name="dots"></ion-spinner>
-      </div>
+      <Loader v-if="isLoading" />
       <ion-list v-else>
         <ion-item-sliding v-for="playlist in playlists" :key="playlist.id">
           <ion-item :button="true" @click="handleSelectedPlaylist(playlist.pathname)">
@@ -45,7 +43,7 @@ import {
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
-
+import Loader from '@/components/SpinnerComponent.vue'
 import { trashOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'

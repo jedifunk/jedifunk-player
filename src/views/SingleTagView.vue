@@ -12,9 +12,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <div class="loading" v-if="isLoading">
-        <ion-spinner name="dots"></ion-spinner>
-      </div>
+      <Loader v-if="isLoading" />
       <Tracklist v-else :tracks="tracks" />
     </ion-content>
   </ion-page>
@@ -34,13 +32,13 @@ import {
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
+import Tracklist from '@/components/TrackList.vue'
+import Loader from '@/components/SpinnerComponent.vue'
+import { trashOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
-import Tracklist from '@/components/TrackList.vue'
-
-import { trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()

@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content>
-      <div>{{ user.username }}</div>
+      <div>{{ store.user.username }}</div>
     </ion-content>
   </ion-page>
 </template>
@@ -11,5 +11,7 @@ import {
   IonContent,
 } from '@ionic/vue'
 
-const user = JSON.parse(localStorage.getItem('user'))
+import { useMainStore } from '@/stores'
+
+const store = useMainStore()
 </script>

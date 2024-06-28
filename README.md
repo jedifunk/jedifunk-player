@@ -28,5 +28,6 @@ Personal Phish audio player.
 - [ ] Improve performance
 - [ ] Improve playback
 - [ ] Allow download to local for faster play
-- [ ] Move data (like, tag, playlist, etc) to supabase or similar
+- [x] Move data (like, tag, playlist, etc) to supabase or similar
+- [ ] Create user auth system
 - [ ] Build to native app

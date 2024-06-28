@@ -9,7 +9,7 @@
           </ion-label>
           <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
         </div>
-        <div>{{ track.formattedDuration }}</div>
+        <div>{{ formatDuration(track.duration) }}</div>
       </div>
     </ion-item>
     <TrackOptions :track="track" />
@@ -20,7 +20,8 @@ import {
   IonItem,
   IonLabel,
   IonItemSliding,
-  IonIcon
+  IonIcon,
+  modalController
 } from '@ionic/vue'
 import Player from '@/components/PlayerComponent.vue'
 import TrackOptions from '@/components/TrackOptions.vue'
@@ -28,9 +29,10 @@ import { barcodeOutline } from 'ionicons/icons'
 
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
 import { useMainStore } from '@/stores'
+import { formatDuration } from '@/utils/helpers'
 
 const store = useMainStore()
-const { show, track } = defineProps(['track', 'show'])
+const { show, tracks, track } = defineProps(['track', 'show', 'tracks'])
 const tm = ref(null)
 const p = ref(null)
 const currentTrack = computed(() => store.currentTrack)

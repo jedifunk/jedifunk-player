@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content>
-      <div class="loading" v-if="isLoading"><ion-spinner name="dots"></ion-spinner></div>
+      <Loader v-if="isLoading" />
       <ion-list v-else>
         <ion-item v-for="show in store.shows.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
           <ion-label>
@@ -38,6 +38,7 @@ import {
   IonSpinner,
   onIonViewWillLeave
 } from '@ionic/vue'
+import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, onMounted } from 'vue'
 import { getShows } from '@/utils/fetch'

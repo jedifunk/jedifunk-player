@@ -6,7 +6,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div class="loading" v-if="isLoading"><ion-spinner name="dots"></ion-spinner></div>
+      <Loader v-if="isLoading" />
       <ion-list v-else>
         <ion-item v-for="year in store.years.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.date)">
           <ion-label>
@@ -31,6 +31,7 @@ import {
   IonLabel,
   IonSpinner
 } from '@ionic/vue';
+import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, onMounted } from 'vue'
 import { getYears } from '@/utils/fetch'

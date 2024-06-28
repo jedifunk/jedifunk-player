@@ -6,9 +6,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <div class="loading" v-if="isLoading">
-        <ion-spinner name="dots"></ion-spinner>
-      </div>
+      <Loader v-if="isLoading" />
       <Tracklist v-else :tracks="tracks"/>
     </ion-content>
   </ion-page>
@@ -20,11 +18,11 @@ import {
   IonTitle,
   IonToolbar,
   IonContent,
-  IonSpinner,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
 import Tracklist from '@/components/TrackList.vue';
+import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref } from 'vue'
 import { useMainStore } from '@/stores/index'

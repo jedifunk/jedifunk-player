@@ -8,9 +8,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <div class="loading" v-if="isLoading">
-        <ion-spinner name="dots"></ion-spinner>
-      </div>
+      <Loader v-if="isLoading" />
       <div v-else>
         <div class="show-details ion-padding">
           <h1>{{ store.singleShow.date }}</h1>
@@ -39,6 +37,7 @@ import {
   IonSpinner
 } from '@ionic/vue'
 import SetList from '@/components/SetList.vue'
+import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, computed, onMounted } from 'vue'
 import { useMainStore } from '@/stores/index'

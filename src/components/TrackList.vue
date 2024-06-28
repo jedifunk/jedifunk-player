@@ -1,6 +1,6 @@
 <template>
   <ion-list class="tracks">
-    <TrackComponent v-for="track in tracks" :key="track.id" :track="track"/>
+    <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracks="tracks"/>
   </ion-list>
 </template>
 <script setup>
