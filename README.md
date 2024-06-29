@@ -14,7 +14,7 @@ Personal Phish audio player.
 - [x] Tracks: Add "playing" icon to current track in list views, or highlight its row
 - [ ] Tracks: Upgrade playing icon to animated audiobar
 - [ ] Tracks: FIX animation of venue
-- [ ] Shows: Setlists abstraction so everything works on shows
+- [x] Shows: Setlists abstraction so everything works on shows
 - [x] Tags: switch to ionChange
 - [x] Tags: add to localStorage
 - [x] Add to Playlist checkbox reactivity
@@ -26,6 +26,8 @@ Personal Phish audio player.
 - [ ] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
+- [ ] Systems: Abstract into separate stores (player, user, systems)
+- [ ] Systems: Abstract functions by use (user, likes, tags, etc)
 - [ ] Improve performance
 - [ ] Improve playback
 - [ ] Allow download to local for faster play

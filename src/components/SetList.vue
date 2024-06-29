@@ -2,7 +2,7 @@
   <div v-for="(tracks, setName) in groupedTracks" :key="setName">
     <h4 class="set-title ion-padding-start">{{ setName }}</h4>
     <ion-list class="tracks" lines="none">
-      <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracks="tracks" :show="true" @click="openPlayer(track)" />
+      <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracks="tracks" :show="true"/>
     </ion-list>
   </div>
 </template>

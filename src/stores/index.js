@@ -157,7 +157,16 @@ export const useMainStore = defineStore({
       }
 
       if (!isLiked) {
-        await sb.addTrackToLikes(track.id, this.user.id)
+        await sb.addTrackToLikes(
+          track.duration,
+          track.id,
+          track.mp3,
+          track.show_date,
+          track.title,
+          this.user.id,
+          track.venue_location,
+          track.venue_name
+        )
       } else {
         await sb.removeTrackFromLikes(track.id, this.user.id)
       }

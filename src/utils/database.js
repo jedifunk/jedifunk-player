@@ -120,19 +120,25 @@ export async function getUserLikes(userId) {
       if (error) {
         console.error('Error fetching likes:', error);
       }
-      
+
     return data
   } catch (error) {
     console.error('failed to get likes', error)
   }
 }
 
-export async function addTrackToLikes(trackId, userId) {
+export async function addTrackToLikes(duration, id, mp3, showDate, title, userId, venueLocation, venueName) {
   try {
-    const { data, error } = await supabase
-      .from('likes')
-      .insert([{track_id: trackId, user_id: userId}])
-      .single()
+    const { data, error } = await supabase.rpc('track_to_likes', {
+      p_id: id,
+      p_title: title,
+      p_show_date: showDate,
+      p_venue_location: venueLocation,
+      p_venue_name: venueName,
+      p_mp3: mp3,
+      p_duration: duration,
+      p_user_id: userId,
+    })
 
       if (error) {
         console.error('Error adding to likes:', error);
