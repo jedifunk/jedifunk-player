@@ -21,7 +21,7 @@ Personal Phish audio player.
 - [ ] Playlist: add search functionality
 - [x] Pinia: clean up and combine actions
 - [x] Abstract like, tag, playlist into resuable components
-- [ ] Router: adjust routes to be cleaner
+- [x] Router: adjust routes to be cleaner
 - [x] Style: FIX alignment of track time when venue is long
 - [ ] Style: Color Theme
 - [ ] Style: Make less generic Ionic

@@ -4,18 +4,10 @@ import Tab from '@/components/Tab.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/tabs/home'
-  },
-  {
-    path: '/tabs/',
     component: Tab,
     children: [
       {
-        path: '/',
-        redirect: '/tabs/home'
-      },
-      {
-        path: 'home',
+        path: '',
         name: 'Shows',
         component: () => import('@/views/AllShows.vue'),
       },
@@ -45,17 +37,17 @@ const routes = [
         component: () => import('@/views/SingleTagView.vue'),
       },
       {
-        path: 'home/:yearParam',
+        path: ':yearParam',
         name: 'Year',
         component: () => import('@/views/YearView.vue'),
       },
       {
-        path: 'home/:yearParam/:dateParam',
+        path: ':yearParam/:dateParam',
         name: 'Date',
         component: () => import('@/views/ShowView.vue'),
       },
       {
-        path: 'home/user/:userParam',
+        path: 'user/:userParam',
         name: 'User',
         component: () => import('@/views/UserView.vue')
       }

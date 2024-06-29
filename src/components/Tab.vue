@@ -3,28 +3,28 @@
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar class="ion-no-border" slot="bottom" :translucent="true">
-        <ion-tab-button tab="shows" href="/tabs/home">
-          <ion-icon :icon="getIcon('shows')" />
+        <ion-tab-button :class="getTabInfo('shows').className" tab="shows" @click="navigateTo('Shows')">
+          <ion-icon :icon="getTabInfo('shows').iconName" />
           <ion-label>Shows</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="liked" href="/tabs/liked">
-          <ion-icon :icon="getIcon('liked')" />
+        <ion-tab-button :class="getTabInfo('liked').className" tab="liked" @click="navigateTo('Liked')">
+          <ion-icon :icon="getTabInfo('liked').iconName" />
           <ion-label>Liked</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="tags" href="/tabs/tags">
-          <ion-icon :icon="getIcon('tags')" />
+        <ion-tab-button :class="getTabInfo('tags').className" tab="tags" @click="navigateTo('Tags')">
+          <ion-icon :icon="getTabInfo('tags').iconName" />
           <ion-label>Tags</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="playlists" href="/tabs/playlists">
-          <ion-icon :icon="getIcon('playlists')" />
+        <ion-tab-button :class="getTabInfo('playlists').className" tab="playlists" @click="navigateTo('Playlists')">
+          <ion-icon :icon="getTabInfo('playlists').iconName" />
           <ion-label>Playlists</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="user" @click="goToUser(store.user.username)">
-          <ion-icon :icon="getIcon('user')" />
+        <ion-tab-button :class="getTabInfo('user').className" tab="user" @click="goToUser(store.user.username)">
+          <ion-icon :icon="getTabInfo('user').iconName" />
           <ion-label>User</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
@@ -45,33 +45,54 @@ import {
 import { calendarOutline, calendar, bookmarkOutline, bookmark, listOutline, list, pricetagsOutline, pricetags, personCircleOutline, personCircle } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { useMainStore } from '@/stores';
-import { computed } from 'vue';
+import { ref, watch } from 'vue';
 
 const store = useMainStore()
 const router = useRouter()
 
-const activeTab = computed(() => {
-  return router.currentRoute.value.name
-})
+const activeTab = ref(router.currentRoute.value.name)
 
-const getIcon = (tabName) => {
+watch(() => router.currentRoute.value, (newRoute) => {
+  activeTab.value = newRoute.name
+}, {immediate: true})
+
+const getTabInfo = (tabName) => {
+  let iconName = '';
+  let className = '';
+
   switch (tabName) {
     case 'shows':
-      return activeTab.value === 'Shows' || activeTab.value === 'Year' || activeTab.value === 'Date' ? calendar : calendarOutline;
+      iconName = activeTab.value === 'Shows' || activeTab.value === 'Year' || activeTab.value === 'Date' ? calendar : calendarOutline;
+      className = activeTab.value === 'Shows' || activeTab.value === 'Year' || activeTab.value === 'Date' ? 'tab-selected' : '';
+      break;
     case 'liked':
-      return activeTab.value === 'Liked' ? bookmark : bookmarkOutline;
+      iconName = activeTab.value === 'Liked' ? bookmark : bookmarkOutline;
+      className = activeTab.value === 'Liked' ? 'tab-selected' : '';
+      break;
     case 'tags':
-      return activeTab.value === 'Tags' ? pricetags : pricetagsOutline;
+      iconName = activeTab.value === 'Tags' || activeTab.value === 'Single Tag' ? pricetags : pricetagsOutline;
+      className = activeTab.value === 'Tags' || activeTab.value === 'Single Tag' ? 'tab-selected' : '';
+      break;
     case 'playlists':
-      return activeTab.value === 'Playlists' ? list : listOutline;
+      iconName = activeTab.value === 'Playlists' || activeTab.value === 'Single Playlist' ? list : listOutline;
+      className = activeTab.value === 'Playlists' || activeTab.value === 'Single Playlist' ? 'tab-selected' : '';
+      break;
     case 'user':
-      return activeTab.value === 'User' ? personCircle : personCircleOutline;
+      iconName = activeTab.value === 'User' ? personCircle : personCircleOutline;
+      className = activeTab.value === 'User' ? 'tab-selected' : '';
+      break;
     default:
-      return calendarOutline; // Default icon
+      iconName = calendarOutline; // Default icon
+      className = ''; // No class selected by default
   }
+
+  return { iconName, className };
 }
 
 const goToUser = (username) => {
   router.push({ name: 'User', params: { userParam: username }})
+}
+const navigateTo = (routeName) => {
+  router.push({ name: routeName });
 }
 </script>
