@@ -3,7 +3,7 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button defaultHref="/playlists"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
@@ -28,7 +28,6 @@ import {
   IonButtons,
   IonButton,
   IonBackButton,
-  IonSpinner,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
@@ -53,6 +52,9 @@ onIonViewWillEnter(async () => {
   isLoading.value = true;
   const targetPathname = route.params.pathname
   try {
+    while(!store.appReady) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     // Search through the playlists in the store state
     const playlist = store.playlists.find(playlist => playlist.pathname === targetPathname);
     if (playlist) {
@@ -62,10 +64,9 @@ onIonViewWillEnter(async () => {
     } else {
       console.log(`No playlist found for pathname: ${targetPathname}`);
     }
+    isLoading.value = false
   } catch (error) {
     console.error('Failed to get filtered tracks:', error);
-  } finally {
-    isLoading.value = false;
   }
 })
 

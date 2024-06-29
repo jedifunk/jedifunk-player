@@ -1,13 +1,13 @@
 <template>
   <ion-app>
-    <ion-router-outlet />
+    <ion-router-outlet/>
     <MiniPlayer v-if="showMiniPlayer" :current-track="currentTrack" />
   </ion-app>
 </template>
 
 <script setup>
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import { computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { useMainStore } from '@/stores/index'
 import { getUser, getUserTagsWithTracks, getUserPlaylistsWithTracks, getUserLikes } from '@/utils/database'
 import MiniPlayer from '@/components/MiniPlayer.vue'
@@ -28,6 +28,8 @@ onBeforeMount(async () => {
     store.setLikes(likes)
   } catch (error) {
     console.error('Error executing method:', error);
+  } finally {
+    store.setAppReady(true)
   }
 })
 </script>

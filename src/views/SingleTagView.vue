@@ -3,7 +3,7 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button defaultHref="/tags"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ route.params.tag }}</ion-title>
         <ion-buttons slot="end">
@@ -28,7 +28,6 @@ import {
   IonButtons,
   IonButton,
   IonBackButton,
-  IonSpinner,
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
@@ -52,8 +51,11 @@ onIonViewWillEnter(async () => {
   isLoading.value = true;
   const targetPathname = route.params.tag
   try {
+    while(!store.appReady) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     // Search through the tags in the store state
-    const tag = store.tags.find(tag => tag.pathname === targetPathname);
+    const tag = await store.tags.find(tag => tag.pathname === targetPathname);
     if (tag) {
       title.value = tag.name
       tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []
@@ -61,10 +63,9 @@ onIonViewWillEnter(async () => {
     } else {
       console.log(`No tag found for pathname: ${targetPathname}`);
     }
-  } catch (error) {
-    console.error('Failed to get filtered tracks:', error);
-  } finally {
     isLoading.value = false;
+  } catch (error) {
+    console.error('Failed to get tagged tracks:', error);
   }
 })
 

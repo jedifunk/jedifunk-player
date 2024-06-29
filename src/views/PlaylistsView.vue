@@ -55,10 +55,13 @@ const router = useRouter()
 const isLoading = ref(true)
 const playlists = ref([])
 
-onIonViewWillEnter(() => {
+onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    playlists.value = store.playlists
+    while(!store.appReady) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    playlists.value = await store.playlists
   } catch (error) {
     console.error('Failed to get playlists', error)
   } finally {

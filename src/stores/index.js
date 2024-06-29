@@ -4,6 +4,7 @@ import * as sb from '@/utils/database'
 export const useMainStore = defineStore({
   id: 'main',
   state: () => ({
+    appReady: false,
     years: [],
     shows: {},
     singleShow: {},
@@ -25,6 +26,9 @@ export const useMainStore = defineStore({
     }  
   },
   actions: {
+    setAppReady(value) {
+      this.appReady = value
+    },
     setUser(user) {
       this.user = user
     },

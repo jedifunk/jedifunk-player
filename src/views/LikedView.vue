@@ -34,6 +34,9 @@ const tracks = ref([])
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
+    while(!store.appReady) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     const list = JSON.parse(JSON.stringify(await store.likes))
     tracks.value = list.map(item => item.tracks).sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
   } catch (error) {

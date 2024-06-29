@@ -58,11 +58,13 @@ const tags = ref([])
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
+    while(!store.appReady) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     tags.value = store.tags
+    isLoading.value = false
   } catch (error) {
     console.error('Failed to get tags', error)
-  } finally {
-    isLoading.value = false
   }
 })
 

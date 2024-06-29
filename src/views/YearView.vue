@@ -3,9 +3,9 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button defaultHref="/"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ store.yearParam }}</ion-title>
+        <ion-title>{{ yearP }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -50,17 +50,21 @@ import Loader from '@/components/SpinnerComponent.vue'
 import { ref, onMounted } from 'vue'
 import { getShows } from '@/utils/fetch'
 import { useMainStore } from '@/stores/index'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { musicalNotes } from 'ionicons/icons'
 
 const store = useMainStore()
-const isLoading = ref(true)
 const router = useRouter()
+const route = useRoute()
+
+const isLoading = ref(true)
+const yearP = ref()
 
 onMounted(async () => {
   isLoading.value = true;
   try {
-    const shows = await getShows(store.yearParam);
+    yearP.value = route.params.yearParam ? route.params.yearParam : store.yearParam
+    const shows = await getShows(yearP.value);
     store.setShows(shows.data)
   } catch (error) {
     console.error('failed to set shows:', error)

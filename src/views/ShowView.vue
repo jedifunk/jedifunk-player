@@ -3,7 +3,7 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button :defaultHref="defaultBack()"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ store.singleShow.date }}</ion-title>
       </ion-toolbar>
@@ -44,32 +44,28 @@ import {
 import SetList from '@/components/SetList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
 
+import { useRoute } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useMainStore } from '@/stores/index'
-
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
 
+const route = useRoute()
 const store = useMainStore()
 const isLoading = ref(true)
-const isLiked = ref({})
+
 
 onMounted(async () => {
   isLoading.value = true
   try {
-    const singleShow = await getSingleShow(store.dateParam)
+    const singleShow = await getSingleShow(route.params.dateParam)
+    store.setDateParam(route.params.dateParam)
+    store.setYearParam(route.params.yearParam)
     store.setSingleShow(singleShow.data) 
   } catch (error) {
     console.error('failed to set single show:', error)
   } finally {
     isLoading.value = false
-  }
-
-  if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
-    store.singleShow.tracks.forEach((track) => {
-      track.formattedDuration = formatDuration(track.duration)
-      isLiked.value[track.id] = false
-    })
   }
 })
 
@@ -85,6 +81,9 @@ const groupedTracks = computed(() => {
   }
   return groups
 })
+const defaultBack = () => {
+  return `/${store.yearParam}`
+}
 onIonViewWillLeave(() => {
   console.log('show view will leave')
 })
