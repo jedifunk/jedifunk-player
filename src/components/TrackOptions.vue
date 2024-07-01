@@ -28,6 +28,8 @@ import { ref, onMounted } from 'vue'
 const store = useMainStore()
 const { track } = defineProps(['track'])
 const isLiked = ref(false)
+const itemOptions = ref(null)
+const emit = defineEmits(['closeOptions'])
 
 onMounted(async () => {
   const liked = await store.likes
@@ -49,6 +51,8 @@ const openTags = async (track) => {
     canDismiss: true,
   })
   await modal.present()
+
+  emit('closeOptions')
 }
 
 const openPlaylistSelectModal = async (track) => {
@@ -60,5 +64,7 @@ const openPlaylistSelectModal = async (track) => {
     canDismiss: true
   })
   await modal.present()
+
+  emit('closeOptions')
 }
 </script>

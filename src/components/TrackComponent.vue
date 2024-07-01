@@ -1,5 +1,5 @@
 <template>
-  <ion-item-sliding>
+  <ion-item-sliding ref="sliding">
     <ion-item :button="true" :detail="false" @click="openPlayer(track)">
       <div class="track flex"> 
         <div class="track-inner flex">
@@ -19,7 +19,7 @@
         <div>{{ formatDuration(track.duration) }}</div>
       </div>
     </ion-item>
-    <TrackOptions :track="track" />
+    <TrackOptions :track="track" @closeOptions="closeOptions" />
   </ion-item-sliding>
 </template>
 <script setup>
@@ -45,6 +45,7 @@ const p = ref(null)
 const currentTrack = computed(() => store.currentTrack)
 const tracksMatch = ref(false)
 const isLoading = ref(true)
+const sliding = ref(null)
 
 const animate = computed(() => {
   if (tm.value && p.value ) {
@@ -80,6 +81,9 @@ const openPlayer = async (track) => {
   })
 
   await modal.present()
+}
+const closeOptions = () => {
+  sliding.value.$el.closeOpened()
 }
 </script>
 <style>

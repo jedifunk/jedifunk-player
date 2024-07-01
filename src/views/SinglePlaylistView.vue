@@ -33,12 +33,12 @@ import {
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 import Tracklist from '@/components/TrackList.vue'
 
-import { play, trashOutline } from 'ionicons/icons'
+import { trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
@@ -47,22 +47,25 @@ const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')
 const pId = ref()
+const playlists = ref([])
+const target = ref(null)
 
 onIonViewWillEnter(async () => {
   isLoading.value = true;
-  const targetPathname = route.params.pathname
+  target.value = route.params.pathname
   try {
     while(!store.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
+    playlists.value = await store.playlists
     // Search through the playlists in the store state
-    const playlist = store.playlists.find(playlist => playlist.pathname === targetPathname);
+    const playlist = playlists.value.find(playlist => playlist.pathname === target.value);
     if (playlist) {
       title.value = playlist.name
       tracks.value = playlist.tracks ? playlist.tracks.filter(track => track !== null) : []
       pId.value = playlist.id
     } else {
-      console.log(`No playlist found for pathname: ${targetPathname}`);
+      console.warn(`No playlist found for pathname: ${target.value}`);
     }
     isLoading.value = false
   } catch (error) {
@@ -70,12 +73,24 @@ onIonViewWillEnter(async () => {
   }
 })
 
+watch(() => store.playlists, (newPlaylists) => {
+  playlists.value = newPlaylists
+  const playlist = playlists.value.find(playlist => playlist.pathname === target.value);
+  if (playlist) {
+    title.value = playlist.name
+    tracks.value = playlist.tracks ? playlist.tracks.filter(track => track !== null) : []
+    pId.value = playlist.id
+  } else {
+    console.warn(`No playlist found for pathname: ${target.value}`);
+  }
+}, {deep: true})
+
 const deletePlaylist = async (playlistId) => {
   await store.deletePlaylistById(playlistId)
   router.push({name: 'Playlists'})
 }
 
 onIonViewWillLeave(() => {
-  console.log('single playlist ion will leave')
+  console.info('single playlist ion will leave')
 })
 </script>

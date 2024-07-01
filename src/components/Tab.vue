@@ -23,9 +23,9 @@
           <ion-label>Playlists</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button :class="getTabInfo('user').className" tab="user" @click="goToUser(store.user.username)">
-          <ion-icon :icon="getTabInfo('user').iconName" />
-          <ion-label>User</ion-label>
+        <ion-tab-button :class="getTabInfo('profile').className" tab="profile" @click="goToUser()">
+          <ion-icon :icon="getTabInfo('profile').iconName" />
+          <ion-label>Profile</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -77,9 +77,9 @@ const getTabInfo = (tabName) => {
       iconName = activeTab.value === 'Playlists' || activeTab.value === 'Single Playlist' ? list : listOutline;
       className = activeTab.value === 'Playlists' || activeTab.value === 'Single Playlist' ? 'tab-selected' : '';
       break;
-    case 'user':
-      iconName = activeTab.value === 'User' ? personCircle : personCircleOutline;
-      className = activeTab.value === 'User' ? 'tab-selected' : '';
+    case 'profile':
+      iconName = activeTab.value === 'Profile' ? personCircle : personCircleOutline;
+      className = activeTab.value === 'Profile' ? 'tab-selected' : '';
       break;
     default:
       iconName = calendarOutline; // Default icon
@@ -89,8 +89,11 @@ const getTabInfo = (tabName) => {
   return { iconName, className };
 }
 
+// const goToUser = (username) => {
+//   router.push({ name: 'Profile', params: { userParam: username }})
+// }
 const goToUser = (username) => {
-  router.push({ name: 'User', params: { userParam: username }})
+  router.push({ name: 'Profile'})
 }
 const navigateTo = (routeName) => {
   router.push({ name: routeName });

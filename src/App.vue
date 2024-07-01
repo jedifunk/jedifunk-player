@@ -9,23 +9,51 @@
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
 import { ref, computed, onBeforeMount } from 'vue'
 import { useMainStore } from '@/stores/index'
-import { getUser, getUserTagsWithTracks, getUserPlaylistsWithTracks, getUserLikes } from '@/utils/database'
+import * as sb from '@/utils/database'
 import MiniPlayer from '@/components/MiniPlayer.vue'
 
 const store = useMainStore()
 const showMiniPlayer = computed(() => store.showMiniPlayer)
 const currentTrack = computed(() => store.currentTrack)
+const session = ref(null)
 
 onBeforeMount(async () => {
   try {
-    const user = await getUser('jedifunk')
+
+    await sb.supabase.auth.getSession().then(({ data }) => {
+      session.value = data.session
+    })
+
+    await sb.supabase.auth.onAuthStateChange((_, _session) => {
+      session.value = _session
+    })
+
+    const {data: {user}} = await sb.supabase.auth.getUser() ?? {}
     store.setUser(user)
-    const tags = await getUserTagsWithTracks(user.id)
+
+    let tags = await sb.getUserTagsWithTracks(user.id)
+    if (tags === null) {
+      const {data} = await sb.supabase.from('tags').select('*')
+      tags = data.map(tag => ({
+      ...tag,
+        tracks: []
+      }));
+    }
     store.setTags(tags)
-    const playlists = await getUserPlaylistsWithTracks(user.id)
+
+    let playlists = await sb.getUserPlaylistsWithTracks(user.id)
+    if (playlists === null) {
+      const {data} = await sb.supabase.from('playlists').select('*')
+      playlists = data.map(tag => ({
+      ...tag,
+        tracks: []
+      }));
+    }
     store.setPlaylists(playlists)
-    const likes = await getUserLikes(user.id)
+
+    const likes = await sb.getUserLikes(user.id)
     store.setLikes(likes)
+
   } catch (error) {
     console.error('Error executing method:', error);
   } finally {

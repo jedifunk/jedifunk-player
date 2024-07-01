@@ -24,7 +24,7 @@ import {
 import Tracklist from '@/components/TrackList.vue';
 import Loader from '@/components/SpinnerComponent.vue'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useMainStore } from '@/stores/index'
 
 const store = useMainStore()
@@ -46,7 +46,12 @@ onIonViewWillEnter(async () => {
   }
 })
 
+watch(() => store.likes, (newLikes) => {
+  const list = JSON.parse(JSON.stringify(newLikes))
+  tracks.value = list.map(item => item.tracks).sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
+}, {deep: true})
+
 onIonViewWillLeave(() => {
-  console.log('liked ion will leave')
+  console.info('liked ion will leave')
 })
 </script>

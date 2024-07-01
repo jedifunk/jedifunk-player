@@ -4,19 +4,6 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-export async function getUser(username) {
-  try {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .single()
-    return data
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 export async function tagTrack(duration, id, mp3, showDate, title, tagId, userId, venueLocation, venueName) {
   try {
     const { data, error } = await supabase.rpc('tag_the_track', {
@@ -49,8 +36,8 @@ export async function untagTrack(tagId, trackId) {
 export async function getUserTagsWithTracks(userId) {
   try {
     const { data, error } = await supabase
-    .from('user_tags_with_tracks')
-    .select('*');
+    .rpc('get_user_tags', { v_user_id: userId })
+    .select('*')
 
     if (error) {
       console.error('Failed to get user tags with tracks:', error.message);
@@ -67,17 +54,17 @@ export async function getUserTagsWithTracks(userId) {
 export async function getUserPlaylistsWithTracks(userId) {
   try {
     const { data, error } = await supabase
-    .from('user_playlists_with_tracks')
+    .rpc('get_user_playlists', {v_user_id: userId})
     .select('*');
 
     if (error) {
-      console.error('Failed to get user tags with tracks:', error.message);
+      console.error('Failed to get user playlists with tracks:', error.message);
       return [];
     }
 
     return data;
   } catch (error) {
-    console.error('Failed to get user tags with tracks:', error);
+    console.error('Failed to get user playlists with tracks:', error);
     return [];
   }
 }

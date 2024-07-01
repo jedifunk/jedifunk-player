@@ -18,6 +18,7 @@ export const useMainStore = defineStore({
     likes: [],
     tags: [],
     playlists: [],
+    profile: {},
     user: {}
   }),
   getters: {
@@ -29,8 +30,11 @@ export const useMainStore = defineStore({
     setAppReady(value) {
       this.appReady = value
     },
-    setUser(user) {
-      this.user = user
+    setUser(value) {
+      this.user = value
+    },
+    setProfile(value) {
+      this.profile = value
     },
     setYears(yearsData) {
       this.years = yearsData;
@@ -45,13 +49,19 @@ export const useMainStore = defineStore({
       this.Tracks = value;
     },
     setTags(value) {
-      this.tags = value
+      if (value) {
+        this.tags = value
+      }
     },
     setPlaylists(value) {
-      this.playlists = value
+      if (value) {
+        this.playlists = value
+      }
     },
     setLikes(likes) {
-      this.likes = likes
+      if (likes) {
+        this.likes = likes
+      }
     },
     setYearParam(year) {
       this.yearParam = year;
@@ -77,12 +87,18 @@ export const useMainStore = defineStore({
         const insertResult = await sb.supabase
          .from('tags')
          .insert([tagData])
-         .single();
-    
+         .select()
+
         if (insertResult.error) throw insertResult.error;
     
-        const updatedTags = await sb.getUserTagsWithTracks(this.user.id)
-        
+        let updatedTags = await sb.getUserTagsWithTracks(this.user.id)
+        if (updatedTags === null) {
+          const {data} = await sb.supabase.from('tags').select('*').eq('user_id', this.user.id)
+          updatedTags = data.map(tag => ({
+          ...tag,
+            tracks: []
+          }));
+        }
         if (updatedTags.error) throw updatedTags.error
 
         this.tags = updatedTags
@@ -99,12 +115,19 @@ export const useMainStore = defineStore({
         const insertPlaylist = await sb.supabase
           .from('playlists')
           .insert([playlistData])
-          .single()
+          .select()
+
         if (insertPlaylist.error) throw insertPlaylist.error
 
-        const updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
+        let updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
+        if (updatedPlaylists === null) {
+          const {data} = await sb.supabase.from('playlists').select('*').eq('user_id', this.user.id)
+          updatedPlaylists = data.map(playlist => ({
+          ...playlist,
+            tracks: []
+          }));
+        }
         if (updatedPlaylists.error) throw updatedPlaylists.error
-
         this.playlists = updatedPlaylists
       } catch (error) {
         console.error('Error inserting playlist', error)
@@ -117,8 +140,11 @@ export const useMainStore = defineStore({
         .match({ id: playlistId})
       if (error) throw error
 
-      const updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
-
+      let updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
+      if (updatedPlaylists === null) {
+        const {data} = await sb.supabase.from('playlists').select('*').eq('user_id', this.user.id)
+        updatedPlaylists = data
+      }
       if (updatedPlaylists.fetchError) throw updatedPlaylists.fetchError
 
       this.playlists = updatedPlaylists
@@ -130,8 +156,11 @@ export const useMainStore = defineStore({
         .match({ id: tagId})
       if (error) throw error
 
-      const updatedTags = await sb.getUserTagsWithTracks(this.user.id)
-
+      let updatedTags = await sb.getUserTagsWithTracks(this.user.id)
+      if (updatedTags === null) {
+        const {data} = await sb.supabase.from('tags').select('*').eq('user_id', this.user.id)
+        updatedTags = data
+      }
       if (updatedTags.fetchError) throw updatedTags.fetchError
 
       this.tags = updatedTags
@@ -172,8 +201,12 @@ export const useMainStore = defineStore({
       }
 
       const updatedLikes = await sb.getUserLikes(this.user.id)
+      if (updatedLikes === null) {
+        const {data} = await sb.supabase.from('likes').select('*').eq('user_id', this.user.id);
+        updatedLikes = data
+      }
       if (updatedLikes.fetchError) throw updatedLikes.fetchError
-
+console.log('in toggle likes', updatedLikes)
       this.likes = updatedLikes
 
       return!isLiked
@@ -219,7 +252,12 @@ export const useMainStore = defineStore({
   
         // Update the tag in the store
         const updatedTagsFromDB = await sb.getUserTagsWithTracks(this.user.id)
-
+        if (updatedTagsFromDB === null) {
+          const {data} = await sb.supabase.from('tags').select('*').eq('user_id', this.user.id);
+          updatedTagsFromDB = data
+        }
+        if (updatedTagsFromDB.fetchError) throw updatedTagsFromDB.fetchError
+console.log('in toggle tags', updatedTagsFromDB)
         this.tags = updatedTagsFromDB
         return!isTrackInTag;
       }
@@ -263,8 +301,13 @@ export const useMainStore = defineStore({
         }
   
         // Update the playlist in the store
-        const updatedPlaylistsFromDB = await sb.getUserPlaylistsWithTracks(this.user.id)
-
+        let updatedPlaylistsFromDB = await sb.getUserPlaylistsWithTracks(this.user.id)
+        if (updatedPlaylistsFromDB === null) {
+          const {data} = await sb.supabase.from('playlists').select('*').eq('user_id', this.user.id);
+          updatedPlaylistsFromDB = data
+        }
+        if (updatedPlaylistsFromDB.fetchError) throw updatedPlaylistsFromDB.fetchError
+console.log('in toggle', updatedPlaylistsFromDB)
         this.playlists = updatedPlaylistsFromDB
         return!isTrackInPlaylist;
       }

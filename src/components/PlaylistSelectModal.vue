@@ -7,8 +7,7 @@
   </ion-toolbar>
   <ion-content>
     <ion-button class="ion-padding" expand="block" @click="openCreatePlaylist">New Playlist</ion-button>
-    <ion-searchbar></ion-searchbar>
-    <ion-list>
+    <ion-list lines="none">
       <ion-item v-for="playlist in playlists" :key="playlist.id">
         <ion-checkbox
           :checked="selectionStatus[playlist.id]"
@@ -28,7 +27,6 @@ import {
   IonButtons,
   IonButton,
   IonContent,
-  IonSearchbar,
   IonList,
   IonItem,
   IonCheckbox,
@@ -50,10 +48,10 @@ const props = defineProps({
   track: Object
 })
 
-onMounted(() => {
+onMounted(async () => {
   isLoading.value = true;
   try {
-    playlists.value = store.playlists
+    playlists.value = await store.playlists
     playlists.value.forEach(playlist => {
       const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id !== undefined && trackInPlaylist.id === Number(props.track.id))
       selectionStatus.value[playlist.id] = trackInPlaylist
@@ -86,8 +84,8 @@ const openCreatePlaylist = async () => {
   })
 }
 
-const toggleSelectPlaylist = (playlistId) => {
-  const trackAddedOrRemoved = store.toggleTrackInPlaylist(playlistId, props.track)
+const toggleSelectPlaylist = async (playlistId) => {
+  const trackAddedOrRemoved = await store.toggleTrackInPlaylist(playlistId, props.track)
   selectionStatus.value[playlistId] = trackAddedOrRemoved
 };
 

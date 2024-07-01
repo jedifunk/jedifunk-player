@@ -35,7 +35,7 @@ import Tracklist from '@/components/TrackList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
 import { trashOutline } from 'ionicons/icons'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
 
@@ -46,22 +46,25 @@ const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')
 const tId = ref()
+const tags = ref([])
+const target = ref()
 
 onIonViewWillEnter(async () => {
   isLoading.value = true;
-  const targetPathname = route.params.tag
+  target.value = route.params.tag
   try {
     while(!store.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
+    tags.value = await store.tags
     // Search through the tags in the store state
-    const tag = await store.tags.find(tag => tag.pathname === targetPathname);
+    const tag = tags.value.find(tag => tag.pathname === target.value);
     if (tag) {
       title.value = tag.name
       tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []
       tId.value = tag.id
     } else {
-      console.log(`No tag found for pathname: ${targetPathname}`);
+      console.warn(`No tag found for pathname: ${target.value}`);
     }
     isLoading.value = false;
   } catch (error) {
@@ -69,12 +72,24 @@ onIonViewWillEnter(async () => {
   }
 })
 
+watch(() => store.tags, (newTags) => {
+  tags.value = newTags
+  const tag = tags.value.find(tag => tag.pathname === target.value);
+  if (tag) {
+    title.value = tag.name
+    tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []
+    tId.value = tag.id
+  } else {
+    console.warn(`No tag found for pathname: ${target.value}`);
+  }
+}, {deep: true})
+
 const deleteTag = async (tagId) => {
   await store.deleteTagById(tagId)
   router.push({name: 'Tags'})
 }
 
 onIonViewWillLeave(() => {
-  console.log('single tag ion will leave')
+  console.info('single tag ion will leave')
 })
 </script>

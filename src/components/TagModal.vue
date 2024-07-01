@@ -7,7 +7,7 @@
   </ion-toolbar>
   <ion-content>
     <ion-button class="ion-padding" expand="block" @click="openCreateTag">New Tag</ion-button>
-    <ion-list>
+    <ion-list lines="none">
       <ion-item v-for="tag in tags" :key="tag.id">
         <ion-checkbox
           :checked="selectionStatus[tag.id]"
@@ -48,10 +48,10 @@ const props = defineProps({
   track: Object
 })
 
-onMounted(() => {
+onMounted(async () => {
   isLoading.value = true;
   try {
-    tags.value = store.tags
+    tags.value = await store.tags
     tags.value.forEach(tag => {
       const trackInTag = tag.tracks.some(trackInTag => trackInTag !== null && trackInTag.id !== null && trackInTag.id !== undefined && trackInTag.id === Number(props.track.id));
       selectionStatus.value[tag.id] = trackInTag
@@ -80,7 +80,7 @@ const openCreateTag = async () => {
   await createTagModal.present()
 
   createTagModal.onDidDismiss = ((detail, role) => {
-    console.log('create tag modal did dismiss', detail, role)
+    console.info('create tag modal did dismiss', detail, role)
   })
 }
 

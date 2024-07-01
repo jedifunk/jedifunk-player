@@ -38,7 +38,6 @@ import {
   IonItemOptions,
   IonItemOption,
   IonLabel,
-  IonSpinner,
   IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
@@ -61,16 +60,17 @@ onIonViewWillEnter(async () => {
     while(!store.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
-    tags.value = store.tags
-    isLoading.value = false
+    tags.value = await store.tags
   } catch (error) {
     console.error('Failed to get tags', error)
+  } finally {
+    isLoading.value = false
   }
 })
 
-watch(() => store.tags, (newTags, oldTags) => {
+watch(() => store.tags, (newTags) => {
   tags.value = newTags
-})
+}, {deep: true})
 
 const deleteTag = async (tagId) => {
   await store.deleteTagById(tagId)
@@ -81,7 +81,7 @@ const handleSelectedTag = (pathname) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('tags ion will leave')
+  console.info('tags ion will leave')
 })
 </script>
 <style>

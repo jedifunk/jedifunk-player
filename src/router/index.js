@@ -47,10 +47,15 @@ const routes = [
         component: () => import('@/views/ShowView.vue'),
       },
       {
-        path: 'user/:userParam',
-        name: 'User',
-        component: () => import('@/views/UserView.vue')
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/ProfileView.vue')
       }
+      // {
+      //   path: 'profile/:userParam',
+      //   name: 'Profile',
+      //   component: () => import('@/views/ProfileView.vue')
+      // }
     ],
   },
 ]

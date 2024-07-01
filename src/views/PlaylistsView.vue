@@ -38,7 +38,6 @@ import {
   IonItemOptions,
   IonItemOption,
   IonLabel,
-  IonSpinner,
   IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
@@ -69,9 +68,9 @@ onIonViewWillEnter(async () => {
   }
 })
 
-watch(() => store.playlists, (newPlaylits) => {
-  playlists.value = newPlaylits
-})
+watch(() => store.playlists, (newPlaylists) => {
+  playlists.value = newPlaylists
+}, {deep: true})
 
 const deletePlaylist = async (playlistId) => {
   await store.deletePlaylistById(playlistId)
@@ -82,8 +81,6 @@ const handleSelectedPlaylist = (pathname) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('playlists ion will leave')
+  console.info('playlists ion will leave')
 })
 </script>
-<style>
-</style>

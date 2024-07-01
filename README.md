@@ -26,12 +26,16 @@ Personal Phish audio player.
 - [ ] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
+- [ ] Tags: Allow edit name
+- [ ] Playlists: Allow edit name
+- [ ] Playlists: add reordering of tracks in playlists
+- [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes
 - [ ] Systems: Abstract into separate stores (player, user, systems)
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)
 - [ ] Improve performance
 - [ ] Improve playback
 - [ ] Allow download to local for faster play
 - [x] Move data (like, tag, playlist, etc) to supabase or similar
-- [ ] Create user auth system
+- [x] Create user auth system
 - [ ] generate album art
 - [ ] Build to native app
