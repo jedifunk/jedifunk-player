@@ -8,17 +8,17 @@
     <ion-content class="ion-padding" :fullscreen="true">
       <Loader v-if="isLoading" />
       <div v-else>
-        <UserAuth />
-        <!-- <ProfileDetails :profile="profile" /> -->
-
-        <form @submit.prevent="updateProfile">
-          <ion-list>
-            <ion-item>
-              <ion-input type="text" name="username" v-model="profile.username" label="Username"></ion-input>
-            </ion-item>
-          </ion-list>
-          <ion-button expand="block" type="submit">Update Profile</ion-button>
-        </form>
+        <UserAuth v-if="!isUser" />
+        <div v-else>
+          <form @submit.prevent="updateProfile">
+            <ion-list>
+              <ion-item>
+                <ion-input type="text" name="username" v-model="profile.username" label="Username"></ion-input>
+              </ion-item>
+            </ion-list>
+            <ion-button expand="block" type="submit">Update Profile</ion-button>
+          </form>
+        </div>
       </div>
     </ion-content>
   </ion-page>
@@ -38,19 +38,18 @@ import {
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
 import UserAuth from '@/components/UserAuth.vue'
-import ProfileDetails from '@/components/ProfileDetails.vue'
 
 import { useMainStore } from '@/stores'
 import { ref } from 'vue'
 import { supabase } from '@/utils/database'
 
-//const session = ref(supabase.auth.getSession())
 const isLoading = ref(true)
 const store = useMainStore()
 const profile = ref({
   username: '',
   avatar_url: '',
 })
+const isUser = ref(false)
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
@@ -58,18 +57,21 @@ onIonViewWillEnter(async () => {
     while(!store.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
-    getProfile()
-    
-    isLoading.value = false
+    const user = await store.user
+    getProfile(user)
+    if (user) {
+      isUser.value = true
+    }
   } catch (error) {
     console.error('failed to load profile', error)
+  } finally {
+    isLoading.value = false
   }
 })
 
-async function getProfile() {
+async function getProfile(user) {
   isLoading.value = true
   try {
-    const user = store.user
     const { data, error, status } = await supabase
       .from('profiles')
       .select(`username, avatar_url`)
@@ -84,6 +86,7 @@ async function getProfile() {
         username: data.username,
         avatar_url: data.avatar_url,
       }
+
     }
   } catch (error) {
     console.error(error)
