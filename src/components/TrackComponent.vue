@@ -10,7 +10,8 @@
           </div>
           <div class="track-meta flex column" ref="tm">
             <ion-label :class="{'playing': tracksMatch}">
-              <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon>
+              <Playing v-if="tracksMatch" />
+              <!-- <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon> -->
               {{ track.title }}
             </ion-label>
             <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
@@ -32,6 +33,7 @@ import {
 } from '@ionic/vue'
 import Player from '@/components/PlayerComponent.vue'
 import TrackOptions from '@/components/TrackOptions.vue'
+import Playing from '@/components/PlayingAnim.vue'
 import { barcodeOutline, musicalNote } from 'ionicons/icons'
 
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
@@ -124,6 +126,7 @@ p.anim {
   display: flex;
   align-items: center;
   color: var(--ion-color-primary);
+  gap: 5px;
 }
 
 @keyframes backAndForth {

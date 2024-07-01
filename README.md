@@ -12,13 +12,12 @@ Personal Phish audio player.
 - [x] Audio player to accept playlists, not just tracklists
 - [x] Clicking previous track restarts current track, then another click to go back a track
 - [x] Tracks: Add "playing" icon to current track in list views, or highlight its row
-- [ ] Tracks: Upgrade playing icon to animated audiobar
+- [x] Tracks: Upgrade playing icon to animated audiobar
 - [ ] Tracks: FIX animation of venue
 - [x] Shows: Setlists abstraction so everything works on shows
 - [x] Tags: switch to ionChange
 - [x] Tags: add to localStorage
 - [x] Add to Playlist checkbox reactivity
-- [ ] Playlist: add search functionality
 - [x] Pinia: clean up and combine actions
 - [x] Abstract like, tag, playlist into resuable components
 - [x] Router: adjust routes to be cleaner
