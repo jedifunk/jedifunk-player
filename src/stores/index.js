@@ -206,7 +206,6 @@ export const useMainStore = defineStore({
         updatedLikes = data
       }
       if (updatedLikes.fetchError) throw updatedLikes.fetchError
-console.log('in toggle likes', updatedLikes)
       this.likes = updatedLikes
 
       return!isLiked
@@ -257,8 +256,8 @@ console.log('in toggle likes', updatedLikes)
           updatedTagsFromDB = data
         }
         if (updatedTagsFromDB.fetchError) throw updatedTagsFromDB.fetchError
-console.log('in toggle tags', updatedTagsFromDB)
         this.tags = updatedTagsFromDB
+
         return!isTrackInTag;
       }
     },
@@ -307,8 +306,8 @@ console.log('in toggle tags', updatedTagsFromDB)
           updatedPlaylistsFromDB = data
         }
         if (updatedPlaylistsFromDB.fetchError) throw updatedPlaylistsFromDB.fetchError
-console.log('in toggle', updatedPlaylistsFromDB)
         this.playlists = updatedPlaylistsFromDB
+        
         return!isTrackInPlaylist;
       }
     },

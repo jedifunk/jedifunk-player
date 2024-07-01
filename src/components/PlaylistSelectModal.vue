@@ -80,7 +80,7 @@ const openCreatePlaylist = async () => {
   await createModal.present()
 
   createModal.onDidDismiss = ((detail, role) => {
-    console.log('create playlist modal did dismiss', detail, role)
+    console.info('create playlist modal did dismiss', detail, role)
   })
 }
 

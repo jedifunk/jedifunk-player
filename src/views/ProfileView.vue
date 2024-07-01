@@ -81,7 +81,6 @@ async function getProfile(user) {
     if (error && status !== 406) throw error
 
     if (data) {
-      console.log(data)
       profile.value = {
         username: data.username,
         avatar_url: data.avatar_url,

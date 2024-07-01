@@ -23,7 +23,7 @@ Personal Phish audio player.
 - [x] Abstract like, tag, playlist into resuable components
 - [x] Router: adjust routes to be cleaner
 - [x] Style: FIX alignment of track time when venue is long
-- [ ] Style: Color Theme
+- [x] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
 - [ ] Tags: Allow edit name

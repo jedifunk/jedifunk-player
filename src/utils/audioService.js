@@ -25,7 +25,6 @@ class AudioService {
       this.player = new Gapless.Queue({
         tracks: this.tracks,
         onProgress: (track) => {
-          //track && console.log(track.completeState);
           this.currentTrackProgress = track.completeState
           this.updateProgress(track)
         },
@@ -63,7 +62,7 @@ class AudioService {
         remainingTime: this.remainingTime,
       });
     } else {
-      console.log('no current track progress available')
+      console.warn('no current track progress available')
     }
   }
 

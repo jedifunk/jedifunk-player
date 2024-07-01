@@ -85,7 +85,7 @@ const defaultBack = () => {
   return `/${store.yearParam}`
 }
 onIonViewWillLeave(() => {
-  console.log('show view will leave')
+  console.info('show view will leave')
 })
 </script>
 <style>

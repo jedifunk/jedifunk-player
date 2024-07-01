@@ -79,7 +79,7 @@ const selectedDate = (date) => {
 }
 
 onIonViewWillLeave(() => {
-  console.log('year view will leave:')
+  console.info('year view will leave:')
 })
 </script>
 <style>

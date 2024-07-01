@@ -132,7 +132,7 @@ const trackChanged = (track) => {
     const matchedTrack = tracklist.value[trackIndex];
     store.setCurrentTrack(matchedTrack)
   } else {
-    console.log("No matching track found.");
+    console.warn("No matching track found.");
   }
 }
 

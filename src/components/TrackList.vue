@@ -10,9 +10,4 @@ import {
 import TrackComponent from '@/components/TrackComponent.vue'
 
 const { tracks } = defineProps(['tracks'])
-
-// onMounted(() => {
-//   isLoading.value = true
-//   console.log(tracks)
-// })
 </script>
