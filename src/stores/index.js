@@ -78,57 +78,57 @@ export const useMainStore = defineStore({
     setCurrentTrack(track) {
       this.currentTrack = track;
     },
-    async addTag(tag) {
+    async saveTag(tag) {
       const tagData = {
         ...tag,
         user_id: this.user.id
       }
       try {
-        const insertResult = await sb.supabase
+        const upsertResult = await sb.supabase
          .from('tags')
-         .insert([tagData])
+         .upsert([{...tagData, }], {onConflict: 'id'})
          .select()
 
-        if (insertResult.error) throw insertResult.error;
-    
-        let updatedTags = await sb.getUserTagsWithTracks(this.user.id)
-        if (updatedTags === null) {
+        if (upsertResult.error) throw upsertResult.error;
+
+        let upsertedTags = await sb.getUserTagsWithTracks(this.user.id)
+        if (upsertedTags === null) {
           const {data} = await sb.supabase.from('tags').select('*').eq('user_id', this.user.id)
-          updatedTags = data.map(tag => ({
+          upsertedTags = data.map(tag => ({
           ...tag,
             tracks: []
           }));
         }
-        if (updatedTags.error) throw updatedTags.error
+        if (upsertedTags.error) throw upsertedTags.error
 
-        this.tags = updatedTags
+        this.tags = upsertedTags
       } catch (error) {
-        console.error('Error inserting tag:', error.message);
+        console.error('Error saving tag', error)
       }
     },
-    async addPlaylist(playlist) {
+    async savePlaylist(playlist) {
       const playlistData = {
         ...playlist,
         user_id: this.user.id
       }
       try {
-        const insertPlaylist = await sb.supabase
+        const upsertPlaylist = await sb.supabase
           .from('playlists')
-          .insert([playlistData])
+          .upsert([{...playlistData}], {onConflict: 'id'})
           .select()
 
-        if (insertPlaylist.error) throw insertPlaylist.error
+        if (upsertPlaylist.error) throw upsertPlaylist.error
 
-        let updatedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
-        if (updatedPlaylists === null) {
+        let upsertedPlaylists = await sb.getUserPlaylistsWithTracks(this.user.id)
+        if (upsertedPlaylists === null) {
           const {data} = await sb.supabase.from('playlists').select('*').eq('user_id', this.user.id)
-          updatedPlaylists = data.map(playlist => ({
+          upsertedPlaylists = data.map(playlist => ({
           ...playlist,
             tracks: []
           }));
         }
-        if (updatedPlaylists.error) throw updatedPlaylists.error
-        this.playlists = updatedPlaylists
+        if (upsertedPlaylists.error) throw upsertedPlaylists.error
+        this.playlists = upsertedPlaylists
       } catch (error) {
         console.error('Error inserting playlist', error)
       }

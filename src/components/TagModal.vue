@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-content>
-    <ion-button class="ion-padding" expand="block" @click="openCreateTag">New Tag</ion-button>
+    <ion-button class="ion-padding" expand="block" @click="openCreateOrEdit">New Tag</ion-button>
     <ion-list lines="none">
       <ion-item v-for="tag in tags" :key="tag.id">
         <ion-checkbox
@@ -38,7 +38,7 @@ import {
 import { ref, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/index'
 
-import CreateTagModal from '@/components/CreateTagModal.vue'
+import CreateObjectsModal from '@/components/CreateObjectsModal.vue'
 
 const store = useMainStore()
 const isLoading = ref(true)
@@ -67,21 +67,23 @@ watch(() => store.tags, (newTags) => {
   tags.value = newTags
 }, {deep: true})
 
-const openCreateTag = async () => {
-  const createTagModal = await modalController.create({ 
-    component: CreateTagModal,
+const openCreateOrEdit = async () => {  
+  const modalInstance = await modalController.create({
+    component: CreateObjectsModal,
     componentProps: {
-      onClose: () => createTagModal.dismiss()
+      objectType: 'tag',
+      //objectToEdit: object,
+      onClose: () => modalInstance.dismiss(),
     },
     breakpoints: [0,.5],
-    initialBreakpoint: .5,
+    initialBreakpoint:.5,
     canDismiss: true,
-  })
-  await createTagModal.present()
+  });
+  await modalInstance.present();
 
-  createTagModal.onDidDismiss = ((detail, role) => {
-    console.info('create tag modal did dismiss', detail, role)
-  })
+  modalInstance.onDidDismiss = ((detail, role) => {
+    console.info('Modal did dismiss', detail, role);
+  });
 }
 
 const toggleSelectTag = async (tagId) => {

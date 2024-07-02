@@ -5,9 +5,9 @@
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/tags"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ route.params.tag }}</ion-title>
+        <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="deleteTag(tId)"><ion-icon slot="icon-only" :icon="trashOutline"></ion-icon></ion-button>
+          <ion-button @click="openOptions"><ion-icon slot="icon-only" :icon="ellipsisHorizontalOutline"></ion-icon></ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -30,10 +30,12 @@ import {
   IonBackButton,
   onIonViewWillEnter,
   onIonViewWillLeave,
+  modalController
 } from '@ionic/vue'
 import Tracklist from '@/components/TrackList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import { trashOutline } from 'ionicons/icons'
+import OptionsModal from '@/components/OptionsModal.vue'
+import { trashOutline, ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -74,7 +76,8 @@ onIonViewWillEnter(async () => {
 
 watch(() => store.tags, (newTags) => {
   tags.value = newTags
-  const tag = tags.value.find(tag => tag.pathname === target.value);
+  const tag = tags.value.find(tag => tag.pathname === target.value)
+  console.log(tag)
   if (tag) {
     title.value = tag.name
     tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []
@@ -84,9 +87,20 @@ watch(() => store.tags, (newTags) => {
   }
 }, {deep: true})
 
-const deleteTag = async (tagId) => {
-  await store.deleteTagById(tagId)
-  router.push({name: 'Tags'})
+const openOptions = async () => {
+  const nTId = tId.value
+  const optionsModal = await modalController.create({
+    component: OptionsModal,
+    componentProps: {
+      objectId: nTId,
+      objectType: 'tag'
+    },
+    canDismiss: true,
+    breakpoints: [.5, 1],
+    initialBreakpoint: .5
+  })
+
+  await optionsModal.present()
 }
 
 onIonViewWillLeave(() => {

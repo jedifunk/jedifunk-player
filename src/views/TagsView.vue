@@ -8,15 +8,15 @@
 
     <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
-      <ion-list v-else>
+      <ion-list v-else ref="sliding">
         <ion-item-sliding v-for="tag in tags" :key="tag.id">
           <ion-item :button="true" @click="handleSelectedTag(tag.pathname)">
             <ion-label>{{ tag.name }}</ion-label>
           </ion-item>
 
           <ion-item-options>
-            <ion-item-option color="danger">
-              <ion-icon slot="icon-only" :icon="trashOutline" @click="deleteTag(tag.id)"></ion-icon>
+            <ion-item-option color="primary">
+              <ion-icon slot="icon-only" :icon="ellipsisHorizontalOutline" @click="openOptions(tag.id)"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
@@ -41,9 +41,11 @@ import {
   IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
+  modalController
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import { trashOutline } from 'ionicons/icons'
+import OptionsModal from '@/components/OptionsModal.vue'
+import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
 import { useMainStore } from '@/stores/index'
@@ -53,6 +55,7 @@ const store = useMainStore()
 const router = useRouter()
 const isLoading = ref(true)
 const tags = ref([])
+const sliding = ref()
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
@@ -72,8 +75,20 @@ watch(() => store.tags, (newTags) => {
   tags.value = newTags
 }, {deep: true})
 
-const deleteTag = async (tagId) => {
-  await store.deleteTagById(tagId)
+const openOptions = async (tId) => {
+  const optionsModal = await modalController.create({
+    component: OptionsModal,
+    componentProps: {
+      objectId: tId,
+      objectType: 'tag'
+    },
+    canDismiss: true,
+    breakpoints: [.5, 1],
+    initialBreakpoint: .5
+  })
+
+  sliding.value.$el.closeSlidingItems()
+  await optionsModal.present()
 }
 
 const handleSelectedTag = (pathname) => {

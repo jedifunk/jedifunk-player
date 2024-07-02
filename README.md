@@ -33,6 +33,7 @@ Personal Phish audio player.
 - [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes
 - [ ] Systems: Abstract into separate stores (player, user, systems)
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)
+- [ ] Systems: Combine Playlist & Tag components to accept either
 - [ ] Auth: set routing
 - [ ] User: add avatar upload
 - [ ] Improve performance

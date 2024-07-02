@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-content>
-    <ion-button class="ion-padding" expand="block" @click="openCreatePlaylist">New Playlist</ion-button>
+    <ion-button class="ion-padding" expand="block" @click="openCreateOrEdit">New Playlist</ion-button>
     <ion-list lines="none">
       <ion-item v-for="playlist in playlists" :key="playlist.id">
         <ion-checkbox
@@ -38,7 +38,7 @@ import {
 import { ref, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/index'
 
-import CreatePlaylistModal from '@/components/CreatePlaylistModal.vue'
+import CreateObjectsModal from '@/components/CreateObjectsModal.vue'
 
 const store = useMainStore()
 const isLoading = ref(true)
@@ -67,21 +67,23 @@ watch(() => store.playlists, (newPlaylists) => {
   playlists.value = newPlaylists
 }, {deep: true})
 
-const openCreatePlaylist = async () => {
-  const createModal = await modalController.create({ 
-    component: CreatePlaylistModal,
+const openCreateOrEdit = async () => {  
+  const modalInstance = await modalController.create({
+    component: CreateObjectsModal,
     componentProps: {
-      onClose: () => createModal.dismiss()
+      objectType: 'playlist',
+      //objectToEdit: object,
+      onClose: () => modalInstance.dismiss(),
     },
     breakpoints: [0,.5],
-    initialBreakpoint: .5,
-    canDismiss: true
-  })
-  await createModal.present()
+    initialBreakpoint:.5,
+    canDismiss: true,
+  });
+  await modalInstance.present();
 
-  createModal.onDidDismiss = ((detail, role) => {
-    console.info('create playlist modal did dismiss', detail, role)
-  })
+  modalInstance.onDidDismiss = ((detail, role) => {
+    console.info('Modal did dismiss', detail, role);
+  });
 }
 
 const toggleSelectPlaylist = async (playlistId) => {

@@ -39,6 +39,7 @@ const pinia = createPinia()
 const app = createApp(App)
   .use(IonicVue, {
     mode: 'ios',
+    backButtonText: null,
   })
   .use(pinia)
   .use(router)

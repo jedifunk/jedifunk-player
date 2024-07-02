@@ -42,8 +42,8 @@ import { useElementSize, useElementBounding } from '@vueuse/core'
 
 const store = useMainStore()
 const { show, tracks, track } = defineProps(['track', 'show', 'tracks'])
-const tm = ref(null)
-const p = ref(null)
+const tm = ref()
+const p = ref()
 const currentTrack = computed(() => store.currentTrack)
 const tracksMatch = ref(false)
 const isLoading = ref(true)

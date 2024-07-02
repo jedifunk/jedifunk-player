@@ -8,15 +8,15 @@
 
     <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
-      <ion-list v-else>
+      <ion-list v-else ref="sliding">
         <ion-item-sliding v-for="playlist in playlists" :key="playlist.id">
           <ion-item :button="true" @click="handleSelectedPlaylist(playlist.pathname)">
             <ion-label>{{ playlist.name }}</ion-label>
           </ion-item>
 
           <ion-item-options>
-            <ion-item-option color="danger">
-              <ion-icon slot="icon-only" :icon="trashOutline" @click="deletePlaylist(playlist.id)"></ion-icon>
+            <ion-item-option color="primary">
+              <ion-icon slot="icon-only" :icon="ellipsisHorizontalOutline" @click="openOptions(playlist.id)"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
@@ -41,9 +41,11 @@ import {
   IonIcon,
   onIonViewWillEnter,
   onIonViewWillLeave,
+  modalController
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import { trashOutline } from 'ionicons/icons'
+import OptionsModal from '@/components/OptionsModal.vue'
+import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
 import { useMainStore } from '@/stores/index'
@@ -53,6 +55,7 @@ const store = useMainStore()
 const router = useRouter()
 const isLoading = ref(true)
 const playlists = ref([])
+const sliding = ref()
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
@@ -72,8 +75,20 @@ watch(() => store.playlists, (newPlaylists) => {
   playlists.value = newPlaylists
 }, {deep: true})
 
-const deletePlaylist = async (playlistId) => {
-  await store.deletePlaylistById(playlistId)
+const openOptions = async (pId) => {
+  const optionsModal = await modalController.create({
+    component: OptionsModal,
+    componentProps: {
+      objectId: pId,
+      objectType: 'playlist'
+    },
+    canDismiss: true,
+    breakpoints: [.5, 1],
+    initialBreakpoint: .5
+  })
+
+  sliding.value.$el.closeSlidingItems()
+  await optionsModal.present()
 }
 
 const handleSelectedPlaylist = (pathname) => {

@@ -7,7 +7,7 @@
         </ion-buttons>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="deletePlaylist(pId)"><ion-icon slot="icon-only" :icon="trashOutline"></ion-icon></ion-button>
+          <ion-button @click="openOptions"><ion-icon slot="icon-only" :icon="ellipsisHorizontalOutline"></ion-icon></ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -30,15 +30,16 @@ import {
   IonBackButton,
   onIonViewWillEnter,
   onIonViewWillLeave,
+  modalController
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
+import OptionsModal from '@/components/OptionsModal.vue'
+import Tracklist from '@/components/TrackList.vue'
+import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMainStore } from '@/stores/index'
-import Tracklist from '@/components/TrackList.vue'
-
-import { trashOutline } from 'ionicons/icons'
 
 const store = useMainStore()
 const route = useRoute()
@@ -84,6 +85,22 @@ watch(() => store.playlists, (newPlaylists) => {
     console.warn(`No playlist found for pathname: ${target.value}`);
   }
 }, {deep: true})
+
+const openOptions = async () => {
+  const nPId = pId.value
+  const optionsModal = await modalController.create({
+    component: OptionsModal,
+    componentProps: {
+      objectId: nPId,
+      objectType: 'playlist'
+    },
+    canDismiss: true,
+    breakpoints: [.5, 1],
+    initialBreakpoint: .5
+  })
+
+  await optionsModal.present()
+}
 
 const deletePlaylist = async (playlistId) => {
   await store.deletePlaylistById(playlistId)
