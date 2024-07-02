@@ -11,10 +11,9 @@
           <div class="track-meta flex column" ref="tm">
             <ion-label :class="{'playing': tracksMatch}">
               <Playing v-if="tracksMatch" />
-              <!-- <ion-icon v-if="tracksMatch" :icon="barcodeOutline"></ion-icon> -->
               {{ track.title }}
             </ion-label>
-            <p v-if="!show" ref="p">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+            <p v-if="!show" ref="p" :class="{ 'anim': shouldAnimate }">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
           </div>
         </div>
         <div>{{ formatDuration(track.duration) }}</div>
@@ -34,11 +33,12 @@ import {
 import Player from '@/components/PlayerComponent.vue'
 import TrackOptions from '@/components/TrackOptions.vue'
 import Playing from '@/components/PlayingAnim.vue'
-import { barcodeOutline, musicalNote } from 'ionicons/icons'
+import { musicalNote } from 'ionicons/icons'
 
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
 import { useMainStore } from '@/stores'
 import { formatDuration } from '@/utils/helpers'
+import { useElementSize, useElementBounding } from '@vueuse/core'
 
 const store = useMainStore()
 const { show, tracks, track } = defineProps(['track', 'show', 'tracks'])
@@ -49,19 +49,12 @@ const tracksMatch = ref(false)
 const isLoading = ref(true)
 const sliding = ref(null)
 
-const animate = computed(() => {
-  if (tm.value && p.value ) {
-    animate.value = p.value.scrollWidth > tm.value.clientWidth
-  }
-  return animate
-})
-
 onMounted(async () => {
   isLoading.value = true;
   try {
     await nextTick()
   } catch (error) {
-    console.error('Failed to get filtered tracks:', error);
+    console.error('Failed:', error);
   } finally {
     isLoading.value = false;
   }
@@ -70,6 +63,13 @@ onMounted(async () => {
 watchEffect(() => {
   tracksMatch.value = currentTrack.value.id === track.id
 })
+
+const shouldAnimate = () => {
+  setTimeout(() => {
+    console.log('p', p.value.scrollWidth, 'tm', tm.value.clientWidth, 'outcome', p.value.scrollWidth > tm.value.clientWidth)
+    return p.value.scrollWidth > tm.value.clientWidth
+  }, 200)
+};
 
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
@@ -100,7 +100,6 @@ const closeOptions = () => {
   gap: 1rem;
   align-items: center;
   max-width: calc(100% - 75px);
-  overflow-x: hidden;
 }
 .track-art div {
   display: flex;
@@ -113,6 +112,9 @@ const closeOptions = () => {
 }
 .track-art ion-icon {
   fill: black;
+}
+.track-meta {
+  overflow-x: hidden;
 }
 .track-meta p {
   margin: 0;

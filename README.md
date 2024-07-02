@@ -25,7 +25,9 @@ Personal Phish audio player.
 - [x] Style: Color Theme
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
+- [ ] User: add password, so can login from multiple devices
 - [ ] Tags: Allow edit name
+- [ ] Tags: colors/emojis ... add to tracks to denote
 - [ ] Playlists: Allow edit name
 - [ ] Playlists: add reordering of tracks in playlists
 - [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes

@@ -6,22 +6,22 @@
   </div>
 </template>
 <script setup>
-import { ref, watchEffect, onUnmounted } from 'vue'
+import { ref, watchEffect, onBeforeUnmount } from 'vue'
 import AudioService from '@/utils/audioService'
 
 let audioService = AudioService.getInstance()
 const isActive = ref(false)
 
-// Watch for progress updates
 watchEffect(() => {
-  audioService.addEventListener('progressUpdate', () => {
-    isActive.value = true
-  })
-})
+  const handler = () => {
+    isActive.value = true;
+  };
 
-// Cleanup function to remove the event listener when the component unmounts
-onUnmounted(() => {
-  audioService.removeEventListener('progressUpdate', handler);
+  audioService.addEventListener('progressUpdate', handler);
+
+  return () => {
+    audioService.removeEventListener('progressUpdate', handler);
+  };
 });
 </script>
 <style>
