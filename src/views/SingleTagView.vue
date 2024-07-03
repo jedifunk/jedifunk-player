@@ -32,9 +32,9 @@ import {
   onIonViewWillLeave,
   modalController
 } from '@ionic/vue'
-import Tracklist from '@/components/TrackList.vue'
+import Tracklist from '@/components/tracks/TrackList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import OptionsModal from '@/components/OptionsModal.vue'
+import OptionsModal from '@/components/options/OptionsModal.vue'
 import { trashOutline, ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'

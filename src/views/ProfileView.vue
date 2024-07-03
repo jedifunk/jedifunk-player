@@ -43,7 +43,7 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import UserAuth from '@/components/UserAuth.vue'
+import UserAuth from '@/components/user/UserAuth.vue'
 
 import { useRouter } from 'vue-router'
 import { useMainStore } from '@/stores'

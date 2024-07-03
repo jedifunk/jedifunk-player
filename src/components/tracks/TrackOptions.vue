@@ -18,8 +18,8 @@ import  {
   IonIcon,
   modalController
 } from '@ionic/vue'
-import TagModal from '@/components/TagModal.vue'
-import PlaylistSelectModal from '@/components/PlaylistSelectModal.vue'
+import TagModal from '@/components/options/TagModal.vue'
+import PlaylistSelectModal from '@/components/options/PlaylistSelectModal.vue'
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline } from 'ionicons/icons'
 
 import { useMainStore } from '@/stores'

@@ -15,7 +15,7 @@
 </template>
 <script setup>
 import { IonContent, IonList, IonItem, IonIcon, IonLabel, modalController } from '@ionic/vue'
-import CreateObjectsModal from '@/components/CreateObjectsModal.vue'
+import CreateObjectsModal from '@/components/options/CreateObjectsModal.vue'
 
 import { onMounted, ref } from 'vue'
 import { useMainStore } from '@/stores'

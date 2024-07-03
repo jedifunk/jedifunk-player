@@ -22,7 +22,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
 import { useMainStore } from '@/stores/index'
-import Player from '@/components/PlayerComponent.vue'
+import Player from '@/components/audio/PlayerComponent.vue'
 import AudioService from '@/utils/audioService'
 
 let audioService = AudioService.getInstance()

@@ -7,7 +7,7 @@
 import {
   IonList,
 } from '@ionic/vue'
-import TrackComponent from '@/components/TrackComponent.vue'
+import TrackComponent from '@/components/tracks/TrackComponent.vue'
 
 const { tracks } = defineProps(['tracks'])
 </script>

@@ -1,18 +1,18 @@
 <template>
   <ion-toolbar>
-    <ion-title>Tag</ion-title>
+    <ion-title>Add To Playlist</ion-title>
     <ion-buttons slot="start">
       <ion-button @click="dismiss">Cancel</ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-content>
-    <ion-button class="ion-padding" expand="block" @click="openCreateOrEdit">New Tag</ion-button>
+    <ion-button class="ion-padding" expand="block" @click="openCreateOrEdit">New Playlist</ion-button>
     <ion-list lines="none">
-      <ion-item v-for="tag in tags" :key="tag.id">
+      <ion-item v-for="playlist in playlists" :key="playlist.id">
         <ion-checkbox
-          :checked="selectionStatus[tag.id]"
-          @ionChange="toggleSelectTag(tag.id)"
-        >{{ tag.name }}</ion-checkbox>
+          :checked="selectionStatus[playlist.id]"
+          @ionChange="toggleSelectPlaylist(playlist.id)"
+        >{{ playlist.name }}</ion-checkbox>
       </ion-item>
     </ion-list>
     <ion-fab vertical="bottom" horizontal="center">
@@ -38,11 +38,11 @@ import {
 import { ref, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/index'
 
-import CreateObjectsModal from '@/components/CreateObjectsModal.vue'
+import CreateObjectsModal from '@/components/options/CreateObjectsModal.vue'
 
 const store = useMainStore()
 const isLoading = ref(true)
-const tags = ref([])
+const playlists = ref([])
 const selectionStatus = ref({})
 const props = defineProps({
   track: Object
@@ -51,10 +51,10 @@ const props = defineProps({
 onMounted(async () => {
   isLoading.value = true;
   try {
-    tags.value = await store.tags
-    tags.value.forEach(tag => {
-      const trackInTag = tag.tracks.some(trackInTag => trackInTag !== null && trackInTag.id !== null && trackInTag.id !== undefined && trackInTag.id === Number(props.track.id));
-      selectionStatus.value[tag.id] = trackInTag
+    playlists.value = await store.playlists
+    playlists.value.forEach(playlist => {
+      const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id !== undefined && trackInPlaylist.id === Number(props.track.id))
+      selectionStatus.value[playlist.id] = trackInPlaylist
     });
   } catch (error) {
     console.error('Failed to get filtered tracks:', error);
@@ -63,16 +63,15 @@ onMounted(async () => {
   }
 })
 
-watch(() => store.tags, (newTags) => {
-  tags.value = newTags
+watch(() => store.playlists, (newPlaylists) => {
+  playlists.value = newPlaylists
 }, {deep: true})
 
 const openCreateOrEdit = async () => {  
   const modalInstance = await modalController.create({
     component: CreateObjectsModal,
     componentProps: {
-      objectType: 'tag',
-      //objectToEdit: object,
+      objectType: 'playlist',
       onClose: () => modalInstance.dismiss(),
     },
     breakpoints: [0,.5],
@@ -86,9 +85,9 @@ const openCreateOrEdit = async () => {
   });
 }
 
-const toggleSelectTag = async (tagId) => {
-  const trackAddedOrRemoved = await store.toggleTagged(tagId, props.track)
-  selectionStatus.value[tagId] = trackAddedOrRemoved
+const toggleSelectPlaylist = async (playlistId) => {
+  const trackAddedOrRemoved = await store.toggleTrackInPlaylist(playlistId, props.track)
+  selectionStatus.value[playlistId] = trackAddedOrRemoved
 };
 
 const dismiss = async () => {

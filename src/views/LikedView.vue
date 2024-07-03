@@ -21,7 +21,7 @@ import {
   onIonViewWillEnter,
   onIonViewWillLeave,
 } from '@ionic/vue'
-import Tracklist from '@/components/TrackList.vue';
+import Tracklist from '@/components/tracks/TrackList.vue';
 import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, watch } from 'vue'

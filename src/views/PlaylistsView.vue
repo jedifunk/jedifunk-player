@@ -44,7 +44,7 @@ import {
   modalController
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
-import OptionsModal from '@/components/OptionsModal.vue'
+import OptionsModal from '@/components/options/OptionsModal.vue'
 import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'

@@ -41,7 +41,7 @@ import {
   IonBackButton,
   onIonViewWillLeave
 } from '@ionic/vue'
-import SetList from '@/components/SetList.vue'
+import SetList from '@/components/tracks/SetList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
 
 import { useRoute } from 'vue-router'

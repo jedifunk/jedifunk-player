@@ -28,8 +28,7 @@ import {
   IonToolbar,
   IonList,
   IonItem,
-  IonLabel,
-  IonSpinner
+  IonLabel
 } from '@ionic/vue';
 import Loader from '@/components/SpinnerComponent.vue'
 

@@ -10,7 +10,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/vue'
 import { ref, computed, onBeforeMount } from 'vue'
 import { useMainStore } from '@/stores/index'
 import * as sb from '@/utils/database'
-import MiniPlayer from '@/components/MiniPlayer.vue'
+import MiniPlayer from '@/components/audio/MiniPlayer.vue'
 
 const store = useMainStore()
 const showMiniPlayer = computed(() => store.showMiniPlayer)

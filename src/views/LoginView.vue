@@ -19,9 +19,9 @@ import {
   IonButton,
   modalController
 } from '@ionic/vue'
-import UserAuth from '@/components/UserAuth.vue'
+import UserAuth from '@/components/user/UserAuth.vue'
 import DeathStar from '@/components/DeathStar.vue'
-import SignUp from '@/components/SignUp.vue'
+import SignUp from '@/components/user/SignUp.vue'
 
 const openSignUp = async () => {
   const signupModal = await modalController.create({

@@ -30,9 +30,9 @@ import {
   IonIcon,
   modalController
 } from '@ionic/vue'
-import Player from '@/components/PlayerComponent.vue'
-import TrackOptions from '@/components/TrackOptions.vue'
-import Playing from '@/components/PlayingAnim.vue'
+import Player from '@/components/audio/PlayerComponent.vue'
+import TrackOptions from '@/components/tracks/TrackOptions.vue'
+import Playing from '@/components/tracks/PlayingAnim.vue'
 import { musicalNote } from 'ionicons/icons'
 
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
