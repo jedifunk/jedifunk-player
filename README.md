@@ -29,7 +29,8 @@ Personal Phish audio player.
 - [x] Tags: Allow edit name
 - [ ] Tags: colors/emojis ... add to tracks to denote
 - [x] Playlists: Allow edit name
-- [ ] Playlists: add reordering of tracks in playlists
+- [ ] Playlists/Tags: Edit option in Options Modal to facilitate reorder& mass removal of tracks
+- [ ] Audio Player: add queue and ability to add tracks to current queue
 - [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes
 - [ ] Systems: Abstract into separate stores (player, user, systems)
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)

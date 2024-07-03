@@ -1,12 +1,12 @@
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <div class="flex column">
+      <div class="login-wrapper flex">
         <DeathStar />
-        <ion-title><h1 class="app-title">the jedi's funk</h1></ion-title>
+        <h1 class="app-title">the jedi's funk</h1>
         <UserAuth />
         <div>
-        <p @click="openSignUp">Or join the darkside</p>
+        <p @click="openSignUp" class="darkside">Or join the darkside</p>
       </div>
       </div>
     </ion-content>
@@ -16,7 +16,6 @@
 import {
   IonPage,
   IonContent,
-  IonTitle,
   IonButton,
   modalController
 } from '@ionic/vue'
@@ -27,13 +26,24 @@ import SignUp from '@/components/SignUp.vue'
 const openSignUp = async () => {
   const signupModal = await modalController.create({
     component: SignUp,
+    breakpoints: [.5, 1],
+    initialBreakpoint: .5,
+    canDismiss: true
   })
 
   await signupModal.present()
 }
 </script>
 <style>
+.login-wrapper {
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+}
 .app-title {
   color: var(--ion-color-primary);
+}
+.darkside {
+  color: var(--ion-color-danger);
 }
 </style>

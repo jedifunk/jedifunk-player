@@ -22,7 +22,7 @@
                 <ion-input type="text" name="password" v-model="password" label="New Password"></ion-input>
               </ion-item>
             </ion-list>
-            <ion-button expand="block" type="submit">Update Profile</ion-button>
+            <ion-button class="ion-margin-top" expand="block" type="submit">Update Profile</ion-button>
           </form>
         </div>
       </div>
