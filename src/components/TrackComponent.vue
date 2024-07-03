@@ -8,12 +8,12 @@
               <ion-icon :icon="musicalNote"></ion-icon>
             </div>
           </div>
-          <div class="track-meta flex column" ref="tm">
+          <div class="track-meta flex column">
             <ion-label :class="{'playing': tracksMatch}">
               <Playing v-if="tracksMatch" />
               {{ track.title }}
             </ion-label>
-            <p v-if="!show" ref="p" :class="{ 'anim': shouldAnimate }">{{ track.show_date }} | {{ track.venue_name }}, {{ track.venue_location }}</p>
+            <p v-if="!show">{{ track.show_date }} • {{ track.venue_location }}</p>
           </div>
         </div>
         <div>{{ formatDuration(track.duration) }}</div>
@@ -38,12 +38,9 @@ import { musicalNote } from 'ionicons/icons'
 import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
 import { useMainStore } from '@/stores'
 import { formatDuration } from '@/utils/helpers'
-import { useElementSize, useElementBounding } from '@vueuse/core'
 
 const store = useMainStore()
 const { show, tracks, track } = defineProps(['track', 'show', 'tracks'])
-const tm = ref()
-const p = ref()
 const currentTrack = computed(() => store.currentTrack)
 const tracksMatch = ref(false)
 const isLoading = ref(true)
@@ -63,13 +60,6 @@ onMounted(async () => {
 watchEffect(() => {
   tracksMatch.value = currentTrack.value.id === track.id
 })
-
-const shouldAnimate = () => {
-  setTimeout(() => {
-    console.log('p', p.value.scrollWidth, 'tm', tm.value.clientWidth, 'outcome', p.value.scrollWidth > tm.value.clientWidth)
-    return p.value.scrollWidth > tm.value.clientWidth
-  }, 200)
-};
 
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
@@ -121,22 +111,10 @@ const closeOptions = () => {
   font-size: 12px;
   white-space: nowrap;
 }
-p.anim {
-  animation: backAndForth 15s linear infinite;
-}
 .track .playing {
   display: flex;
   align-items: center;
   color: var(--ion-color-primary);
   gap: 5px;
-}
-
-@keyframes backAndForth {
-  0% { transform: translateX(0); }
-  10% { transform: translateX(0); }
-  45% { transform: translateX(calc(-100% + 200px)); }
-  55% { transform: translateX(calc(-100% + 200px)); }
-  90% { transform: translateX(0); }
-  100% { transform: translateX(0); }
 }
 </style>

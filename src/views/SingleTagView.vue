@@ -77,7 +77,6 @@ onIonViewWillEnter(async () => {
 watch(() => store.tags, (newTags) => {
   tags.value = newTags
   const tag = tags.value.find(tag => tag.pathname === target.value)
-  console.log(tag)
   if (tag) {
     title.value = tag.name
     tracks.value = tag.tracks ? tag.tracks.filter(track => track !== null) : []

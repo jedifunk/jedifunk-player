@@ -3,7 +3,7 @@
     <div class="flex">
       <div ref="ctm" class="current-track-meta" @click="handleModalSwitch">
         <h6>{{ currentTrack.title }}</h6>
-        <p ref="para" :class="{'anim': shouldAnimate}">{{ currentTrack.show_date }} | {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
+        <p ref="para" :class="{'anim': anim}">{{ currentTrack.show_date }} • {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayback">
         <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
@@ -38,15 +38,9 @@ const remainingTime = ref('00:00')
 const newTrackUrl = ref(null)
 const ctm = ref(null)
 const para = ref(null)
+const anim = ref(false)
 
 const normalizedUrl = url => url.toLowerCase().trim()
-
-const shouldAnimate = computed(() => {
-  if (!ctm.value ||!para.value) return false;
-  const ctmWidth = ctm.value.clientWidth;
-  const pScrollWidth = para.value.scrollWidth;
-  return pScrollWidth > ctmWidth;
-})
 
 onMounted( async() => {
   await nextTick()
@@ -61,6 +55,8 @@ onMounted( async() => {
     })
     audioService.addEventListener('trackChanged', (data) => trackChanged(data))
   }
+  await new Promise(resolve => setTimeout(resolve, 100));
+  animate()
 })
 
 const togglePlayback = () => {
@@ -91,6 +87,13 @@ const handleModalSwitch = async () => {
 
   await modal.present()
 }
+
+const animate = () => {
+  if (para.value.scrollWidth > ctm.value.clientWidth) {
+    anim.value = true
+  }
+}
+
 onUnmounted(() => {
   audioService.removeEventListener('progressUpdate')
   audioService.removeEventListener('trackChanged')
@@ -131,17 +134,14 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 p.anim {
-  animation: backAndForth 15s linear infinite;
+  animation: backAndForth 15s ease-in-out infinite;
 }
 .mini-player .progress-bar-container {
   height: 2px;
 }
 @keyframes backAndForth {
-  0% { transform: translateX(0); }
-  10% { transform: translateX(0); }
-  45% { transform: translateX(calc(-100% + 200px)); }
-  55% { transform: translateX(calc(-100% + 200px)); }
-  90% { transform: translateX(0); }
-  100% { transform: translateX(0); }
+  0%, 100% { transform: translateX(0); }
+  10%, 90% { transform: translateX(0); }
+  50% { transform: translateX(calc(-100% + 200px)); }
 }
 </style>

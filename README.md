@@ -13,7 +13,7 @@ Personal Phish audio player.
 - [x] Clicking previous track restarts current track, then another click to go back a track
 - [x] Tracks: Add "playing" icon to current track in list views, or highlight its row
 - [x] Tracks: Upgrade playing icon to animated audiobar
-- [ ] Tracks: FIX animation of venue
+- [x] Tracks: FIX animation of venue
 - [x] Shows: Setlists abstraction so everything works on shows
 - [x] Tags: switch to ionChange
 - [x] Tags: add to localStorage
@@ -26,14 +26,14 @@ Personal Phish audio player.
 - [ ] Style: Make less generic Ionic
 - [ ] Style: Dark Mode
 - [ ] User: add password, so can login from multiple devices
-- [ ] Tags: Allow edit name
+- [x] Tags: Allow edit name
 - [ ] Tags: colors/emojis ... add to tracks to denote
-- [ ] Playlists: Allow edit name
+- [x] Playlists: Allow edit name
 - [ ] Playlists: add reordering of tracks in playlists
 - [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes
 - [ ] Systems: Abstract into separate stores (player, user, systems)
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)
-- [ ] Systems: Combine Playlist & Tag components to accept either
+- [x] Systems: Combine Playlist & Tag components to accept either
 - [ ] Auth: set routing
 - [ ] User: add avatar upload
 - [ ] Improve performance
