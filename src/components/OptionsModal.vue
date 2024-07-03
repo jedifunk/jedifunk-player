@@ -8,7 +8,7 @@
         <ion-label>Add Color</ion-label>
       </ion-item>
       <ion-item detail="false" :button="true" @click="deleteObject">
-        <ion-label>Delete {{ objectType }} {{ objectId }}</ion-label>
+        <ion-label>Delete {{ objectType }}</ion-label>
       </ion-item>
     </ion-list>
   </ion-content>
@@ -69,10 +69,17 @@ const openCreateOrEdit = async () => {
   });
 }
 
+const dismiss = async () => {
+  await modalController.dismiss()
+}
+
 const deleteObject = async () => {
+  dismiss()
   if (objectType === 'tag') {
+    router.replace({name: 'Tags'})
     await store.deleteTagById(objectId)
   } else {
+    router.replace({name: 'Playlists'})
     await store.deletePlaylistById(objectId)
   }
 }

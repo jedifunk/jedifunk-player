@@ -103,6 +103,7 @@ export async function getUserLikes(userId) {
     const { data, error } = await supabase
       .from('likes')
       .select('*, tracks (*)')
+      .eq('user_id', userId)
 
       if (error) {
         console.error('Error fetching likes:', error);

@@ -38,10 +38,9 @@ onMounted(async () => {
 })
 
 const toggleLikeStatus = async (track) => {
+  emit('closeOptions')
   const liked = await store.toggleLikeStatus(track)
   isLiked.value = liked
-
-  emit('closeOptions')
 }
 
 const openTags = async (track) => {

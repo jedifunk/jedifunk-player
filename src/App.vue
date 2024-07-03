@@ -33,7 +33,7 @@ onBeforeMount(async () => {
 
     let tags = await sb.getUserTagsWithTracks(user.id)
     if (tags === null) {
-      const {data} = await sb.supabase.from('tags').select('*')
+      const {data} = await sb.supabase.from('tags').select('*').eq('user_id', user.id)
       tags = data.map(tag => ({
       ...tag,
         tracks: []
@@ -43,7 +43,7 @@ onBeforeMount(async () => {
 
     let playlists = await sb.getUserPlaylistsWithTracks(user.id)
     if (playlists === null) {
-      const {data} = await sb.supabase.from('playlists').select('*')
+      const {data} = await sb.supabase.from('playlists').select('*').eq('user_id', user.id)
       playlists = data.map(tag => ({
       ...tag,
         tracks: []
