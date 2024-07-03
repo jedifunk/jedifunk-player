@@ -72,7 +72,6 @@ const openCreateOrEdit = async () => {
     component: CreateObjectsModal,
     componentProps: {
       objectType: 'playlist',
-      //objectToEdit: object,
       onClose: () => modalInstance.dismiss(),
     },
     breakpoints: [0,.5],

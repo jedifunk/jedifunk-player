@@ -3,9 +3,12 @@
     <div class="ion-padding">
       <div>
         <ion-input type="email" placeholder="Your email" v-model="email" />
+        <ion-input type="password" placeholder="Password" v-model="password">
+          <!-- <ion-password-toggle slot="end"></ion-password-toggle> -->
+        </ion-input>
       </div>
       <div>
-        <ion-button expand="block" type="submit"  @click="handleSignIn">Sign In</ion-button>
+        <ion-button expand="block" type="submit"  @click="handleSignIn">Login</ion-button>
       </div>
     </div>
   </form>
@@ -17,6 +20,7 @@ import { supabase } from '@/utils/database'
 
 const isLoading = ref(true)
 const email = ref('')
+const password = ref('')
 
 const handleSignIn = async () => {
   try {
@@ -30,4 +34,12 @@ const handleSignIn = async () => {
     isLoading.value = false
   }
 }
+
+async function signInWithEmail() {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  })
+}
+
 </script>

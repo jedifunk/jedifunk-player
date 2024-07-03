@@ -1,7 +1,13 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Tab from '@/components/Tab.vue'
+import { supabase } from '@/utils/database'
 
 const routes = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/LoginView.vue')
+  },
   {
     path: '/',
     component: Tab,
@@ -10,6 +16,7 @@ const routes = [
         path: '',
         name: 'Shows',
         component: () => import('@/views/AllShows.vue'),
+        meta: {requiresAuth: true}
       },
       {
         path: 'playlists',
@@ -64,5 +71,25 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
+
+router.beforeEach(async (to, from, next) => {
+  let user = null
+  try {
+    user = await supabase.auth.getUser()
+  } catch (err) {
+    console.error(err)
+  }
+  
+  // Check if the route requires authentication
+  // This assumes you have a method to check if the route needs auth
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+  // If the route requires auth and the user is not authenticated, redirect to login
+  if (requiresAuth && !user.data.user) {
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
+});
 
 export default router

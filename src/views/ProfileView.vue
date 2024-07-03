@@ -3,6 +3,9 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-title>Profile</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="solid" size="small" @click="handleLogout">Logout</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding" :fullscreen="true">
@@ -14,6 +17,9 @@
             <ion-list>
               <ion-item>
                 <ion-input type="text" name="username" v-model="profile.username" label="Username"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-input type="text" name="password" v-model="password" label="New Password"></ion-input>
               </ion-item>
             </ion-list>
             <ion-button expand="block" type="submit">Update Profile</ion-button>
@@ -39,16 +45,19 @@ import {
 import Loader from '@/components/SpinnerComponent.vue'
 import UserAuth from '@/components/UserAuth.vue'
 
+import { useRouter } from 'vue-router'
 import { useMainStore } from '@/stores'
 import { ref } from 'vue'
 import { supabase } from '@/utils/database'
 
 const isLoading = ref(true)
 const store = useMainStore()
+const router = useRouter()
 const profile = ref({
   username: '',
   avatar_url: '',
 })
+const password = ref('')
 const isUser = ref(false)
 
 onIonViewWillEnter(async () => {
@@ -85,7 +94,6 @@ async function getProfile(user) {
         username: data.username,
         avatar_url: data.avatar_url,
       }
-
     }
   } catch (error) {
     console.error(error)
@@ -105,6 +113,10 @@ const updateProfile = async () => {
       updated_at: new Date(),
     }
 
+    if (password.value) {
+      await supabase.auth.updateUser({ password: password.value })
+    }
+
     let { error } = await supabase
       .from('profiles')
       .upsert(updates, {returning: 'minimal'})
@@ -117,5 +129,10 @@ const updateProfile = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const handleLogout = async () => {
+  await supabase.auth.signOut({ scope: 'local' })
+  router.push({ name: 'Login' })
 }
 </script>
