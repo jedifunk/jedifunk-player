@@ -35,6 +35,9 @@ import '@ionic/vue/css/palettes/dark.always.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import { defineCustomElements } from '@ionic/pwa-elements/loader'
+defineCustomElements(window)
+
 const pinia = createPinia()
 const app = createApp(App)
   .use(IonicVue, {

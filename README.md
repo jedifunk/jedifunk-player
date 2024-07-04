@@ -38,7 +38,7 @@ Personal Phish audio player.
 - [ ] Auth: set routing
 - [ ] User: add avatar upload
 - [ ] Auth: Add reset password
-- [ ] Style: style the login/profile
+- [x] Style: style the login/profile
 - [ ] Improve performance
 - [ ] Improve playback
 - [ ] Allow download to local for faster play

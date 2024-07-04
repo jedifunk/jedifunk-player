@@ -24,7 +24,8 @@
         </ion-tab-button>
 
         <ion-tab-button :class="getTabInfo('profile').className" tab="profile" @click="goToUser()">
-          <ion-icon :icon="getTabInfo('profile').iconName" />
+          <img class="avatar-icon" v-if="avatar" :src="avatar" alt="avatar" />
+          <ion-icon v-else :icon="getTabInfo('profile').iconName" />
           <ion-label>Profile</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
@@ -49,7 +50,7 @@ import { ref, watch } from 'vue';
 
 const store = useMainStore()
 const router = useRouter()
-
+const avatar = store.avatar
 const activeTab = ref(router.currentRoute.value.name)
 
 watch(() => router.currentRoute.value, (newRoute) => {
@@ -99,3 +100,15 @@ const navigateTo = (routeName) => {
   router.push({ name: routeName });
 }
 </script>
+<style>
+.avatar-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 24px;
+  order: -1;
+}
+</style>

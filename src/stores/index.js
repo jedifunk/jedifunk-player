@@ -19,7 +19,8 @@ export const useMainStore = defineStore({
     tags: [],
     playlists: [],
     profile: {},
-    user: {}
+    user: {},
+    avatar: null
   }),
   getters: {
     maxPlaylistId() {
@@ -35,6 +36,9 @@ export const useMainStore = defineStore({
     },
     setProfile(value) {
       this.profile = value
+    },
+    setAvatar(value) {
+      this.avatar = value
     },
     setYears(yearsData) {
       this.years = yearsData;

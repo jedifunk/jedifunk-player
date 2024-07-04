@@ -21,6 +21,9 @@
               <ion-item>
                 <ion-input type="text" name="password" v-model="password" label="New Password"></ion-input>
               </ion-item>
+              <ion-item>
+                <Avatar :path="profile.avatar_url" @updatePath="newAvatar"></Avatar>
+              </ion-item>
             </ion-list>
             <ion-button class="ion-margin-top" expand="block" type="submit">Update Profile</ion-button>
           </form>
@@ -38,12 +41,14 @@ import {
   IonList,
   IonItem,
   IonInput,
+  IonButtons,
   IonButton,
   IonContent,
   onIonViewWillEnter
 } from '@ionic/vue'
 import Loader from '@/components/SpinnerComponent.vue'
 import UserAuth from '@/components/user/UserAuth.vue'
+import Avatar from '@/components/user/AvatarComponent.vue'
 
 import { useRouter } from 'vue-router'
 import { useMainStore } from '@/stores'
@@ -71,6 +76,7 @@ onIonViewWillEnter(async () => {
     if (user) {
       isUser.value = true
     }
+    if (profile.value.avatar_url) {}
   } catch (error) {
     console.error('failed to load profile', error)
   } finally {
@@ -102,6 +108,11 @@ async function getProfile(user) {
   }
 }
 
+const newAvatar = (fileName) => {
+  console.log('avatar', fileName)
+  profile.value.avatar_url = fileName
+  console.log('profile avatar', profile.value.avatar_url)
+}
 
 const updateProfile = async () => {
   isLoading.value = true
@@ -121,9 +132,9 @@ const updateProfile = async () => {
       .from('profiles')
       .upsert(updates, {returning: 'minimal'})
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
+
+    store.setProfile(updates)
   } catch (error) {
     console.error(error.message);
   } finally {
