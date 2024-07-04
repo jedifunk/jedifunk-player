@@ -36,7 +36,7 @@ Personal Phish audio player.
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)
 - [x] Systems: Combine Playlist & Tag components to accept either
 - [ ] Auth: set routing
-- [ ] User: add avatar upload
+- [x] User: add avatar upload
 - [ ] Auth: Add reset password
 - [x] Style: style the login/profile
 - [ ] Improve performance

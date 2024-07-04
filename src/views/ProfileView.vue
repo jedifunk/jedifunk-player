@@ -109,9 +109,7 @@ async function getProfile(user) {
 }
 
 const newAvatar = (fileName) => {
-  console.log('avatar', fileName)
   profile.value.avatar_url = fileName
-  console.log('profile avatar', profile.value.avatar_url)
 }
 
 const updateProfile = async () => {

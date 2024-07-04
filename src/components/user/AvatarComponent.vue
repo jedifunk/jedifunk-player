@@ -1,5 +1,6 @@
 <template>
   <div class="avatar">
+    <Loader v-if="isLoading" />
     <div class="avatar_wrapper" @click="uploadAvatar">
       <img v-if="avatarUrl" :src="avatarUrl" />
       <ion-icon v-else :icon="person" class="no-avatar"></ion-icon>
@@ -8,27 +9,31 @@
 </template>
 <script setup>
 import { IonIcon } from '@ionic/vue'
+import Loader from '@/components/SpinnerComponent.vue'
 import { person } from 'ionicons/icons'
 
 import { ref, toRefs, watch, onMounted } from 'vue'
 import { supabase } from '@/utils/database'
 import { useMainStore } from '@/stores'
-import { Camera, CameraResultType } from '@capacitor/camera'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 
 const store = useMainStore()
 const props = defineProps(['path'])
 const emit = defineEmits(['upload', 'updatePath'])
 const { path } = toRefs(props)
 const avatarUrl = ref('')
+const isLoading = ref(true)
 
 onMounted(async () => {
+  isLoading.value = true
   try {
-    avatarUrl.value = store.avatar
+    avatarUrl.value = await store.avatar
     if(!avatarUrl && path.value) {
       await downloadImage()
     }
+    isLoading.value = false
   } catch (error) {
-
+    console.error('failed to load image', error)
   }
 })
 const downloadImage = async () => {
@@ -52,6 +57,9 @@ const uploadAvatar = async () => {
   try {
     const photo = await Camera.getPhoto({
       resultType: CameraResultType.DataUrl,
+      quality: 10,
+      width: 200,
+      source: CameraSource.Photos
     })
     if (photo.dataUrl) {
       const file = await fetch(photo.dataUrl)
@@ -59,7 +67,7 @@ const uploadAvatar = async () => {
         .then((blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }))
 
       const fileName = `${Math.random()}-${new Date().getTime()}.${photo.format}`
-      console.log('fileName', fileName)
+
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file)
