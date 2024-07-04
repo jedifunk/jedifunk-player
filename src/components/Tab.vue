@@ -51,6 +51,7 @@ import { ref, watch } from 'vue';
 const store = useMainStore()
 const router = useRouter()
 const avatar = store.avatar
+console.log(avatar)
 const activeTab = ref(router.currentRoute.value.name)
 
 watch(() => router.currentRoute.value, (newRoute) => {
@@ -110,5 +111,11 @@ const navigateTo = (routeName) => {
   margin-bottom: 2px;
   font-size: 24px;
   order: -1;
+}
+.avatar-icon + ion-label {
+  font-size: 10px;
+  margin-top: 0;
+  margin-bottom: 1px;
+  min-height: 11px;
 }
 </style>
