@@ -1,36 +1,16 @@
 import { defineStore } from 'pinia'
 import * as sb from '@/utils/database'
 
-export const useMainStore = defineStore({
-  id: 'main',
+export const useUserStore = defineStore('user', {
   state: () => ({
-    appReady: false,
-    years: [],
-    shows: {},
-    singleShow: {},
-    tracks: [],
-    yearParam: null,
-    dateParam: null,
-    showMiniPlayer: false,
-    isPlaying: false,
-    currentTrack: {},
-    comingFrom: 'show',
+    user: {},
+    profile: {},
     likes: [],
     tags: [],
     playlists: [],
-    profile: {},
-    user: {},
     avatar: null
   }),
-  getters: {
-    maxPlaylistId() {
-      return Math.max(...this.playlists.map(playlist => playlist.id));
-    }  
-  },
   actions: {
-    setAppReady(value) {
-      this.appReady = value
-    },
     setUser(value) {
       this.user = value
     },
@@ -39,18 +19,6 @@ export const useMainStore = defineStore({
     },
     setAvatar(value) {
       this.avatar = value
-    },
-    setYears(yearsData) {
-      this.years = yearsData;
-    },
-    setShows(value) {
-      this.shows = value;
-    },
-    setSingleShow(value) {
-      this.singleShow = value;
-    },
-    setTracks(value) {
-      this.Tracks = value;
     },
     setTags(value) {
       if (value) {
@@ -66,21 +34,6 @@ export const useMainStore = defineStore({
       if (likes) {
         this.likes = likes
       }
-    },
-    setYearParam(year) {
-      this.yearParam = year;
-    },
-    setDateParam(value) {
-      this.dateParam = value;
-    },
-    setShowMiniPlayer(value) {
-      this.showMiniPlayer = value;
-    },
-    setIsPlaying(isPlaying) {
-      this.isPlaying = isPlaying;
-    },
-    setCurrentTrack(track) {
-      this.currentTrack = track;
     },
     async saveTag(tag) {
       const tagData = {
@@ -168,14 +121,6 @@ export const useMainStore = defineStore({
       if (updatedTags.fetchError) throw updatedTags.fetchError
 
       this.tags = updatedTags
-    },
-    setComingFrom(value) {
-      const validOptions = ["show", "other", "miniplayer"];
-      if (validOptions.includes(value)) {
-          this.comingFrom = value;
-      } else {
-        console.error("Invalid value for comingFrom:", value);
-      }
     },
     async toggleLikeStatus(track) {
       const trackId = track.id;

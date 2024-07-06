@@ -48,10 +48,12 @@ import OptionsModal from '@/components/options/OptionsModal.vue'
 import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
-import { useMainStore } from '@/stores/index'
+import { useMainStore } from '@/stores/main'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
-const store = useMainStore()
+const mainStore = useMainStore()
+const store = useUserStore()
 const router = useRouter()
 const isLoading = ref(true)
 const playlists = ref([])
@@ -60,7 +62,7 @@ const sliding = ref()
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     playlists.value = await store.playlists

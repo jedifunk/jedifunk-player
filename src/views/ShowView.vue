@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button :defaultHref="defaultBack()"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ store.singleShow.date }}</ion-title>
+        <ion-title>{{ showsStore.singleShow.date }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -14,17 +14,17 @@
         <div class="show-details ion-padding">
           <ion-header collapse="condense">
             <ion-toolbar>
-              <h1>{{ store.singleShow.date }}</h1>
+              <h1>{{ showsStore.singleShow.date }}</h1>
             </ion-toolbar>
           </ion-header>
-          <h3>{{ store.singleShow.venue.name }}</h3>
+          <h3>{{ showsStore.singleShow.venue.name }}</h3>
           <p>
-            {{ store.singleShow.venue.location }}
-            <span>{{ formatDuration(store.singleShow.duration) }}</span>
+            {{ showsStore.singleShow.venue.location }}
+            <span>{{ formatDuration(showsStore.singleShow.duration) }}</span>
           </p>
         </div>
         <div>
-          <SetList :groupedTracks="groupedTracks"/>
+          <SetList :tracks="showsStore.singleShow.tracks" :groupedTracks="groupedTracks"/>
         </div>  
       </div>
     </ion-content>
@@ -46,22 +46,21 @@ import Loader from '@/components/SpinnerComponent.vue'
 
 import { useRoute } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
-import { useMainStore } from '@/stores/index'
+import { useShowsStore } from '@/stores/shows'
 import { getSingleShow } from '@/utils/fetch'
 import { formatDuration } from '@/utils/helpers'
 
 const route = useRoute()
-const store = useMainStore()
+const showsStore = useShowsStore()
 const isLoading = ref(true)
-
 
 onMounted(async () => {
   isLoading.value = true
   try {
     const singleShow = await getSingleShow(route.params.dateParam)
-    store.setDateParam(route.params.dateParam)
-    store.setYearParam(route.params.yearParam)
-    store.setSingleShow(singleShow.data) 
+    showsStore.setDateParam(route.params.dateParam)
+    showsStore.setYearParam(route.params.yearParam)
+    showsStore.setSingleShow(singleShow.data)
   } catch (error) {
     console.error('failed to set single show:', error)
   } finally {
@@ -71,8 +70,8 @@ onMounted(async () => {
 
 const groupedTracks = computed(() => {
   const groups = {}
-  if (store.singleShow && Array.isArray(store.singleShow.tracks)) {
-    store.singleShow.tracks.forEach(track => {
+  if (showsStore.singleShow && Array.isArray(showsStore.singleShow.tracks)) {
+    showsStore.singleShow.tracks.forEach(track => {
       if (!groups[track.set_name]) {
         groups[track.set_name] = [];
       }
@@ -82,7 +81,7 @@ const groupedTracks = computed(() => {
   return groups
 })
 const defaultBack = () => {
-  return `/${store.yearParam}`
+  return `/${showsStore.yearParam}`
 }
 onIonViewWillLeave(() => {
   console.info('show view will leave')

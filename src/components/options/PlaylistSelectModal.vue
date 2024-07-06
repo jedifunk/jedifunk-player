@@ -36,11 +36,11 @@ import {
 } from '@ionic/vue'
 
 import { ref, onMounted, watch } from 'vue';
-import { useMainStore } from '@/stores/index'
+import { useUserStore } from '@/stores/user'
 
 import CreateObjectsModal from '@/components/options/CreateObjectsModal.vue'
 
-const store = useMainStore()
+const store = useUserStore()
 const isLoading = ref(true)
 const playlists = ref([])
 const selectionStatus = ref({})

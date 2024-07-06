@@ -8,13 +8,15 @@
 <script setup>
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
 import { ref, computed, onBeforeMount } from 'vue'
-import { useMainStore } from '@/stores/index'
+import { useUserStore } from '@/stores/user'
 import * as sb from '@/utils/database'
 import MiniPlayer from '@/components/audio/MiniPlayer.vue'
+import { useMainStore } from './stores/main'
 
-const store = useMainStore()
-const showMiniPlayer = computed(() => store.showMiniPlayer)
-const currentTrack = computed(() => store.currentTrack)
+const userStore = useUserStore()
+const mainStore = useMainStore()
+const showMiniPlayer = computed(() => mainStore.showMiniPlayer)
+const currentTrack = computed(() => mainStore.currentTrack)
 const session = ref(null)
 
 onBeforeMount(async () => {
@@ -29,7 +31,7 @@ onBeforeMount(async () => {
     })
 
     const {data: {user}} = await sb.supabase.auth.getUser() ?? {}
-    store.setUser(user)
+    userStore.setUser(user)
 
     let tags = await sb.getUserTagsWithTracks(user.id)
     if (tags === null) {
@@ -39,7 +41,7 @@ onBeforeMount(async () => {
         tracks: []
       }));
     }
-    store.setTags(tags)
+    userStore.setTags(tags)
 
     let playlists = await sb.getUserPlaylistsWithTracks(user.id)
     if (playlists === null) {
@@ -49,15 +51,15 @@ onBeforeMount(async () => {
         tracks: []
       }));
     }
-    store.setPlaylists(playlists)
+    userStore.setPlaylists(playlists)
 
     const likes = await sb.getUserLikes(user.id)
-    store.setLikes(likes)
+    userStore.setLikes(likes)
 
   } catch (error) {
     console.error('Error executing method:', error);
   } finally {
-    store.setAppReady(true)
+    mainStore.setAppReady(true)
   }
 })
 </script>

@@ -6,7 +6,7 @@
         <p ref="para" :class="{'anim': anim}">{{ currentTrack.show_date }} • {{ currentTrack.venue_name }}, {{ currentTrack.venue_location }}</p>
       </div>
       <ion-button fill="clear" size="small" @click="togglePlayback">
-        <ion-icon slot="icon-only" size="small" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
+        <ion-icon slot="icon-only" size="small" :icon="mainStore.isPlaying ? pauseOutline : playOutline"></ion-icon>
       </ion-button>
     </div>
     <div class="progress">
@@ -21,15 +21,15 @@
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { IonButton, IonIcon, modalController } from '@ionic/vue'
 import { playOutline, pauseOutline } from 'ionicons/icons'
-import { useMainStore } from '@/stores/index'
+import { useMainStore } from '@/stores/main'
 import Player from '@/components/audio/PlayerComponent.vue'
 import AudioService from '@/utils/audioService'
 
 let audioService = AudioService.getInstance()
 
-const store = useMainStore()
-const tracklist = computed(() => store.Tracks)
-const currentTrack = computed(() => store.currentTrack)
+const mainStore = useMainStore()
+const tracklist = computed(() => mainStore.Tracks)
+const currentTrack = computed(() => mainStore.currentTrack)
 const currentTime = ref(0)
 const duration = ref(0)
 const progressBar = ref(0)
@@ -61,7 +61,7 @@ onMounted( async() => {
 
 const togglePlayback = () => {
   audioService.togglePlayPause()
-  store.setIsPlaying(store.isPlaying =! store.isPlaying)
+  mainStore.setIsPlaying(mainStore.isPlaying =! mainStore.isPlaying)
 }
 
 const trackChanged = (track) => {
@@ -72,15 +72,15 @@ const trackChanged = (track) => {
   // If a matching track is found, retrieve the track object
   if (trackIndex!== -1) {
     const matchedTrack = tracklist.value[trackIndex];
-    store.setCurrentTrack(matchedTrack)
+    mainStore.setCurrentTrack(matchedTrack)
   } else {
     console.warn("No matching track found.");
   }
 }
 
 const handleModalSwitch = async () => {
-  store.setShowMiniPlayer(false)
-  store.setComingFrom('miniplayer')
+  mainStore.setShowMiniPlayer(false)
+  mainStore.setComingFrom('miniplayer')
   const modal = await modalController.create({
     component: Player
   })

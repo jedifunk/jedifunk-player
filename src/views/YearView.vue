@@ -49,11 +49,11 @@ import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, onMounted } from 'vue'
 import { getShows } from '@/utils/fetch'
-import { useMainStore } from '@/stores/index'
+import { useShowsStore } from '@/stores/shows'
 import { useRouter, useRoute } from 'vue-router'
 import { musicalNotes } from 'ionicons/icons'
 
-const store = useMainStore()
+const store = useShowsStore()
 const router = useRouter()
 const route = useRoute()
 

@@ -22,10 +22,10 @@ import TagModal from '@/components/options/TagModal.vue'
 import PlaylistSelectModal from '@/components/options/PlaylistSelectModal.vue'
 import { bookmarkOutline, bookmark, listOutline, pricetagsOutline } from 'ionicons/icons'
 
-import { useMainStore } from '@/stores'
+import { useUserStore } from '@/stores/user'
 import { ref, onMounted } from 'vue'
 
-const store = useMainStore()
+const store = useUserStore()
 const { track } = defineProps(['track'])
 const isLiked = ref(false)
 const itemOptions = ref(null)
@@ -38,9 +38,9 @@ onMounted(async () => {
 })
 
 const toggleLikeStatus = async (track) => {
-  emit('closeOptions')
   const liked = await store.toggleLikeStatus(track)
   isLiked.value = liked
+  emit('closeOptions')
 }
 
 const openTags = async (track) => {

@@ -35,15 +35,16 @@ import {
 import Tracklist from '@/components/tracks/TrackList.vue'
 import Loader from '@/components/SpinnerComponent.vue'
 import OptionsModal from '@/components/options/OptionsModal.vue'
-import { trashOutline, ellipsisHorizontalOutline } from 'ionicons/icons'
+import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useMainStore } from '@/stores/index'
+import { useRoute } from 'vue-router'
+import { useMainStore } from '@/stores/main'
+import { useUserStore } from '@/stores/user'
 
-const store = useMainStore()
+const mainStore = useMainStore()
+const store = useUserStore()
 const route = useRoute()
-const router = useRouter()
 const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')
@@ -55,7 +56,7 @@ onIonViewWillEnter(async () => {
   isLoading.value = true;
   target.value = route.params.tag
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     tags.value = await store.tags

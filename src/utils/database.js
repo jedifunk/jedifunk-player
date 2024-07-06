@@ -4,6 +4,30 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+export async function getProfile(user) {
+  try {
+    const { data, error, status } = await supabase
+      .from('profiles')
+      .select(`username, avatar_url`)
+      .eq('id', user.id)
+      .single()
+
+    if (error && status !== 406) throw error
+
+    let profile
+    if (data) {
+      profile = {
+        username: data.username,
+        avatar_url: data.avatar_url,
+      }
+    }
+
+    return profile
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export async function tagTrack(duration, id, mp3, showDate, title, tagId, userId, venueLocation, venueName) {
   try {
     const { data, error } = await supabase.rpc('tag_the_track', {

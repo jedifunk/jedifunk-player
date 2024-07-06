@@ -1,8 +1,8 @@
 <template>
-  <div v-for="(tracks, setName) in groupedTracks" :key="setName">
+  <div v-for="(tracks, setName) in props.groupedTracks" :key="setName">
     <h4 class="set-title ion-padding-start">{{ setName }}</h4>
     <ion-list class="tracks" lines="none">
-      <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracks="tracks" :show="true"/>
+      <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracklist="props.tracks" :show="true"/>
     </ion-list>
   </div>
 </template>
@@ -11,7 +11,11 @@ import {
   IonList,
 } from '@ionic/vue'
 import TrackComponent from '@/components/tracks/TrackComponent.vue'
-const { groupedTracks } = defineProps(['groupedTracks'])
+
+const props = defineProps({
+  groupedTracks: Object,
+  tracks: Array
+})
 </script>
 <style>
 .item {

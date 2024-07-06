@@ -25,16 +25,18 @@ import Tracklist from '@/components/tracks/TrackList.vue';
 import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, watch } from 'vue'
-import { useMainStore } from '@/stores/index'
+import { useMainStore } from '@/stores/main'
+import { useUserStore } from '@/stores/user'
 
-const store = useMainStore()
+const mainStore = useMainStore()
+const store = useUserStore()
 const isLoading = ref(true)
 const tracks = ref([])
 
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     const list = JSON.parse(JSON.stringify(await store.likes))

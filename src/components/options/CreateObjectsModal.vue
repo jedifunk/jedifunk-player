@@ -21,13 +21,12 @@ import {
   IonContent,
   IonInput,
   IonButton,
-  modalController
 } from '@ionic/vue'
 
 import { ref, onMounted, watchEffect } from 'vue';
-import { useMainStore } from '@/stores';
+import { useUserStore } from '@/stores/user';
 
-const store = useMainStore();
+const store = useUserStore();
 const objectName = ref('');
 const isValidName = ref(true);
 const nameExists = ref(false);

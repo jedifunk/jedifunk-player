@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Tab from '@/components/Tab.vue'
-import { supabase } from '@/utils/database'
+import { useUserStore } from '@/stores/user';
 
 const routes = [
   {
@@ -58,11 +58,6 @@ const routes = [
         name: 'Profile',
         component: () => import('@/views/ProfileView.vue')
       }
-      // {
-      //   path: 'profile/:userParam',
-      //   name: 'Profile',
-      //   component: () => import('@/views/ProfileView.vue')
-      // }
     ],
   },
 ]
@@ -73,9 +68,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  const store = useUserStore()
   let user = null
   try {
-    user = await supabase.auth.getUser()
+    user = store.user
   } catch (err) {
     console.error(err)
   }
@@ -85,7 +81,7 @@ router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   // If the route requires auth and the user is not authenticated, redirect to login
-  if (requiresAuth && !user.data.user) {
+  if (requiresAuth && !user) {
     next({ name: 'Login' });
   } else {
     next();

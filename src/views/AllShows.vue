@@ -34,10 +34,10 @@ import Loader from '@/components/SpinnerComponent.vue'
 
 import { ref, onMounted } from 'vue'
 import { getYears } from '@/utils/fetch'
-import { useMainStore } from '@/stores/index'
+import { useShowsStore } from '@/stores/shows'
 import { useRouter } from 'vue-router'
 
-const store = useMainStore()
+const store = useShowsStore()
 const isLoading = ref(true)
 const router = useRouter()
 

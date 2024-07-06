@@ -16,7 +16,6 @@
 import {
   IonPage,
   IonContent,
-  IonButton,
   modalController
 } from '@ionic/vue'
 import UserAuth from '@/components/user/UserAuth.vue'

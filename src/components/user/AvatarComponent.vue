@@ -14,10 +14,10 @@ import { person } from 'ionicons/icons'
 
 import { ref, toRefs, watch, onMounted } from 'vue'
 import { supabase } from '@/utils/database'
-import { useMainStore } from '@/stores'
+import { useUserStore } from '@/stores/user'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 
-const store = useMainStore()
+const store = useUserStore()
 const props = defineProps(['path'])
 const emit = defineEmits(['upload', 'updatePath'])
 const { path } = toRefs(props)
@@ -28,7 +28,7 @@ onMounted(async () => {
   isLoading.value = true
   try {
     avatarUrl.value = await store.avatar
-    if(!avatarUrl && path.value) {
+    if(!avatarUrl.value && path.value) {
       await downloadImage()
     }
     isLoading.value = false
@@ -83,6 +83,7 @@ const uploadAvatar = async () => {
 }
 
 watch(path, () => {
+  console.log('watch')
   if (path.value) downloadImage()
 })
 </script>

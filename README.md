@@ -32,10 +32,10 @@ Personal Phish audio player.
 - [ ] Playlists/Tags: Edit option in Options Modal to facilitate reorder& mass removal of tracks
 - [ ] Audio Player: add queue and ability to add tracks to current queue
 - [ ] Shows: allow to select multiple tracks to add to tag, playlist, likes
-- [ ] Systems: Abstract into separate stores (player, user, systems)
+- [x] Systems: Abstract into separate stores (player, user, systems)
 - [ ] Systems: Abstract functions by use (user, likes, tags, etc)
 - [x] Systems: Combine Playlist & Tag components to accept either
-- [ ] Auth: set routing
+- [x] Auth: set routing
 - [x] User: add avatar upload
 - [ ] Auth: Add reset password
 - [x] Style: style the login/profile

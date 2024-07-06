@@ -23,7 +23,7 @@
           <ion-label>Playlists</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button :class="getTabInfo('profile').className" tab="profile" @click="goToUser()">
+        <ion-tab-button :class="getTabInfo('profile').className" tab="profile" @click="navigateTo('Profile')">
           <img class="avatar-icon" v-if="avatar" :src="avatar" alt="avatar" />
           <ion-icon v-else :icon="getTabInfo('profile').iconName" />
           <ion-label>Profile</ion-label>
@@ -45,13 +45,13 @@ import {
 } from '@ionic/vue';
 import { calendarOutline, calendar, bookmarkOutline, bookmark, listOutline, list, pricetagsOutline, pricetags, personCircleOutline, personCircle } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
-import { useMainStore } from '@/stores';
+import { useUserStore } from '@/stores/user'
 import { ref, watch } from 'vue';
 
-const store = useMainStore()
+const store = useUserStore()
 const router = useRouter()
 const avatar = store.avatar
-console.log(avatar)
+
 const activeTab = ref(router.currentRoute.value.name)
 
 watch(() => router.currentRoute.value, (newRoute) => {
@@ -91,12 +91,6 @@ const getTabInfo = (tabName) => {
   return { iconName, className };
 }
 
-// const goToUser = (username) => {
-//   router.push({ name: 'Profile', params: { userParam: username }})
-// }
-const goToUser = (username) => {
-  router.push({ name: 'Profile'})
-}
 const navigateTo = (routeName) => {
   router.push({ name: routeName });
 }

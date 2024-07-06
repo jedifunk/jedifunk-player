@@ -1,7 +1,7 @@
 <template>
   <ion-header class="ion-no-border">
     <ion-toolbar>
-      <ion-title>{{ store.dateParam }}</ion-title>
+      <ion-title>{{ showsStore.dateParam }}</ion-title>
       <ion-buttons slot="start">
         <ion-button @click="dismiss(currentTrack)">
           <ion-icon slot="icon-only" :icon="chevronDown"></ion-icon>
@@ -41,7 +41,7 @@
             <ion-icon slot="icon-only" size="large" :icon="playSkipBackOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="togglePlayback">
-            <ion-icon slot="icon-only" size="large" :icon="store.isPlaying ? pauseOutline : playOutline"></ion-icon>
+            <ion-icon slot="icon-only" size="large" :icon="mainStore.isPlaying ? pauseOutline : playOutline"></ion-icon>
           </ion-button>
           <ion-button fill="clear" @click="skipForward">
             <ion-icon slot="icon-only" size="large" :icon="playSkipForwardOutline"></ion-icon>
@@ -64,15 +64,17 @@ import {
 } from '@ionic/vue'
 
 import { ref, onMounted, nextTick, computed, onUnmounted } from 'vue'
-import { useMainStore } from '@/stores/index'
+import { useMainStore } from '@/stores/main'
+import { useShowsStore } from '@/stores/shows'
 import { chevronDown, playOutline, playSkipBackOutline, playSkipForwardOutline, pauseOutline } from 'ionicons/icons'
 import AudioService from '@/utils/audioService'
 
 let audioService = AudioService.getInstance()
-const store = useMainStore()
+const mainStore = useMainStore()
+const showsStore = useShowsStore()
 
-const tracklist = computed(() => store.Tracks)
-const currentTrack = computed(() => store.currentTrack)
+const tracklist = computed(() => mainStore.tracks)
+const currentTrack = computed(() => mainStore.currentTrack)
 const comingFrom = ref(null)
 const newTrackUrl = ref(null)
 const progressBar = ref(0)
@@ -89,12 +91,12 @@ const normalizedUrl = url => url.toLowerCase().trim()
 
 onMounted(async () => {
   await nextTick()
-  comingFrom.value = store.comingFrom
+  comingFrom.value = mainStore.comingFrom
 
   // Determine the starting track based on whether we're coming from a show
   let currentTrackNormalizedMp3 = ''
 
-  if (comingFrom.value === 'show' || comingFrom.value === 'other') {
+  if (comingFrom.value !== 'miniplayer') {
     const tUrls = tracklist.value.map(track => track.mp3)
 
     audioService.setTracks(tUrls)
@@ -105,7 +107,7 @@ onMounted(async () => {
       const trackIndex = audioService.tracks.findIndex(track => normalizedUrl(track) === currentTrackNormalizedMp3);
       if (trackIndex!== -1) {
         audioService.gotoTrack(trackIndex, true);
-        store.setIsPlaying(true);
+        mainStore.setIsPlaying(true);
       }
     }
   }
@@ -130,7 +132,7 @@ const trackChanged = (track) => {
   // If a matching track is found, retrieve the track object
   if (trackIndex!== -1) {
     const matchedTrack = tracklist.value[trackIndex];
-    store.setCurrentTrack(matchedTrack)
+    mainStore.setCurrentTrack(matchedTrack)
   } else {
     console.warn("No matching track found.");
   }
@@ -138,7 +140,7 @@ const trackChanged = (track) => {
 
 const togglePlayback = () => {
   audioService.togglePlayPause()
-  store.setIsPlaying(store.isPlaying =! store.isPlaying)
+  mainStore.setIsPlaying(mainStore.isPlaying =! mainStore.isPlaying)
 }
 
 const skipForward = () => {
@@ -168,7 +170,7 @@ const skipBackward = () => {
 
 const dismiss = async () => {
   await modalController.dismiss()
-  store.setShowMiniPlayer(true)
+  mainStore.setShowMiniPlayer(true)
 }
 onUnmounted(() => {
   audioService.removeEventListener('progressUpdate')

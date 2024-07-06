@@ -1,6 +1,6 @@
 <template>
   <ion-list class="tracks" lines="none">
-    <TrackComponent v-for="track in tracks" :key="track.id" :track="track" :tracks="tracks"/>
+    <TrackComponent v-for="track in props.tracks" :key="track.id" :track="track" :tracklist="props.tracks"/>
   </ion-list>
 </template>
 <script setup>
@@ -9,5 +9,5 @@ import {
 } from '@ionic/vue'
 import TrackComponent from '@/components/tracks/TrackComponent.vue'
 
-const { tracks } = defineProps(['tracks'])
+const props = defineProps({tracks: Array})
 </script>

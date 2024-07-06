@@ -35,13 +35,18 @@ import TrackOptions from '@/components/tracks/TrackOptions.vue'
 import Playing from '@/components/tracks/PlayingAnim.vue'
 import { musicalNote } from 'ionicons/icons'
 
-import { onMounted, nextTick, ref, computed, watchEffect } from 'vue';
-import { useMainStore } from '@/stores'
+import { onMounted, nextTick, ref, toRefs, computed, watchEffect } from 'vue';
+import { useMainStore } from '@/stores/main'
 import { formatDuration } from '@/utils/helpers'
 
-const store = useMainStore()
-const { show, tracks, track } = defineProps(['track', 'show', 'tracks'])
-const currentTrack = computed(() => store.currentTrack)
+const mainStore = useMainStore()
+const props = defineProps({
+  track: Object,
+  show: Boolean,
+  tracklist: Array
+})
+const { track, show, tracklist } = toRefs(props)
+const currentTrack = computed(() => mainStore.currentTrack)
 const tracksMatch = ref(false)
 const isLoading = ref(true)
 const sliding = ref(null)
@@ -58,15 +63,16 @@ onMounted(async () => {
 })
 
 watchEffect(() => {
-  tracksMatch.value = currentTrack.value.id === track.id
+  tracksMatch.value = currentTrack.value.id === props.track.id
 })
 
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
-  store.setTracks(tracks)
+  mainStore.setTracks(tracklist.value)
+
   // set the selected track clicked
-  store.setCurrentTrack(track)
-  store.setComingFrom('other')
+  mainStore.setCurrentTrack(track)
+  mainStore.setComingFrom(show.value ? 'show' : 'other')
 
   const modal = await modalController.create({
     component: Player,

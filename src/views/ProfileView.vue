@@ -51,12 +51,14 @@ import UserAuth from '@/components/user/UserAuth.vue'
 import Avatar from '@/components/user/AvatarComponent.vue'
 
 import { useRouter } from 'vue-router'
-import { useMainStore } from '@/stores'
+import { useMainStore } from '@/stores/main'
+import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
-import { supabase } from '@/utils/database'
+import { supabase, getProfile } from '@/utils/database'
 
 const isLoading = ref(true)
-const store = useMainStore()
+const mainStore = useMainStore()
+const store = useUserStore()
 const router = useRouter()
 const profile = ref({
   username: '',
@@ -68,15 +70,23 @@ const isUser = ref(false)
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     const user = await store.user
-    getProfile(user)
+    profile.value = await store.profile
+
+    if (!profile.value || !profile.value.username) {
+      const p = await getProfile(user)
+      profile.value = {
+        username: p.username,
+        avatar_url: p.avatar_url
+      }
+      store.setProfile(profile.value)
+    }
     if (user) {
       isUser.value = true
     }
-    if (profile.value.avatar_url) {}
   } catch (error) {
     console.error('failed to load profile', error)
   } finally {
@@ -84,36 +94,7 @@ onIonViewWillEnter(async () => {
   }
 })
 
-async function getProfile(user) {
-  isLoading.value = true
-  try {
-    const { data, error, status } = await supabase
-      .from('profiles')
-      .select(`username, avatar_url`)
-      .eq('id', user.id)
-      .single()
-
-    if (error && status !== 406) throw error
-
-    if (data) {
-      profile.value = {
-        username: data.username,
-        avatar_url: data.avatar_url,
-      }
-    }
-  } catch (error) {
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const newAvatar = (fileName) => {
-  profile.value.avatar_url = fileName
-}
-
 const updateProfile = async () => {
-  isLoading.value = true
   try {
     const user = store.user
     const updates = {
@@ -135,9 +116,11 @@ const updateProfile = async () => {
     store.setProfile(updates)
   } catch (error) {
     console.error(error.message);
-  } finally {
-    isLoading.value = false
   }
+}
+
+const newAvatar = (fileName) => {
+  profile.value.avatar_url = fileName
 }
 
 const handleLogout = async () => {

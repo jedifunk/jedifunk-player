@@ -18,10 +18,13 @@ import { IonContent, IonList, IonItem, IonIcon, IonLabel, modalController } from
 import CreateObjectsModal from '@/components/options/CreateObjectsModal.vue'
 
 import { onMounted, ref } from 'vue'
-import { useMainStore } from '@/stores'
+import { useMainStore } from '@/stores/main'
+import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 
-const store = useMainStore()
+
+const store = useUserStore()
+const mainStore = useMainStore()
 const router = useRouter()
 const isLoading = ref(true)
 const { objectId, objectType } = defineProps(['objectId', 'objectType'])
@@ -30,7 +33,7 @@ const object = ref(null)
 onMounted(async () => {
   isLoading.value = true
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     switch(objectType) {

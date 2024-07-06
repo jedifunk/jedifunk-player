@@ -38,12 +38,13 @@ import Tracklist from '@/components/tracks/TrackList.vue'
 import { ellipsisHorizontalOutline } from 'ionicons/icons'
 
 import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useMainStore } from '@/stores/index'
+import { useRoute } from 'vue-router'
+import { useMainStore } from '@/stores/main'
+import { useUserStore } from '@/stores/user'
 
-const store = useMainStore()
+const mainStore = useMainStore()
+const userStore = useUserStore()
 const route = useRoute()
-const router = useRouter()
 const isLoading = ref(true)
 const tracks = ref([])
 const title = ref('')
@@ -55,11 +56,11 @@ onIonViewWillEnter(async () => {
   isLoading.value = true;
   target.value = route.params.pathname
   try {
-    while(!store.appReady) {
+    while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
-    playlists.value = await store.playlists
-    // Search through the playlists in the store state
+    playlists.value = await userStore.playlists
+    // Search through the playlists in the userStore state
     const playlist = playlists.value.find(playlist => playlist.pathname === target.value);
     if (playlist) {
       title.value = playlist.name
@@ -74,7 +75,7 @@ onIonViewWillEnter(async () => {
   }
 })
 
-watch(() => store.playlists, (newPlaylists) => {
+watch(() => userStore.playlists, (newPlaylists) => {
   playlists.value = newPlaylists
   const playlist = playlists.value.find(playlist => playlist.pathname === target.value);
   if (playlist) {
@@ -100,11 +101,6 @@ const openOptions = async () => {
   })
 
   await optionsModal.present()
-}
-
-const deletePlaylist = async (playlistId) => {
-  await store.deletePlaylistById(playlistId)
-  router.push({name: 'Playlists'})
 }
 
 onIonViewWillLeave(() => {
