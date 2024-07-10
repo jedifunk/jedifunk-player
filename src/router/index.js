@@ -11,12 +11,12 @@ const routes = [
   {
     path: '/',
     component: Tab,
+    meta: {requiresAuth: true},
     children: [
       {
         path: '',
         name: 'Shows',
         component: () => import('@/views/AllShows.vue'),
-        meta: {requiresAuth: true}
       },
       {
         path: 'playlists',
@@ -68,10 +68,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const store = useUserStore()
+  const userStore = useUserStore()
   let user = null
   try {
-    user = store.user
+    user = userStore.user
   } catch (err) {
     console.error(err)
   }

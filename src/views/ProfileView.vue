@@ -3,9 +3,6 @@
     <ion-header class="ion-no-border" :translucent="true">
       <ion-toolbar>
         <ion-title>Profile</ion-title>
-        <ion-buttons slot="end">
-          <ion-button fill="solid" size="small" @click="handleLogout">Logout</ion-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding" :fullscreen="true">
@@ -27,6 +24,7 @@
             </ion-list>
             <ion-button class="ion-margin-top" expand="block" type="submit">Update Profile</ion-button>
           </form>
+          <ion-button class="ion-margin-top" color="danger" expand="block" @click="handleLogout">Logout</ion-button>
         </div>
       </div>
     </ion-content>
@@ -41,7 +39,6 @@ import {
   IonList,
   IonItem,
   IonInput,
-  IonButtons,
   IonButton,
   IonContent,
   onIonViewWillEnter
@@ -58,7 +55,7 @@ import { supabase, getProfile } from '@/utils/database'
 
 const isLoading = ref(true)
 const mainStore = useMainStore()
-const store = useUserStore()
+const userStore = useUserStore()
 const router = useRouter()
 const profile = ref({
   username: '',
@@ -73,8 +70,8 @@ onIonViewWillEnter(async () => {
     while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
-    const user = await store.user
-    profile.value = await store.profile
+    const user = await userStore.user
+    profile.value = await userStore.profile
 
     if (!profile.value || !profile.value.username) {
       const p = await getProfile(user)
@@ -82,7 +79,7 @@ onIonViewWillEnter(async () => {
         username: p.username,
         avatar_url: p.avatar_url
       }
-      store.setProfile(profile.value)
+      userStore.setProfile(profile.value)
     }
     if (user) {
       isUser.value = true
@@ -96,7 +93,7 @@ onIonViewWillEnter(async () => {
 
 const updateProfile = async () => {
   try {
-    const user = store.user
+    const user = userStore.user
     const updates = {
       id: user.id,
       ...profile.value,
@@ -113,7 +110,7 @@ const updateProfile = async () => {
 
     if (error) throw error;
 
-    store.setProfile(updates)
+    userStore.setProfile(updates)
   } catch (error) {
     console.error(error.message);
   }

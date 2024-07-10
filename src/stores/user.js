@@ -149,7 +149,7 @@ export const useUserStore = defineStore('user', {
         await sb.removeTrackFromLikes(track.id, this.user.id)
       }
 
-      const updatedLikes = await sb.getUserLikes(this.user.id)
+      let updatedLikes = await sb.getUserLikes(this.user.id)
       if (updatedLikes === null) {
         const {data} = await sb.supabase.from('likes').select('*').eq('user_id', this.user.id);
         updatedLikes = data
@@ -199,7 +199,7 @@ export const useUserStore = defineStore('user', {
         }
   
         // Update the tag in the store
-        const updatedTagsFromDB = await sb.getUserTagsWithTracks(this.user.id)
+        let updatedTagsFromDB = await sb.getUserTagsWithTracks(this.user.id)
         if (updatedTagsFromDB === null) {
           const {data} = await sb.supabase.from('tags').select('*').eq('user_id', this.user.id);
           updatedTagsFromDB = data
