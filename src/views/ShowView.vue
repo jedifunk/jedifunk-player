@@ -60,9 +60,9 @@ onMounted(async () => {
     const singleShow = await getSingleShow(route.params.dateParam)
     showsStore.setDateParam(route.params.dateParam)
     showsStore.setYearParam(route.params.yearParam)
-    showsStore.setSingleShow(singleShow.data)
+    showsStore.setSingleShow(singleShow)
   } catch (error) {
-    console.error('failed to set single show:', error)
+    console.error('failed to set single show:', error.message)
   } finally {
     isLoading.value = false
   }

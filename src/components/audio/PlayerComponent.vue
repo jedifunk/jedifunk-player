@@ -97,7 +97,7 @@ onMounted(async () => {
   let currentTrackNormalizedMp3 = ''
 
   if (comingFrom.value !== 'miniplayer') {
-    const tUrls = tracklist.value.map(track => track.mp3)
+    const tUrls = tracklist.value.map(track => track.mp3_url)
 
     audioService.setTracks(tUrls)
     audioService.initPlayer()

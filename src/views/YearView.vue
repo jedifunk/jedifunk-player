@@ -12,7 +12,7 @@
     <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
       <ion-list v-else lines="none">
-        <ion-item v-for="show in store.shows.slice().reverse()" :key="show.id" :button="true" @click="selectedDate(show.date)">
+        <ion-item v-for="show in store.shows" :key="show.id" :button="true" @click="selectedDate(show.date)">
           <div class="show-wrapper">
             <div class="show-art">
               <div>
@@ -65,9 +65,9 @@ onMounted(async () => {
   try {
     yearP.value = route.params.yearParam ? route.params.yearParam : store.yearParam
     const shows = await getShows(yearP.value);
-    store.setShows(shows.data)
+    store.setShows(shows.shows)
   } catch (error) {
-    console.error('failed to set shows:', error)
+    console.error('failed to set shows:', error.message)
   } finally {
     isLoading.value = false;
   }

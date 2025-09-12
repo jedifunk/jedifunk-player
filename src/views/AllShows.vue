@@ -8,10 +8,10 @@
     <ion-content :fullscreen="true">
       <Loader v-if="isLoading" />
       <ion-list v-else lines="none">
-        <ion-item v-for="year in store.years.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.date)">
+        <ion-item v-for="year in store.years.slice().reverse()" :key="year.date" :button="true" @click="selectedYear(year.period)">
           <ion-label>
-            <h1>{{  year.date }}</h1>
-            <p>{{ year.show_count }} Shows</p>
+            <h1>{{  year.period }}</h1>
+            <p>{{ year.shows_count }} Shows</p>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -41,22 +41,36 @@ const store = useShowsStore()
 const isLoading = ref(true)
 const router = useRouter()
 
+// onMounted(async () => {
+//   isLoading.value = true
+//   try {
+//     const fetchedData = await getYears();
+//     console.log(fetchedData)
+//     if (fetchedData.success) {
+//       const yearsData = fetchedData.data
+//       store.setYears('all shows', yearsData)
+//       console.log('years', store.years)
+//     } else {
+//       console.error("Fetching years failed or returned unexpected data", fetchedData);
+//     }
+//   } catch (error) {
+//     console.error('failed to fetch and set years')
+//   } finally {
+//     isLoading.value = false
+//   }
+// })
 onMounted(async () => {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const fetchedData = await getYears();
-    if (fetchedData.success) {
-      const yearsData = fetchedData.data
-      store.setYears(yearsData)
-    } else {
-      console.error("Fetching years failed or returned unexpected data");
-    }
+    const years = await getYears();
+    store.setYears(years);
   } catch (error) {
-    console.error('failed to fetch and set years:', error)
+    console.error('failed to fetch and set years:', error.message);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
+
 
 function selectedYear(year) {
   store.setYearParam(year)

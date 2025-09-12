@@ -69,7 +69,7 @@ watchEffect(() => {
 const openPlayer = async (track) => {
   // set tracks for use in player tracklist
   mainStore.setTracks(tracklist.value)
-
+console.log(mainStore.tracks)
   // set the selected track clicked
   mainStore.setCurrentTrack(track)
   mainStore.setComingFrom(show.value ? 'show' : 'other')
