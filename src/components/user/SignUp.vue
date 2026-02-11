@@ -1,11 +1,10 @@
-<template>
+<!-- <template>
   <form class="" @submit.prevent="signUpNewUser">
     <div class="ion-padding">
       <h4>Let the force flow through you</h4>
       <div>
         <ion-input type="email" placeholder="Your email" v-model="email" />
         <ion-input type="password" placeholder="Password" v-model="password">
-          <!-- <ion-password-toggle slot="end"></ion-password-toggle> -->
         </ion-input>
       </div>
       <div>
@@ -31,4 +30,43 @@ async function signUpNewUser() {
 }
 
 
+</script> -->
+<template>
+  <form class="" @submit.prevent="signUpNewUser">
+    <div class="ion-padding">
+      <h4>Let the force flow through you</h4>
+      <div>
+        <ion-input type="email" placeholder="Your email" v-model="email" />
+        <ion-input type="password" placeholder="Password" v-model="password" />
+      </div>
+      <div>
+        <ion-button expand="block" type="submit" :disabled="isSigningUp">
+          {{ isSigningUp ? 'Processing...' : 'Rock the Galaxy' }}
+        </ion-button>
+      </div>
+    </div>
+  </form>
+</template>
+
+<script setup>
+import { IonButton, IonInput, modalController } from '@ionic/vue'
+import { supabase } from '@/utils/database'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const email = ref('')
+const password = ref('')
+const isSigningUp = ref(false)
+
+async function signUpNewUser() {
+  const { data, error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value
+  })
+  if (!error && data?.user) {
+    await modalController.dismiss()
+    router.replace('/')
+  }
+}
 </script>

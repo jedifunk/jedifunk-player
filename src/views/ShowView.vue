@@ -65,6 +65,7 @@ onMounted(async () => {
     console.error('failed to set single show:', error.message)
   } finally {
     isLoading.value = false
+    console.log(showsStore.singleShow.tracks)
   }
 })
 

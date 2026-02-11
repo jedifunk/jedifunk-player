@@ -1,9 +1,188 @@
+// import { createClient } from '@supabase/supabase-js'
+
+// const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+// const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+// export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// export async function getProfile(user) {
+//   try {
+//     const { data, error, status } = await supabase
+//       .from('profiles')
+//       .select(`username, avatar_url`)
+//       .eq('id', user.id)
+//       .single()
+
+//     if (error && status !== 406) throw error
+
+//     let profile
+//     if (data) {
+//       profile = {
+//         username: data.username,
+//         avatar_url: data.avatar_url,
+//       }
+//     }
+
+//     return profile
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
+
+// export async function tagTrack(duration, id, mp3, showDate, title, tagId, userId, venueLocation, venueName) {
+//   try {
+//     const { data, error } = await supabase.rpc('tag_the_track', {
+//       p_duration: duration, // Adjusted to match the expected parameter name
+//       p_id: id, // Adjusted to match the expected parameter name
+//       p_mp3: mp3, // Adjusted to match the expected parameter name
+//       p_show_date: showDate, // Adjusted to match the expected parameter name
+//       p_title: title, // Adjusted to match the expected parameter name
+//       p_tag_id: tagId,
+//       p_user_id: userId, // Adjusted to match the expected parameter name
+//       p_venue_location: venueLocation, // Adjusted to match the expected parameter name
+//       p_venue_name: venueName // Adjusted to match the expected parameter name
+//     })
+//   } catch (error) {
+//     console.error("Failed to tag track:", error.message);
+//   }
+// }
+
+// export async function untagTrack(tagId, trackId) {
+//   try {
+//     const { data, error } = await supabase.rpc('untag_the_track', {
+//       p_tag_id: tagId,
+//       p_track_id: trackId
+//     })
+//   } catch (error) {
+//     console.error('Error removing track from tag:', error.message);
+//   }
+// }
+
+// export async function getUserTagsWithTracks(userId) {
+//   try {
+//     const { data, error } = await supabase
+//     .rpc('get_user_tags', { v_user_id: userId })
+//     .select('*')
+
+//     if (error) {
+//       console.error('Failed to get user tags with tracks:', error.message);
+//       return [];
+//     }
+
+//     return data;
+//   } catch (error) {
+//     console.error('Failed to get user tags with tracks:', error);
+//     return [];
+//   }
+// }
+
+// export async function getUserPlaylistsWithTracks(userId) {
+//   try {
+//     const { data, error } = await supabase
+//     .rpc('get_user_playlists', {v_user_id: userId})
+//     .select('*');
+
+//     if (error) {
+//       console.error('Failed to get user playlists with tracks:', error.message);
+//       return [];
+//     }
+
+//     return data;
+//   } catch (error) {
+//     console.error('Failed to get user playlists with tracks:', error);
+//     return [];
+//   }
+// }
+
+// export async function addTrackToPlaylist(duration, id, mp3, showDate, title, playlistId, userId, venueLocation, venueName) {
+//   try {
+//     const { data, error } = await supabase.rpc('track_to_playlist', {
+//       p_duration: duration, // Adjusted to match the expected parameter name
+//       p_id: id, // Adjusted to match the expected parameter name
+//       p_mp3: mp3, // Adjusted to match the expected parameter name
+//       p_show_date: showDate, // Adjusted to match the expected parameter name
+//       p_title: title, // Adjusted to match the expected parameter name
+//       p_playlist_id: playlistId,
+//       p_user_id: userId, // Adjusted to match the expected parameter name
+//       p_venue_location: venueLocation, // Adjusted to match the expected parameter name
+//       p_venue_name: venueName // Adjusted to match the expected parameter name
+//     })
+//   } catch (error) {
+//     console.error("Failed to add track to playlist:", error.message);
+//   }
+// }
+
+// export async function removeTrackFromPlaylist(playlistId, trackId) {
+//   try {
+//     const { data, error } = await supabase.rpc('remove_track_from_playlist', {
+//       p_playlist_id: playlistId,
+//       p_track_id: trackId
+//     })
+//   } catch (error) {
+//     console.error('Error removing track from playlist:', error.message);
+//   }
+// }
+
+// export async function getUserLikes(userId) {
+//   try {
+//     const { data, error } = await supabase
+//       .from('likes')
+//       .select('*, tracks (*)')
+//       .eq('user_id', userId)
+
+//       if (error) {
+//         console.error('Error fetching likes:', error);
+//       }
+
+//     return data
+//   } catch (error) {
+//     console.error('failed to get likes', error)
+//   }
+// }
+
+// export async function addTrackToLikes(duration, id, mp3, showDate, title, userId, venueLocation, venueName) {
+//   try {
+//     const { data, error } = await supabase.rpc('track_to_likes', {
+//       p_id: id,
+//       p_title: title,
+//       p_show_date: showDate,
+//       p_venue_location: venueLocation,
+//       p_venue_name: venueName,
+//       p_mp3: mp3,
+//       p_duration: duration,
+//       p_user_id: userId,
+//     })
+
+//       if (error) {
+//         console.error('Error adding to likes:', error);
+//       }
+//   } catch (error) {
+//     console.error('failed to add track to likes', error)
+//   }
+// }
+
+// export async function removeTrackFromLikes(trackId, userId) {
+//   try {
+//     const { data, error } = await supabase
+//       .from('likes')
+//       .delete()
+//       .match({ track_id: trackId, user_id: userId });
+
+//       if (error) {
+//         console.error('Error removing from likes:', error);
+//       }
+//   } catch (error) {
+//     console.error('failed to remove track from likes', error)
+//   }
+// }
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+/**
+ * PROFILES
+ */
 export async function getProfile(user) {
   try {
     const { data, error, status } = await supabase
@@ -13,33 +192,29 @@ export async function getProfile(user) {
       .single()
 
     if (error && status !== 406) throw error
-
-    let profile
-    if (data) {
-      profile = {
-        username: data.username,
-        avatar_url: data.avatar_url,
-      }
-    }
-
-    return profile
+    return data
   } catch (error) {
-    console.error(error)
+    console.error('Error fetching profile:', error)
   }
 }
 
-export async function tagTrack(duration, id, mp3, showDate, title, tagId, userId, venueLocation, venueName) {
+/**
+ * TAGS
+ */
+export async function tagTrack(track, tagId, userId) {
   try {
-    const { data, error } = await supabase.rpc('tag_the_track', {
-      p_duration: duration, // Adjusted to match the expected parameter name
-      p_id: id, // Adjusted to match the expected parameter name
-      p_mp3: mp3, // Adjusted to match the expected parameter name
-      p_show_date: showDate, // Adjusted to match the expected parameter name
-      p_title: title, // Adjusted to match the expected parameter name
+    await supabase.rpc('tag_the_track', {
+      p_id: track.id.toString(),
+      p_title: track.title,
+      p_duration: track.duration,
+      p_mp3_url: track.mp3_url,
+      p_show_date: track.show_date,
+      p_venue_name: track.venue_name,
+      p_venue_location: track.venue_location,
+      p_track_slug: track.slug,
+      p_show_id: track.show_id,
       p_tag_id: tagId,
-      p_user_id: userId, // Adjusted to match the expected parameter name
-      p_venue_location: venueLocation, // Adjusted to match the expected parameter name
-      p_venue_name: venueName // Adjusted to match the expected parameter name
+      p_user_id: userId
     })
   } catch (error) {
     console.error("Failed to tag track:", error.message);
@@ -48,9 +223,9 @@ export async function tagTrack(duration, id, mp3, showDate, title, tagId, userId
 
 export async function untagTrack(tagId, trackId) {
   try {
-    const { data, error } = await supabase.rpc('untag_the_track', {
+    await supabase.rpc('untag_the_track', {
       p_tag_id: tagId,
-      p_track_id: trackId
+      p_track_id: trackId.toString()
     })
   } catch (error) {
     console.error('Error removing track from tag:', error.message);
@@ -59,52 +234,32 @@ export async function untagTrack(tagId, trackId) {
 
 export async function getUserTagsWithTracks(userId) {
   try {
-    const { data, error } = await supabase
-    .rpc('get_user_tags', { v_user_id: userId })
-    .select('*')
-
-    if (error) {
-      console.error('Failed to get user tags with tracks:', error.message);
-      return [];
-    }
-
-    return data;
+    const { data, error } = await supabase.rpc('get_user_tags', { v_user_id: userId })
+    if (error) throw error
+    return data || []
   } catch (error) {
-    console.error('Failed to get user tags with tracks:', error);
+    console.error('Failed to get user tags:', error);
     return [];
   }
 }
 
-export async function getUserPlaylistsWithTracks(userId) {
+/**
+ * PLAYLISTS
+ */
+export async function addTrackToPlaylist(track, playlistId, userId) {
   try {
-    const { data, error } = await supabase
-    .rpc('get_user_playlists', {v_user_id: userId})
-    .select('*');
-
-    if (error) {
-      console.error('Failed to get user playlists with tracks:', error.message);
-      return [];
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Failed to get user playlists with tracks:', error);
-    return [];
-  }
-}
-
-export async function addTrackToPlaylist(duration, id, mp3, showDate, title, playlistId, userId, venueLocation, venueName) {
-  try {
-    const { data, error } = await supabase.rpc('track_to_playlist', {
-      p_duration: duration, // Adjusted to match the expected parameter name
-      p_id: id, // Adjusted to match the expected parameter name
-      p_mp3: mp3, // Adjusted to match the expected parameter name
-      p_show_date: showDate, // Adjusted to match the expected parameter name
-      p_title: title, // Adjusted to match the expected parameter name
+    await supabase.rpc('track_to_playlist', {
+      p_id: track.id.toString(),
+      p_title: track.title,
+      p_duration: track.duration,
+      p_mp3_url: track.mp3_url,
+      p_show_date: track.show_date,
+      p_venue_name: track.venue_name,
+      p_venue_location: track.venue_location,
+      p_track_slug: track.slug,
+      p_show_id: track.show_id,
       p_playlist_id: playlistId,
-      p_user_id: userId, // Adjusted to match the expected parameter name
-      p_venue_location: venueLocation, // Adjusted to match the expected parameter name
-      p_venue_name: venueName // Adjusted to match the expected parameter name
+      p_user_id: userId
     })
   } catch (error) {
     console.error("Failed to add track to playlist:", error.message);
@@ -113,15 +268,29 @@ export async function addTrackToPlaylist(duration, id, mp3, showDate, title, pla
 
 export async function removeTrackFromPlaylist(playlistId, trackId) {
   try {
-    const { data, error } = await supabase.rpc('remove_track_from_playlist', {
+    await supabase.rpc('remove_track_from_playlist', {
       p_playlist_id: playlistId,
-      p_track_id: trackId
+      p_track_id: trackId.toString()
     })
   } catch (error) {
     console.error('Error removing track from playlist:', error.message);
   }
 }
 
+export async function getUserPlaylistsWithTracks(userId) {
+  try {
+    const { data, error } = await supabase.rpc('get_user_playlists', { v_user_id: userId })
+    if (error) throw error
+    return data || []
+  } catch (error) {
+    console.error('Failed to get user playlists:', error);
+    return [];
+  }
+}
+
+/**
+ * LIKES
+ */
 export async function getUserLikes(userId) {
   try {
     const { data, error } = await supabase
@@ -129,48 +298,43 @@ export async function getUserLikes(userId) {
       .select('*, tracks (*)')
       .eq('user_id', userId)
 
-      if (error) {
-        console.error('Error fetching likes:', error);
-      }
-
-    return data
+    if (error) throw error
+    return data || []
   } catch (error) {
-    console.error('failed to get likes', error)
+    console.error('Error fetching likes:', error)
+    return []
   }
 }
 
-export async function addTrackToLikes(duration, id, mp3, showDate, title, userId, venueLocation, venueName) {
+export async function addTrackToLikes(track, userId) {
   try {
-    const { data, error } = await supabase.rpc('track_to_likes', {
-      p_id: id,
-      p_title: title,
-      p_show_date: showDate,
-      p_venue_location: venueLocation,
-      p_venue_name: venueName,
-      p_mp3: mp3,
-      p_duration: duration,
-      p_user_id: userId,
+    const { error } = await supabase.rpc('track_to_likes', {
+      p_id: track.id.toString(),
+      p_title: track.title,
+      p_duration: track.duration,
+      p_mp3_url: track.mp3_url,
+      p_show_date: track.show_date,
+      p_venue_name: track.venue_name,
+      p_venue_location: track.venue_location,
+      p_track_slug: track.slug,
+      p_show_id: track.show_id,
+      p_user_id: userId
     })
-
-      if (error) {
-        console.error('Error adding to likes:', error);
-      }
+    if (error) throw error
   } catch (error) {
-    console.error('failed to add track to likes', error)
+    console.error('Failed to add track to likes:', error)
   }
 }
 
 export async function removeTrackFromLikes(trackId, userId) {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('likes')
       .delete()
-      .match({ track_id: trackId, user_id: userId });
+      .match({ track_id: trackId.toString(), user_id: userId });
 
-      if (error) {
-        console.error('Error removing from likes:', error);
-      }
+    if (error) throw error
   } catch (error) {
-    console.error('failed to remove track from likes', error)
+    console.error('Failed to remove track from likes:', error)
   }
 }
