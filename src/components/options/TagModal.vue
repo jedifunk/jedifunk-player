@@ -53,37 +53,49 @@ onMounted(async () => {
   try {
     tags.value = await store.tags
     tags.value.forEach(tag => {
-      const trackInTag = tag.tracks.some(trackInTag => trackInTag !== null && trackInTag.id !== null && trackInTag.id !== undefined && trackInTag.id === Number(props.track.id));
-      selectionStatus.value[tag.id] = trackInTag
+      const trackInTag = tag.tracks && tag.tracks.some(t => 
+        t && t.id && String(t.id) === String(props.track.id)
+      );
+      selectionStatus.value[tag.id] = !!trackInTag;
     });
   } catch (error) {
     console.error('Failed to get filtered tracks:', error);
   } finally {
     isLoading.value = false;
+    console.log('tags value in modal', tags.value)
   }
 })
 
 watch(() => store.tags, (newTags) => {
-  tags.value = newTags
-}, {deep: true})
+  tags.value = newTags;
+
+  newTags.forEach(tag => {
+    const trackInTag = tag.tracks && tag.tracks.some(t => 
+      t && t.id && String(t.id) === String(props.track.id)
+    );
+    selectionStatus.value[tag.id] = !!trackInTag;
+  });
+}, { deep: true });
 
 const openCreateOrEdit = async () => {  
   const modalInstance = await modalController.create({
     component: CreateObjectsModal,
     componentProps: {
       objectType: 'tag',
-      //objectToEdit: object,
-      onClose: () => modalInstance.dismiss(),
+      onClose: () => modalInstance.dismiss(), // Fallback
     },
-    breakpoints: [0,.5],
-    initialBreakpoint:.5,
+    breakpoints: [0, .5],
+    initialBreakpoint: .5,
     canDismiss: true,
   });
+  
   await modalInstance.present();
 
-  modalInstance.onDidDismiss = ((detail, role) => {
-    console.info('Modal did dismiss', detail, role);
-  });
+  const { data, role } = await modalInstance.onDidDismiss();
+
+  if (role === 'confirm' && data && props.track) {
+    await toggleSelectTag(data.id);
+  }
 }
 
 const toggleSelectTag = async (tagId) => {

@@ -201,9 +201,9 @@ export async function getProfile(user) {
 /**
  * TAGS
  */
-export async function tagTrack(track, tagId, userId) {
+export async function tagTrack(track, tagId) {
   try {
-    await supabase.rpc('tag_the_track', {
+    const { error } = await supabase.rpc('tag_the_track', {
       p_id: track.id.toString(),
       p_title: track.title,
       p_duration: track.duration,
@@ -212,10 +212,11 @@ export async function tagTrack(track, tagId, userId) {
       p_venue_name: track.venue_name,
       p_venue_location: track.venue_location,
       p_track_slug: track.slug,
-      p_show_id: track.show_id,
-      p_tag_id: tagId,
-      p_user_id: userId
-    })
+      p_show_id: track.show_id || (track.show ? track.show.id : null),
+      p_tag_id: tagId
+    });
+
+    if (error) throw error;
   } catch (error) {
     console.error("Failed to tag track:", error.message);
   }

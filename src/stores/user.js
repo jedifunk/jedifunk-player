@@ -295,6 +295,76 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    async saveTag(tagObj) {
+      if (!this.user) return
+      try {
+        const tagData = {
+          name: tagObj.name,
+          pathname: tagObj.pathname,
+          user_id: this.user.id
+        }
+
+        if (tagObj.id) {
+          tagData.id = tagObj.id
+        }
+
+        const { data, error } = await sb.supabase
+          .from('tags')
+          .upsert(tagData, { onConflict: 'id' })
+          .select()
+          .single()
+
+        if (error) throw error
+        
+        this.tags = await sb.getUserTagsWithTracks(this.user.id)
+        return data
+      } catch (e) { 
+        console.error('Error saving tag:', e) 
+      }
+    },
+
+    async savePlaylist(playlistObj) {
+      if (!this.user) return
+      try {
+        const playlistData = {
+          name: playlistObj.name,
+          pathname: playlistObj.pathname,
+          user_id: this.user.id
+        }
+
+        if (playlistObj.id) {
+          playlistData.id = playlistObj.id
+        }
+
+        const { data, error } = await sb.supabase
+          .from('playlists')
+          .upsert(playlistData, { onConflict: 'id' })
+          .select()
+          .single()
+
+        if (error) throw error
+
+        this.playlists = await sb.getUserPlaylistsWithTracks(this.user.id)
+        return data
+      } catch (e) { 
+        console.error('Error saving playlist:', e) 
+      }
+    },
+
+    async deleteTagById(tagId) {
+      try {
+        await sb.supabase.from('tags').delete().eq('id', tagId)
+        this.tags = this.tags.filter(t => t.id !== tagId)
+      } catch (e) { console.error(e) }
+    },
+
+    async deletePlaylistById(playlistId) {
+      try {
+        await sb.supabase.from('playlists').delete().eq('id', playlistId)
+        this.playlists = this.playlists.filter(p => p.id !== playlistId)
+      } catch (e) { console.error(e) }
+    },
+
     async toggleLikeStatus(track) {
       const isLiked = this.likes.some(l => l.track_id === track.id.toString())
       try {

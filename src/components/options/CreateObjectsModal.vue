@@ -21,6 +21,7 @@ import {
   IonContent,
   IonInput,
   IonButton,
+  modalController
 } from '@ionic/vue'
 
 import { ref, onMounted, watchEffect } from 'vue';
@@ -86,25 +87,49 @@ watchEffect(() => {
   }
 });
 
+// const saveObject = async () => {
+//   if (!isValidName.value ||!isObjectNameValid.value) return;
+
+//   const pathname = objectName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+//   const newObj = {
+//     name: objectName.value,
+//     pathname: pathname,
+//    ...(isEditing.value? { id: props.objectToEdit.value.id } : {})
+//   };
+
+//   if (props.objectType === 'tag') {
+//     await store.saveTag(newObj)
+//   } else {
+//     await store.savePlaylist(newObj)
+//   }
+
+//   objectName.value = ''; // Reset the object name after creation
+//   props.onClose();
+// }
 const saveObject = async () => {
-  if (!isValidName.value ||!isObjectNameValid.value) return;
+  if (!isValidName.value || !isObjectNameValid.value) return;
 
   const pathname = objectName.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   const newObj = {
     name: objectName.value,
     pathname: pathname,
-   ...(isEditing.value? { id: props.objectToEdit.value.id } : {})
+    ...(isEditing.value ? { id: props.objectToEdit.value.id } : {})
   };
 
+  let savedItem = null; // Store the result
   if (props.objectType === 'tag') {
-    await store.saveTag(newObj)
+    savedItem = await store.saveTag(newObj); // Ensure your store returns the new tag
   } else {
-    await store.savePlaylist(newObj)
+    savedItem = await store.savePlaylist(newObj);
   }
 
-  objectName.value = ''; // Reset the object name after creation
-  props.onClose();
+  objectName.value = ''; 
+  
+  // Pass the savedItem back through modalController dismiss
+  // Note: We use modalController here directly to return data
+  modalController.dismiss(savedItem, 'confirm');
 }
 </script>
 <style scoped>
