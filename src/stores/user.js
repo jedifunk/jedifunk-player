@@ -389,15 +389,45 @@ export const useUserStore = defineStore('user', {
       } catch (e) { console.error(e) }
     },
 
+    // async toggleTrackInPlaylist(playlistId, track) {
+    //   const playlist = this.playlists.find(p => p.id === playlistId)
+    //   if (!playlist) return
+    //   const isTrackInPlaylist = playlist.tracks.some(tr => tr?.id === track.id.toString())
+    //   try {
+    //     isTrackInPlaylist ? await sb.removeTrackFromPlaylist(playlistId, track.id) : await sb.addTrackToPlaylist(track, playlistId, this.user.id)
+    //     this.playlists = await sb.getUserPlaylistsWithTracks(this.user.id)
+    //     return !isTrackInPlaylist
+    //   } catch (e) { console.error(e) }
+    // }
+
     async toggleTrackInPlaylist(playlistId, track) {
       const playlist = this.playlists.find(p => p.id === playlistId)
       if (!playlist) return
+      
       const isTrackInPlaylist = playlist.tracks.some(tr => tr?.id === track.id.toString())
+      
+      // Robust show_id finding
+      const showId = track.show_id || (track.show ? track.show.id : null);
+      
+      // Enrich the track object before sending it to the DB
+      const enrichedTrack = {
+        ...track,
+        show_id: showId
+      };
+
       try {
-        isTrackInPlaylist ? await sb.removeTrackFromPlaylist(playlistId, track.id) : await sb.addTrackToPlaylist(track, playlistId, this.user.id)
+        if (isTrackInPlaylist) {
+          await sb.removeTrackFromPlaylist(playlistId, track.id)
+        } else {
+          await sb.addTrackToPlaylist(enrichedTrack, playlistId, this.user.id)
+        }
+        
+        // Refresh local data
         this.playlists = await sb.getUserPlaylistsWithTracks(this.user.id)
         return !isTrackInPlaylist
-      } catch (e) { console.error(e) }
+      } catch (e) { 
+        console.error("Playlist toggle failed:", e) 
+      }
     }
   }
 })

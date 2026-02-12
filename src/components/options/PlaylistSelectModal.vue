@@ -40,6 +40,59 @@ import { useUserStore } from '@/stores/user'
 
 import CreateObjectsModal from '@/components/options/CreateObjectsModal.vue'
 
+// const store = useUserStore()
+// const isLoading = ref(true)
+// const playlists = ref([])
+// const selectionStatus = ref({})
+// const props = defineProps({
+//   track: Object
+// })
+
+// onMounted(async () => {
+//   isLoading.value = true;
+//   try {
+//     playlists.value = await store.playlists
+//     playlists.value.forEach(playlist => {
+//       const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id !== undefined && trackInPlaylist.id === Number(props.track.id))
+//       selectionStatus.value[playlist.id] = trackInPlaylist
+//     });
+//   } catch (error) {
+//     console.error('Failed to get filtered tracks:', error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// })
+
+// watch(() => store.playlists, (newPlaylists) => {
+//   playlists.value = newPlaylists
+// }, {deep: true})
+
+// const openCreateOrEdit = async () => {  
+//   const modalInstance = await modalController.create({
+//     component: CreateObjectsModal,
+//     componentProps: {
+//       objectType: 'playlist',
+//       onClose: () => modalInstance.dismiss(),
+//     },
+//     breakpoints: [0,.5],
+//     initialBreakpoint:.5,
+//     canDismiss: true,
+//   });
+//   await modalInstance.present();
+
+//   modalInstance.onDidDismiss = ((detail, role) => {
+//     console.info('Modal did dismiss', detail, role);
+//   });
+// }
+
+// const toggleSelectPlaylist = async (playlistId) => {
+//   const trackAddedOrRemoved = await store.toggleTrackInPlaylist(playlistId, props.track)
+//   selectionStatus.value[playlistId] = trackAddedOrRemoved
+// };
+
+// const dismiss = async () => {
+//   await modalController.dismiss()
+// }
 const store = useUserStore()
 const isLoading = ref(true)
 const playlists = ref([])
@@ -48,41 +101,56 @@ const props = defineProps({
   track: Object
 })
 
+// Helper function to sync the checkboxes
+const syncSelectionStatus = (playlistArray) => {
+  playlistArray.forEach(playlist => {
+    // Standardizing comparison to String to avoid Type errors (881 vs "881")
+    const trackInPlaylist = playlist.tracks && playlist.tracks.some(t => 
+      t && t.id && String(t.id) === String(props.track.id)
+    );
+    selectionStatus.value[playlist.id] = !!trackInPlaylist;
+  });
+}
+
 onMounted(async () => {
   isLoading.value = true;
   try {
-    playlists.value = await store.playlists
-    playlists.value.forEach(playlist => {
-      const trackInPlaylist = playlist.tracks.some(trackInPlaylist => trackInPlaylist !== null && trackInPlaylist.id !== null && trackInPlaylist.id !== undefined && trackInPlaylist.id === Number(props.track.id))
-      selectionStatus.value[playlist.id] = trackInPlaylist
-    });
+    playlists.value = store.playlists // Use store state directly
+    syncSelectionStatus(playlists.value);
   } catch (error) {
-    console.error('Failed to get filtered tracks:', error);
+    console.error('Failed to initialize playlists:', error);
   } finally {
     isLoading.value = false;
   }
 })
 
+// Update the watcher to re-sync checkboxes when store changes
 watch(() => store.playlists, (newPlaylists) => {
   playlists.value = newPlaylists
-}, {deep: true})
+  syncSelectionStatus(newPlaylists)
+}, { deep: true })
 
 const openCreateOrEdit = async () => {  
   const modalInstance = await modalController.create({
     component: CreateObjectsModal,
     componentProps: {
       objectType: 'playlist',
-      onClose: () => modalInstance.dismiss(),
+      // No need for onClose here if saveObject uses modalController.dismiss
     },
-    breakpoints: [0,.5],
-    initialBreakpoint:.5,
+    breakpoints: [0, .5],
+    initialBreakpoint: .5,
     canDismiss: true,
   });
+  
   await modalInstance.present();
 
-  modalInstance.onDidDismiss = ((detail, role) => {
-    console.info('Modal did dismiss', detail, role);
-  });
+  // Handle the "Auto-Select" for the newly created playlist
+  const { data, role } = await modalInstance.onDidDismiss();
+
+  if (role === 'confirm' && data && props.track) {
+    // data is the new playlist object returned from store.savePlaylist
+    await toggleSelectPlaylist(data.id);
+  }
 }
 
 const toggleSelectPlaylist = async (playlistId) => {
