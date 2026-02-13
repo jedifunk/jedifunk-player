@@ -366,16 +366,26 @@ export const useUserStore = defineStore('user', {
     },
 
     async toggleLikeStatus(track) {
-      const isLiked = this.likes.some(l => l.track_id === track.id.toString())
+      if (!this.user) return;
+      
+      const isLiked = this.likes.some(l => String(l.track_id) === String(track.id));
+      
+      const showId = track.show_id || (track.show ? track.show.id : null);
+      const enrichedTrack = { ...track, show_id: showId };
+
       try {
         if (!isLiked) {
-          await sb.addTrackToLikes(track, this.user.id)
+          await sb.addTrackToLikes(enrichedTrack, this.user.id);
         } else {
-          await sb.removeTrackFromLikes(track.id, this.user.id)
+          await sb.removeTrackFromLikes(track.id, this.user.id);
         }
-        this.likes = await sb.getUserLikes(this.user.id)
-        return !isLiked
-      } catch (e) { console.error(e) }
+
+        this.likes = await sb.getUserLikes(this.user.id);
+        
+        return !isLiked;
+      } catch (e) { 
+        console.error('Error toggling like:', e); 
+      }
     },
 
     async toggleTagged(tagId, track) {
@@ -389,27 +399,14 @@ export const useUserStore = defineStore('user', {
       } catch (e) { console.error(e) }
     },
 
-    // async toggleTrackInPlaylist(playlistId, track) {
-    //   const playlist = this.playlists.find(p => p.id === playlistId)
-    //   if (!playlist) return
-    //   const isTrackInPlaylist = playlist.tracks.some(tr => tr?.id === track.id.toString())
-    //   try {
-    //     isTrackInPlaylist ? await sb.removeTrackFromPlaylist(playlistId, track.id) : await sb.addTrackToPlaylist(track, playlistId, this.user.id)
-    //     this.playlists = await sb.getUserPlaylistsWithTracks(this.user.id)
-    //     return !isTrackInPlaylist
-    //   } catch (e) { console.error(e) }
-    // }
-
     async toggleTrackInPlaylist(playlistId, track) {
       const playlist = this.playlists.find(p => p.id === playlistId)
       if (!playlist) return
       
       const isTrackInPlaylist = playlist.tracks.some(tr => tr?.id === track.id.toString())
-      
-      // Robust show_id finding
+
       const showId = track.show_id || (track.show ? track.show.id : null);
-      
-      // Enrich the track object before sending it to the DB
+
       const enrichedTrack = {
         ...track,
         show_id: showId
@@ -421,8 +418,7 @@ export const useUserStore = defineStore('user', {
         } else {
           await sb.addTrackToPlaylist(enrichedTrack, playlistId, this.user.id)
         }
-        
-        // Refresh local data
+
         this.playlists = await sb.getUserPlaylistsWithTracks(this.user.id)
         return !isTrackInPlaylist
       } catch (e) { 

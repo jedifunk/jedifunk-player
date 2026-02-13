@@ -33,14 +33,21 @@ const store = useUserStore()
 const isLoading = ref(true)
 const tracks = ref([])
 
+const updateTrackList = (likesData) => {
+  if (!likesData) return [];
+  return likesData
+    .filter(item => item.tracks)
+    .map(item => item.tracks)
+    .sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime());
+}
+
 onIonViewWillEnter(async () => {
   isLoading.value = true
   try {
     while(!mainStore.appReady) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
-    const list = JSON.parse(JSON.stringify(await store.likes))
-    tracks.value = list.map(item => item.tracks).sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
+    tracks.value = updateTrackList(store.likes)
   } catch (error) {
     console.error('failed to get liked tracks:', error)
   } finally {
@@ -49,9 +56,8 @@ onIonViewWillEnter(async () => {
 })
 
 watch(() => store.likes, (newLikes) => {
-  const list = JSON.parse(JSON.stringify(newLikes))
-  tracks.value = list.map(item => item.tracks).sort((a, b) => new Date(b.show_date).getTime() - new Date(a.show_date).getTime())
-}, {deep: true})
+  tracks.value = updateTrackList(newLikes)
+}, { deep: true })
 
 onIonViewWillLeave(() => {
   console.info('liked ion will leave')

@@ -1,6 +1,6 @@
 <template>
   <ion-item-options side="end"> 
-    <ion-item-option @click="toggleLikeStatus(track)">
+    <ion-item-option @click="handleToggleLike">
       <ion-icon slot="icon-only" :icon="isLiked ? bookmark : bookmarkOutline"></ion-icon>
     </ion-item-option>
     <ion-item-option color="secondary" @click="openTags(track)">
@@ -12,60 +12,59 @@
   </ion-item-options>
 </template>
 <script setup>
-import  {
+import {
   IonItemOptions,
   IonItemOption,
   IonIcon,
   modalController
 } from '@ionic/vue'
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { 
+  bookmarkOutline, 
+  bookmark, 
+  listOutline, 
+  pricetagsOutline 
+} from 'ionicons/icons'
+
 import TagModal from '@/components/options/TagModal.vue'
 import PlaylistSelectModal from '@/components/options/PlaylistSelectModal.vue'
-import { bookmarkOutline, bookmark, listOutline, pricetagsOutline } from 'ionicons/icons'
-
-import { useUserStore } from '@/stores/user'
-import { ref, onMounted } from 'vue'
 
 const store = useUserStore()
-const { track } = defineProps(['track'])
-const isLiked = ref(false)
-const itemOptions = ref(null)
+const props = defineProps(['track'])
 const emit = defineEmits(['closeOptions'])
 
-onMounted(async () => {
-  const liked = await store.likes
-  const trackId = track.id
-  isLiked.value = liked.some(liked => liked.track_id === trackId)
+const isLiked = computed(() => {
+  if (!props.track || !store.likes) return false
+  return store.likes.some(l => String(l.track_id) === String(props.track.id))
 })
 
-const toggleLikeStatus = async (track) => {
-  const liked = await store.toggleLikeStatus(track)
-  isLiked.value = liked
+const handleToggleLike = async () => {
+  await store.toggleLikeStatus(props.track)
   emit('closeOptions')
 }
 
-const openTags = async (track) => {
+const openTags = async () => {
   const modal = await modalController.create({ 
     component: TagModal,
     componentProps: {
-      track: track
+      track: props.track
     },
     canDismiss: true,
   })
   await modal.present()
-
   emit('closeOptions')
 }
 
-const openPlaylistSelectModal = async (track) => {
+const openPlaylistSelectModal = async () => {
   const modal = await modalController.create({ 
     component: PlaylistSelectModal,
     componentProps: {
-      track: track
+      track: props.track
     },
     canDismiss: true
   })
   await modal.present()
-
   emit('closeOptions')
 }
 </script>

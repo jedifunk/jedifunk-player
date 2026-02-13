@@ -247,25 +247,6 @@ export async function getUserTagsWithTracks(userId) {
 /**
  * PLAYLISTS
  */
-// export async function addTrackToPlaylist(track, playlistId, userId) {
-//   try {
-//     await supabase.rpc('track_to_playlist', {
-//       p_id: track.id.toString(),
-//       p_title: track.title,
-//       p_duration: track.duration,
-//       p_mp3_url: track.mp3_url,
-//       p_show_date: track.show_date,
-//       p_venue_name: track.venue_name,
-//       p_venue_location: track.venue_location,
-//       p_track_slug: track.slug,
-//       p_show_id: track.show_id,
-//       p_playlist_id: playlistId,
-//       p_user_id: userId
-//     })
-//   } catch (error) {
-//     console.error("Failed to add track to playlist:", error.message);
-//   }
-// }
 export async function addTrackToPlaylist(track, playlistId, userId) {
   try {
     const { error } = await supabase.rpc('track_to_playlist', {
@@ -338,8 +319,8 @@ export async function addTrackToLikes(track, userId) {
       p_venue_name: track.venue_name,
       p_venue_location: track.venue_location,
       p_track_slug: track.slug,
-      p_show_id: track.show_id,
-      p_user_id: userId
+      p_user_id: userId,
+      p_show_id: track.show_id || (track.show ? track.show.id : null)
     })
     if (error) throw error
   } catch (error) {
@@ -352,10 +333,13 @@ export async function removeTrackFromLikes(trackId, userId) {
     const { error } = await supabase
       .from('likes')
       .delete()
-      .match({ track_id: trackId.toString(), user_id: userId });
+      .match({ 
+        track_id: trackId.toString(), 
+        user_id: userId 
+      });
 
-    if (error) throw error
+    if (error) throw error;
   } catch (error) {
-    console.error('Failed to remove track from likes:', error)
+    console.error('Failed to remove track from likes:', error);
   }
 }
